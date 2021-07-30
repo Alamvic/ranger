@@ -1,5 +1,5 @@
 Class {
-	#name : #RAPrimitiveAutoTest2,
+	#name : #RAPrimitiveAutoTest,
 	#superclass : #VMSimpleStackBasedCogitAbstractTest,
 	#instVars : [
 		'solution',
@@ -14,7 +14,7 @@ Class {
 }
 
 { #category : #'building suites' }
-RAPrimitiveAutoTest2 class >> testParameters [
+RAPrimitiveAutoTest class >> testParameters [
 
 	| interpreter solutions matrix primitives suite interpreter32 interpreter64 |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
@@ -47,34 +47,33 @@ RAPrimitiveAutoTest2 class >> testParameters [
 ]
 
 { #category : #building }
-RAPrimitiveAutoTest2 >> allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 [ 
+RAPrimitiveAutoTest >> allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 [ 
 	
 	^ memory allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest2 >> execute [
+RAPrimitiveAutoTest >> execute [
 
 	| stopAddress |
 	stopAddress := solution isFailure
 		ifTrue: [ 
-			compilationResult = UnimplementedPrimitive
-				ifTrue: [ ^ self "Its ok, do not execute anything. This path was a failure and was not compiled" ].
+			compilationResult = UnimplementedPrimitive ifTrue: [ 
+				"Its ok, do not execute anything. This path was a failure and was not compiled"
+				^ self ].
 			endInstruction address ]
 		ifFalse: [ callerAddress ].
 	
-	self openMachineDebuggerAt: primitiveAddress.
-	
-	self runFrom: primitiveAddress "16777216" until: stopAddress
+	self runFrom: primitiveAddress until: stopAddress
 ]
 
 { #category : #accessing }
-RAPrimitiveAutoTest2 >> generator: aString [ 
+RAPrimitiveAutoTest >> generator: aString [ 
 	generator := aString
 ]
 
 { #category : #building }
-RAPrimitiveAutoTest2 >> integerObjectOfTwoComplement: twoComplement [ 
+RAPrimitiveAutoTest >> integerObjectOfTwoComplement: twoComplement [ 
 	
 	| pharoInteger |
 	pharoInteger := twoComplement integerOfTwoComplementOfBitSize: memory numSmallIntegerBits.
@@ -82,7 +81,7 @@ RAPrimitiveAutoTest2 >> integerObjectOfTwoComplement: twoComplement [
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest2 >> prepareAutoCall [
+RAPrimitiveAutoTest >> prepareAutoCall [
 
 	self
 		prepareStackForSendReceiver: (objectBuilder instantiate: solution receiver)
@@ -90,19 +89,19 @@ RAPrimitiveAutoTest2 >> prepareAutoCall [
 ]
 
 { #category : #accessing }
-RAPrimitiveAutoTest2 >> primitive: aString [ 
+RAPrimitiveAutoTest >> primitive: aString [ 
 	
 	primitive := aString
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest2 >> runCaseManaged [ 
+RAPrimitiveAutoTest >> runCaseManaged [ 
 
 	^ self runCase
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest2 >> setUp [
+RAPrimitiveAutoTest >> setUp [
 
 	super setUp.
 	solution objectBuilder: self.
@@ -114,13 +113,13 @@ RAPrimitiveAutoTest2 >> setUp [
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest2 >> solution: aSolution [
+RAPrimitiveAutoTest >> solution: aSolution [
 
 	solution := aSolution
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest2 >> testPrimitive [
+RAPrimitiveAutoTest >> testPrimitive [
 
 	primitiveAddress := self compile: [ 
 		compilationResult := cogit objectRepresentation perform: generator.
