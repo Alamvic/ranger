@@ -4,22 +4,6 @@ Class {
 	#category : #'Ranger-Constraints'
 }
 
-{ #category : #converting }
-RALessOrEqualsConstraint >> addToSolver: aSolver withVariables: variables interpreter: interpreter [
-
-	| leftOperand rightOperand |
-	leftOperand := operands first
-		               addToSolver: aSolver
-		               withVariables: variables
-		               interpreter: interpreter.
-	rightOperand := operands second
-		                addToSolver: aSolver
-		                withVariables: variables
-		                interpreter: interpreter.
-
-	aSolver addConstraint: (leftOperand cnLEQ: rightOperand)
-]
-
 { #category : #transformations }
 RALessOrEqualsConstraint >> invert [
 

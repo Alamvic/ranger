@@ -21,7 +21,7 @@ RAPrimitiveAutoTest class >> testParameters [
 	interpreter32 := (suite detect: [:e | e setUp. e wordSize = 4]) interpreter.
 	interpreter64 := (suite detect: [:e | e setUp. e wordSize = 8]) interpreter.
 	matrix := ParametrizedTestMatrix new.
-	primitives := (60 to: 64) collect: [ :i |
+	primitives := (1 to: 6) collect: [ :i |
 		{ 
 			StackInterpreter primitiveTable at: i + 1.
 			(interpreter32 cogit class primitiveTable at: i) primitiveGenerator.

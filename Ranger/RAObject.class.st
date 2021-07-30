@@ -29,12 +29,6 @@ RAObject >> = anotherVariable [
 	^ variableName = anotherVariable variableName
 ]
 
-{ #category : #solving }
-RAObject >> addToSolver: aClSimplexSolver withVariables: aCollection interpreter: aCogVMSimulatorLSB [ 
-	
-	^ self
-]
-
 { #category : #accessing }
 RAObject >> classIndex [
 

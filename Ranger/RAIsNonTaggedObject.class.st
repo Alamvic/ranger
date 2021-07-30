@@ -4,17 +4,6 @@ Class {
 	#category : #'Ranger-VMSpecificConstraints'
 }
 
-{ #category : #adding }
-RAIsNonTaggedObject >> addToSolver: aSolver withVariables: variables interpreter: interpreter [
-
-	| operand |
-	operand := operands first
-		           addToSolver: aSolver
-		           withVariables: variables
-		           interpreter: interpreter.
-	^ aSolver addConstraint: (operand typeTag equals: 0)
-]
-
 { #category : #microzinc }
 RAIsNonTaggedObject >> mzConstraintOnInterpreter: interpreter [ 
 

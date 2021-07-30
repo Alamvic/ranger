@@ -4,21 +4,6 @@ Class {
 	#category : #'Ranger-Constraints'
 }
 
-{ #category : #adding }
-RAAndConstraint >> addToSolver: aSolver withVariables: variables interpreter: interpreter [
-
-	"In Cassowary this is by default an AND, no need to push another constraint"
-
-	operands first
-		addToSolver: aSolver
-		withVariables: variables
-		interpreter: interpreter.
-	operands second
-		addToSolver: aSolver
-		withVariables: variables
-		interpreter: interpreter
-]
-
 { #category : #microzinc }
 RAAndConstraint >> mzConstraintOnInterpreter: anInterpreter [
 	

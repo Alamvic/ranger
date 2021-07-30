@@ -4,23 +4,6 @@ Class {
 	#category : #'Ranger-VMSpecificConstraints'
 }
 
-{ #category : #adding }
-RAIsImmediateObject >> addToSolver: aSolver withVariables: variables interpreter: interpreter [
-
-	| operand |
-	1halt.
-	operand := operands first
-		           addToSolver: aSolver
-		           withVariables: variables
-		           interpreter: interpreter.
-	"Use two complement"
-	aSolver addConstraint: (operand typeTag cnGEQ: 1).
-	aSolver addConstraint: (operand typeTag cnLEQ: 3).
-
-
-	aSolver addConstraint: (operand typeTag cnEqual: 1)
-]
-
 { #category : #negating }
 RAIsImmediateObject >> negated [
 	

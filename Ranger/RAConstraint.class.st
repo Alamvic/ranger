@@ -55,12 +55,6 @@ RAConstraint >> = anotherConstraint [
 	^ self operands = anotherConstraint operands
 ]
 
-{ #category : #adding }
-RAConstraint >> addToSolver: aSolver withVariables: variables interpreter: anObject [
-
-	self subclassResponsibility
-]
-
 { #category : #testing }
 RAConstraint >> isConstant [
 	
