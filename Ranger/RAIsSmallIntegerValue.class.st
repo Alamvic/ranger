@@ -13,15 +13,12 @@ RAIsSmallIntegerValue >> addToSolver: aSolver withVariables: variables interpret
 		           withVariables: variables
 		           interpreter: interpreter.
 
-	"Use two complement"
-	aSolver addConstraint:
-		(operand integerValue cnLEQ: (interpreter objectMemory minSmallInteger
-			twoComplementOfBitSize: interpreter objectMemory numSmallIntegerBits)). "max smallInteger"
-	aSolver addConstraint: (operand integerValue cnGEQ: 0). "min smallInteger"
+	aSolver addConstraint: (operand integerValue lessOrEquals: (interpreter objectMemory maxSmallInteger)).
+	aSolver addConstraint: (operand integerValue greaterOrEquals: (interpreter objectMemory minSmallInteger)).
 
 	"Do nothing, we already know it's a small integer"
-	operand typeTag = 17 ifTrue: [ ^ self ].
-	aSolver addConstraint: (operand typeTag cnEqual: 17)
+	operand typeTag = 2 ifTrue: [ ^ self ].
+	aSolver addConstraint: (operand typeTag equals: 2)
 ]
 
 { #category : #negating }

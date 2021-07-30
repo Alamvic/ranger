@@ -7,7 +7,8 @@ Class {
 		'primitiveAddress',
 		'generator',
 		'primitive',
-		'objectBuilder'
+		'objectBuilder',
+		'compilationResult'
 	],
 	#category : #Ranger
 }
@@ -25,10 +26,10 @@ RAPrimitiveAutoTest2 class >> testParameters [
 		(primitiveSubtract 	genPrimitiveSubtract) ).
 	primitives do: [ :p | | architectures |
 		architectures := {
-		{ #ISA -> #'aarch64'. #wordSize -> 8}.
-		{ #ISA -> #'IA32'. #wordSize -> 4}.
-		{ #ISA -> #'X64'. #wordSize -> 8}.
-		{ #ISA -> #'ARMv5'. #wordSize -> 4}}.
+"		{ #ISA -> #'aarch64'. #wordSize -> 8}.
+"		{ #ISA -> #'IA32'. #wordSize -> 4}.
+"		{ #ISA -> #'X64'. #wordSize -> 8}.
+"		{ #ISA -> #'ARMv5'. #wordSize -> 4}}.
 		architectures do: [ :arch |
 			interpreter := arch second value = 4
 				ifTrue: [ interpreter32 ]
@@ -42,7 +43,7 @@ RAPrimitiveAutoTest2 class >> testParameters [
 					#generator -> p second.
 					#solution -> e} ] ] ].
 	
-	^ super testParameters * matrix
+	^ matrix
 ]
 
 { #category : #building }
@@ -56,9 +57,15 @@ RAPrimitiveAutoTest2 >> execute [
 
 	| stopAddress |
 	stopAddress := solution isFailure
-		ifTrue: [ endInstruction address ]
+		ifTrue: [ 
+			compilationResult = UnimplementedPrimitive
+				ifTrue: [ ^ self "Its ok, do not execute anything. This path was a failure and was not compiled" ].
+			endInstruction address ]
 		ifFalse: [ callerAddress ].
-	self runFrom: primitiveAddress until: stopAddress
+	
+	self openMachineDebuggerAt: primitiveAddress.
+	
+	self runFrom: primitiveAddress "16777216" until: stopAddress
 ]
 
 { #category : #accessing }
@@ -89,6 +96,12 @@ RAPrimitiveAutoTest2 >> primitive: aString [
 ]
 
 { #category : #running }
+RAPrimitiveAutoTest2 >> runCaseManaged [ 
+
+	^ self runCase
+]
+
+{ #category : #running }
 RAPrimitiveAutoTest2 >> setUp [
 
 	super setUp.
@@ -110,7 +123,7 @@ RAPrimitiveAutoTest2 >> solution: aSolution [
 RAPrimitiveAutoTest2 >> testPrimitive [
 
 	primitiveAddress := self compile: [ 
-		cogit objectRepresentation perform: generator.
+		compilationResult := cogit objectRepresentation perform: generator.
 		"If the primitive fails it continues, so we need to have an instruction to detect the end"
 		endInstruction := cogit Stop ].
 	self prepareAutoCall.

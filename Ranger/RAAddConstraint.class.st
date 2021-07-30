@@ -21,7 +21,7 @@ RAAddConstraint >> addToSolver: aSolver withVariables: variables interpreter: in
 	rightValue := rightOperand integerValue.
 
 	^ (RAObject named: UUID new asString)
-		  typeTag: 17;
+		  typeTag: 2;
 		  integerValue: leftValue + rightValue;
 		  yourself "Native value"
 ]

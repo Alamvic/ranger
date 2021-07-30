@@ -12,16 +12,13 @@ RAIsLargeIntegerValue >> addToSolver: aSolver withVariables: variables interpret
 		           addToSolver: aSolver
 		           withVariables: variables
 		           interpreter: interpreter.
-
-	"Use two complement"
-	aSolver addConstraint:
-		(operand integerValue cnGEQ: (interpreter objectMemory minSmallInteger
-			twoComplementOfBitSize: interpreter objectMemory numSmallIntegerBits) + 1). "max smallInteger"
+	aSolver addConstraint: ((operand integerValue greaterThan: interpreter objectMemory maxSmallInteger)
+		or: (operand integerValue lowerThan: interpreter objectMemory minSmallInteger)).
 
 	"Do nothing, we already know it's a native integer"
-	operand typeTag = 17 ifTrue: [ ^ self ].
+	operand typeTag = 2 ifTrue: [ ^ self ].
 
-	aSolver addConstraint: (operand typeTag cnGEQ: 17) "Native integer"
+	aSolver addConstraint: (operand typeTag equals: 2) "Native integer"
 ]
 
 { #category : #negating }

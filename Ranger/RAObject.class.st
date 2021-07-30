@@ -36,8 +36,16 @@ RAObject >> addToSolver: aClSimplexSolver withVariables: aCollection interpreter
 RAObject >> initialize [
 
 	super initialize.
-	typeTag := ClVariable new name: variableName , '-type'.
-	integerValue := ClVariable new name: variableName , '-value'
+
+	typeTag := MzVariable new
+		           name: variableName , '_type';
+		           type: '0..2';
+		           yourself.
+
+	integerValue := MzVariable new
+		                name: variableName , '_value';
+		                type: 'int';
+		                yourself
 ]
 
 { #category : #accessing }

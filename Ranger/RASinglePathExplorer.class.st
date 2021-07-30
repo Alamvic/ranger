@@ -191,13 +191,15 @@ RASinglePathExplorer >> interpretIfTrueifFalseWith: aRBMessageNode [
 { #category : #'special cases' }
 RASinglePathExplorer >> interpretIntegerObjectOfWith: aRBMessageNode [ 
 	
-	| smallInteger |
+	| smallInteger receiver |
+	aRBMessageNode receiver acceptVisitor: self.
+	receiver := self popOperand.
+
 	aRBMessageNode arguments first acceptVisitor: self.
 	smallInteger := self popOperand.
 	
-	self flag: #'hardcoding number of bits!'.
 	self pushOperand: {
-		smallInteger first << 3 + 1 "64 bits" . 
+		(receiver first integerObjectOf: smallInteger first).
 		RAIntegerObjectOf operands: {smallInteger second}
 	}
 ]
@@ -205,13 +207,15 @@ RASinglePathExplorer >> interpretIntegerObjectOfWith: aRBMessageNode [
 { #category : #'special cases' }
 RASinglePathExplorer >> interpretIntegerValueOfWith: aRBMessageNode [ 
 	
-	| smallInteger |
+	| smallInteger receiver |
+	aRBMessageNode receiver acceptVisitor: self.
+	receiver := self popOperand.
+	
 	aRBMessageNode arguments first acceptVisitor: self.
 	smallInteger := self popOperand.
-	
-	self flag: #'hardcoding number of bits!'.
+
 	self pushOperand: {
-		smallInteger first >> 3 "64 bits" .
+		(receiver first integerValueOf: smallInteger first).
 		RAIntegerValueOf operands: { smallInteger second }
 	}
 ]
@@ -282,10 +286,7 @@ RASinglePathExplorer >> interpretIsIntegerValueWith: aRBMessageNode [
 	aRBMessageNode arguments first acceptVisitor: self.
 	smallInteger := self popOperand.
 	
-	concreteValue := receiver first isIntegerValue: smallInteger first.
-	
-	self flag: #'hardcoding number of bits!'.
-	"intValue >= self minSmallInteger and: [intValue <= self maxSmallInteger"
+	concreteValue := receiver first isIntegerValue: smallInteger first.	
 	self pushOperand: {
 		concreteValue.
 		RAIsSmallIntegerValue operands: {smallInteger second}
@@ -389,7 +390,7 @@ RASinglePathExplorer >> interpretPrimitive: method receiver: receiver arguments:
 { #category : #'special cases' }
 RASinglePathExplorer >> interpretStackTopWith: aRBMessageNode [ 
 
-	self pushOperand: {vmStack top . RAObject named: 'stack-0'}
+	self pushOperand: {vmStack top . RAObject named: 'stack_0'}
 ]
 
 { #category : #'special cases' }
@@ -403,7 +404,7 @@ RASinglePathExplorer >> interpretStackValueWith: aRBMessageNode [
 	value := self popOperand first.
 	value isInteger ifFalse: [ self error: 'expected an integer value' ].
 	
-	self pushOperand: {(vmStack at: value + 1) . RAObject named: 'stack-', value asString}
+	self pushOperand: {(vmStack at: value + 1) . RAObject named: 'stack_', value asString}
 ]
 
 { #category : #'special cases' }

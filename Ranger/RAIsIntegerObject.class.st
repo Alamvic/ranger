@@ -12,13 +12,10 @@ RAIsIntegerObject >> addToSolver: aSolver withVariables: variables interpreter: 
 		           addToSolver: aSolver
 		           withVariables: variables
 		           interpreter: interpreter.
-	"Use two complement"
-	aSolver addConstraint:
-		(operand integerValue cnLEQ: (interpreter objectMemory minSmallInteger
-			twoComplementOfBitSize: interpreter objectMemory numSmallIntegerBits)). "max smallInteger"
-	aSolver addConstraint: (operand integerValue cnGEQ: 0). "min smallInteger"
 
-	aSolver addConstraint: (operand typeTag cnEqual: 1)
+	aSolver addConstraint: (operand integerValue lessOrEquals: interpreter objectMemory maxSmallInteger).
+	aSolver addConstraint: (operand integerValue greaterOrEquals: interpreter objectMemory minSmallInteger).
+	aSolver addConstraint: (operand typeTag equals: 1)
 ]
 
 { #category : #negating }

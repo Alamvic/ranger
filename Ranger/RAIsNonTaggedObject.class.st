@@ -12,7 +12,7 @@ RAIsNonTaggedObject >> addToSolver: aSolver withVariables: variables interpreter
 		           addToSolver: aSolver
 		           withVariables: variables
 		           interpreter: interpreter.
-	^ aSolver addConstraint: (operand typeTag cnEqual: 0)
+	^ aSolver addConstraint: (operand typeTag equals: 0)
 ]
 
 { #category : #negating }

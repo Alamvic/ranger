@@ -127,12 +127,14 @@ RAPath >> solveWithInterpreter: interpreter [
 	constraintVariables := pathConstraints
 		                       flatCollect: [ :e | e variables ]
 		                       as: Set.
-	solver := ClSimplexSolver new.
+	solver := MzSolver new.
 	pathConstraints do: [ :e | 
 		e
 			addToSolver: solver
 			withVariables: constraintVariables
 			interpreter: interpreter ].
+
+	solver satisfy.
 
 	^ RAConstraintSolution new
 		  path: self;

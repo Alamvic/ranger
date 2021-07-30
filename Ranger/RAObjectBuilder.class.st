@@ -23,7 +23,7 @@ RAObjectBuilder >> instantiate: aRAObject [
 			format: 1 "object with instance variables"
 			classIndex: self nextOrdinaryClassIndex ].
 	aRAObject typeTag = 1 ifTrue: [ 
-		^ self integerObjectOfTwoComplement: aRAObject integerValue ].
+		^ interpreter objectMemory integerObjectOf: aRAObject integerValue  ].
 	self halt.
 ]
 

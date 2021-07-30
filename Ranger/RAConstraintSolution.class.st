@@ -17,6 +17,12 @@ RAConstraintSolution >> argument: index [
 	^ self stackValue: numberOfArguments - index
 ]
 
+{ #category : #accessing }
+RAConstraintSolution >> arguments [
+	
+	^ (numberOfArguments - 1 to: 0 by: -1) collect: [ :i | self stackValue: i ]
+]
+
 { #category : #'as yet unclassified' }
 RAConstraintSolution >> inspectionItems: aBuilder [
 	<inspectorPresentationOrder: 0 title: 'Path'> 
@@ -64,9 +70,9 @@ RAConstraintSolution >> objectBuilder: builder [
 RAConstraintSolution >> parameterNames [
 	
 	^ ((numberOfArguments "0 based because of Receiver" to: 0 by: -1)
-		collect: [ :e | 'stack-', e asString, '-type' ]),
+		collect: [ :e | 'stack_', e asString, '_type' ]),
 			((numberOfArguments "0 based because of Receiver" to: 0 by: -1)
-				collect: [ :e | 'stack-', e asString, '-value' ])
+				collect: [ :e | 'stack_', e asString, '_value' ])
 ]
 
 { #category : #accessing }
@@ -122,10 +128,10 @@ RAConstraintSolution >> solver: anObject [
 RAConstraintSolution >> stackValue: anInteger [ 
 	
 	| name |
-	name := 'stack-', anInteger asString.
+	name := 'stack_', anInteger asString.
 	^ (RAObject named: name)
-		typeTag: (self valueOf: name, '-type');
-		integerValue: (self valueOf: name, '-value');
+		typeTag: (self valueOf: name, '_type');
+		integerValue: (self valueOf: name, '_value');
 		yourself
 ]
 
@@ -133,7 +139,7 @@ RAConstraintSolution >> stackValue: anInteger [
 RAConstraintSolution >> valueOf: aString [ 
 	
 	| value |
-	value := variables detect: [ :e | e name = aString ] ifNone: [ ^ 0 ].
+	value := variables detect: [ :e | e name = aString ] ifNone: [  ^ 0 ].
 	value value ifNil: [ ^ 666 "Unknown" ].
 	^ value value ceiling
 ]

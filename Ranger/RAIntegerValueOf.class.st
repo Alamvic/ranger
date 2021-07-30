@@ -14,7 +14,7 @@ RAIntegerValueOf >> addToSolver: aSolver withVariables: variables interpreter: i
 		               interpreter: interpreter.
 
 	^ (RAObject named: UUID new asString)
-		  typeTag: 17;
+		  typeTag: 2;
 		  integerValue: leftOperand integerValue;
 		  yourself "a native integer"
 ]
