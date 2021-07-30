@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'variableName'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Tests'
 }
 
 { #category : #'instance creation' }

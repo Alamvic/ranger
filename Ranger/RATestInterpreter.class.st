@@ -1,7 +1,7 @@
 Class {
 	#name : #RATestInterpreter,
 	#superclass : #CogVMSimulatorLSB,
-	#category : #Ranger
+	#category : #'Ranger-Tests'
 }
 
 { #category : #'as yet unclassified' }

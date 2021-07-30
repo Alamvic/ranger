@@ -1,7 +1,7 @@
 Class {
 	#name : #RAIsNonTaggedObject,
 	#superclass : #RAPathConstraint,
-	#category : #Ranger
+	#category : #'Ranger-VMSpecificConstraints'
 }
 
 { #category : #adding }
@@ -13,6 +13,12 @@ RAIsNonTaggedObject >> addToSolver: aSolver withVariables: variables interpreter
 		           withVariables: variables
 		           interpreter: interpreter.
 	^ aSolver addConstraint: (operand typeTag equals: 0)
+]
+
+{ #category : #microzinc }
+RAIsNonTaggedObject >> mzConstraintOnInterpreter: interpreter [ 
+
+	^ (operands first mzConstraintOnInterpreter: interpreter) typeTag equals: 0
 ]
 
 { #category : #negating }

@@ -6,7 +6,7 @@ Class {
 		'parent',
 		'failure'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Exploring'
 }
 
 { #category : #copying }
@@ -129,10 +129,7 @@ RAPath >> solveWithInterpreter: interpreter [
 		                       as: Set.
 	solver := MzSolver new.
 	pathConstraints do: [ :e | 
-		e
-			addToSolver: solver
-			withVariables: constraintVariables
-			interpreter: interpreter ].
+		solver addConstraint: (e mzConstraintOnInterpreter: interpreter). ].
 
 	solver satisfy.
 

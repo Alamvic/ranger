@@ -5,7 +5,7 @@ Class {
 		'specialCases',
 		'interpretationStack'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Interpreter'
 }
 
 { #category : #API }
@@ -31,11 +31,11 @@ RAASTInterpreter >> doBasicMessageSend: aRBMessageNode [
 		             self popOperand ].
 	aRBMessageNode isSuperSend ifTrue: [ self halt ].
 	method := self lookupSelector: aRBMessageNode selector inReceiver: receiver.
-	(method selector = #value and: [ receiver class == DDBlockClosure ]) 
+	(method selector = #value and: [ receiver first class == RABlockClosure ]) 
 		ifTrue: [ 
 			^ self
-				  interpretBlock: receiver
-				  receiver: receiver home receiver
+				  interpretBlock: receiver first
+				  receiver: receiver first home receiver
 				  arguments: arguments ].
 	method ast isPrimitive ifTrue: [ 
 		^ self
@@ -145,18 +145,6 @@ RAASTInterpreter >> popOperand [
 ]
 
 { #category : #API }
-RAASTInterpreter >> pushFrameWithReceiver: aReceiver withMethod: aMethod [
-	
-	| frame |
-	frame := self basicNewFrame
-		receiver: aReceiver;
-		method: aMethod;
-		yourself.
-	interpretationStack addLast: frame.
-	^ frame
-]
-
-{ #category : #API }
 RAASTInterpreter >> pushFrameWithReceiver: aReceiver withMethod: aMethod withArguments: arguments [
 	
 	| frame |
@@ -167,6 +155,9 @@ RAASTInterpreter >> pushFrameWithReceiver: aReceiver withMethod: aMethod withArg
 	interpretationStack addLast: frame.
 	aMethod argumentNames with: arguments do: [ :name :value |
 		self temporaryAt: name put: value
+	].
+	aMethod temporaryNames do: [ :name |
+		self temporaryAt: name put: { 0 . RAConstant value: 0 }
 	].
 	^ frame
 ]
@@ -238,19 +229,27 @@ RAASTInterpreter >> visitLiteralValueNode: aRBLiteralValueNode [
 { #category : #visiting }
 RAASTInterpreter >> visitMessageNode: aRBMessageNode [
 
+	(aRBMessageNode selector = #assert:) ifTrue: [ 
+		"If this is an assert, ignore it.
+		Make sure it is a stament, otherwise its value is used???"
+		self assert: aRBMessageNode parent isSequence.
+		self pushOperand: nil.
+		^ self ].
+
 	"Resolve it as a normal send"
 	specialCases at: aRBMessageNode selector ifPresent: [ :mapping | 
 		^ self perform: mapping withArguments: { aRBMessageNode } ].
+	
+	"Stop here if we are going far too low level..."
+	self haltIf: [ #(assert: rawNumSlotsOf: byteAt: longAt: long32At: long64At:) includes: aRBMessageNode selector ].
 	^ self doBasicMessageSend: aRBMessageNode
 ]
 
 { #category : #visiting }
 RAASTInterpreter >> visitMethodNode: aRBMethodNode [ 
 	
-	aRBMethodNode statements do: [ :each |
-		each acceptVisitor: self.
-		self currentFrame hasReturned ifTrue: [ ^ self ].
-		self popOperand. ]
+	aRBMethodNode body acceptVisitor: self.
+	self popOperand.
 ]
 
 { #category : #visiting }

@@ -5,7 +5,7 @@ Class {
 		'operands',
 		'origin'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Constraints'
 }
 
 { #category : #'as yet unclassified' }
@@ -24,6 +24,10 @@ RAConstraint class >> constraintClassFor: anOperation [
 		#bitShift: -> RABitShiftConstraint.
 		#+ -> RAAddConstraint.
 		#- -> RASubstractionConstraint.
+		#* -> RAMultiplicationConstraint.
+		#/ -> RADivisionConstraint.
+		#'\\' -> RAModuloConstraint.
+		#'//' -> RAQuotientConstraint.
 	 } asDictionary at: anOperation
 ]
 
@@ -67,6 +71,12 @@ RAConstraint >> isConstant [
 RAConstraint >> isVariable [
 	
 	^ false
+]
+
+{ #category : #microzinc }
+RAConstraint >> mzConstraintOnInterpreter: anInterpreter [
+	
+	self subclassResponsibility
 ]
 
 { #category : #negating }

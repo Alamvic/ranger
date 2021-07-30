@@ -1,5 +1,5 @@
 Class {
-	#name : #RAIntegerObjectOf,
+	#name : #RABooleanObjectOf,
 	#superclass : #RAValueConstraint,
 	#category : #'Ranger-VMSpecificConstraints'
 }

@@ -8,7 +8,7 @@ Class {
 		'numberOfArguments',
 		'objectBuilder'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Exploring'
 }
 
 { #category : #'value-accessing' }

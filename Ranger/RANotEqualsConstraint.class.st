@@ -1,7 +1,7 @@
 Class {
 	#name : #RANotEqualsConstraint,
 	#superclass : #RAPathConstraint,
-	#category : #Ranger
+	#category : #'Ranger-Constraints'
 }
 
 { #category : #converting }
@@ -31,6 +31,16 @@ RANotEqualsConstraint >> addToSolver: aSolver withVariables: variables interpret
 RANotEqualsConstraint >> invert [
 
 	^ RANotEqualsConstraint operands: self operands reversed
+]
+
+{ #category : #microzinc }
+RANotEqualsConstraint >> mzConstraintOnInterpreter: interpreter [ 
+
+	| leftOperand rightOperand |
+	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
+	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
+
+	^ leftOperand notEquals: rightOperand
 ]
 
 { #category : #negating }

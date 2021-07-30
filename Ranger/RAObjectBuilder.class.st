@@ -5,7 +5,7 @@ Class {
 		'interpreter',
 		'nextIndex'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Exploring'
 }
 
 { #category : #'value-setup' }
@@ -18,6 +18,7 @@ RAObjectBuilder >> allocateNewSpaceSlots: anInteger format: anInteger2 classInde
 RAObjectBuilder >> instantiate: aRAObject [ 
 	
 	aRAObject typeTag = 0 ifTrue: [ 
+		self assert: aRAObject specialObjectIndex ~= 0.
 		^ self
 			allocateNewSpaceSlots: 0 "It has slots, but we should not access them"
 			format: 1 "object with instance variables"

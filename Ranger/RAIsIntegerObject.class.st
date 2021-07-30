@@ -1,7 +1,7 @@
 Class {
 	#name : #RAIsIntegerObject,
 	#superclass : #RAPathConstraint,
-	#category : #Ranger
+	#category : #'Ranger-VMSpecificConstraints'
 }
 
 { #category : #adding }
@@ -16,6 +16,17 @@ RAIsIntegerObject >> addToSolver: aSolver withVariables: variables interpreter: 
 	aSolver addConstraint: (operand integerValue lessOrEquals: interpreter objectMemory maxSmallInteger).
 	aSolver addConstraint: (operand integerValue greaterOrEquals: interpreter objectMemory minSmallInteger).
 	aSolver addConstraint: (operand typeTag equals: 1)
+]
+
+{ #category : #microzinc }
+RAIsIntegerObject >> mzConstraintOnInterpreter: interpreter [
+
+	| operand |
+	operand := operands first mzConstraintOnInterpreter: interpreter.
+
+	^ (operand integerValue lessOrEquals: interpreter objectMemory maxSmallInteger)
+		and: ((operand integerValue greaterOrEquals: interpreter objectMemory minSmallInteger)
+		and: (operand typeTag equals: 1))
 ]
 
 { #category : #negating }

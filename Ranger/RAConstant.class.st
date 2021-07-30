@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'value'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Exploring'
 }
 
 { #category : #'instance creation' }
@@ -35,8 +35,27 @@ RAConstant >> isVariable [
 	^ false
 ]
 
+{ #category : #microzinc }
+RAConstant >> mzConstraintOnInterpreter: interpreter [
+	
+	^ value asMzValue
+]
+
+{ #category : #negating }
+RAConstant >> negated [
+	
+	"This only works if this is a boolean constant"
+	^ RAConstant value: value not
+]
+
 { #category : #printing }
 RAConstant >> prettyString [
+	
+	^ value asString
+]
+
+{ #category : #printing }
+RAConstant >> printMinizinc [
 	
 	^ value asString
 ]

@@ -5,7 +5,7 @@ Class {
 		'abstractOperandStack',
 		'abstractTemporaryFrame'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Interpreter'
 }
 
 { #category : #accessing }

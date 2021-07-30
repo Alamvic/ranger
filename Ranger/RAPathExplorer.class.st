@@ -8,7 +8,7 @@ Class {
 		'pathConstraints',
 		'executionStack'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Exploring'
 }
 
 { #category : #api }

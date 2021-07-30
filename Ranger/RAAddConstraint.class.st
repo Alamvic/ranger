@@ -1,7 +1,7 @@
 Class {
 	#name : #RAAddConstraint,
 	#superclass : #RAValueConstraint,
-	#category : #Ranger
+	#category : #'Ranger-Constraints'
 }
 
 { #category : #adding }
@@ -22,6 +22,22 @@ RAAddConstraint >> addToSolver: aSolver withVariables: variables interpreter: in
 
 	^ (RAObject named: UUID new asString)
 		  typeTag: 2;
+		  integerValue: leftValue + rightValue;
+		  yourself "Native value"
+]
+
+{ #category : #microzinc }
+RAAddConstraint >> mzConstraintOnInterpreter: interpreter [ 
+	
+	| leftOperand rightOperand leftValue rightValue |
+	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
+	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
+
+	leftValue := leftOperand integerValue.
+	rightValue := rightOperand integerValue.
+
+	^ (RAObject named: UUID new asString)
+		  typeTag: 2 asMzValue;
 		  integerValue: leftValue + rightValue;
 		  yourself "Native value"
 ]

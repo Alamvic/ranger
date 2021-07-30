@@ -4,9 +4,12 @@ Class {
 	#instVars : [
 		'variableName',
 		'typeTag',
-		'integerValue'
+		'integerValue',
+		'specialObjectIndex',
+		'classIndex',
+		'slots'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Exploring'
 }
 
 { #category : #'instance creation' }
@@ -32,10 +35,29 @@ RAObject >> addToSolver: aClSimplexSolver withVariables: aCollection interpreter
 	^ self
 ]
 
+{ #category : #accessing }
+RAObject >> classIndex [
+
+	^ classIndex
+]
+
+{ #category : #accessing }
+RAObject >> classIndex: anObject [
+
+	classIndex := anObject
+]
+
 { #category : #printing }
 RAObject >> initialize [
 
 	super initialize.
+
+	slots := Dictionary new.
+
+	classIndex := MzVariable new
+		              name: variableName , '_classIndex';
+		              type: 'int';
+		              yourself.
 
 	typeTag := MzVariable new
 		           name: variableName , '_type';
@@ -45,7 +67,12 @@ RAObject >> initialize [
 	integerValue := MzVariable new
 		                name: variableName , '_value';
 		                type: 'int';
-		                yourself
+		                yourself.
+
+	specialObjectIndex := MzVariable new
+		                      name: variableName , '_specialObjectIndex';
+		                      type: 'int';
+		                      yourself
 ]
 
 { #category : #accessing }
@@ -71,6 +98,12 @@ RAObject >> isVariable [
 	^ true
 ]
 
+{ #category : #microzinc }
+RAObject >> mzConstraintOnInterpreter: interpreter [
+	
+	^ self
+]
+
 { #category : #accessing }
 RAObject >> name [
 	
@@ -90,6 +123,26 @@ RAObject >> printOn: aStream [
 	aStream nextPut: $(.
 	aStream print: variableName.
 	aStream nextPut: $).
+]
+
+{ #category : #accessing }
+RAObject >> slotAt: aRAObject [ 
+	
+	^ slots
+		at: aRAObject integerValue
+		ifAbsentPut: [ RAObject named: variableName, '_slot', slots size asString ]
+]
+
+{ #category : #accessing }
+RAObject >> specialObjectIndex [
+
+	^ specialObjectIndex
+]
+
+{ #category : #accessing }
+RAObject >> specialObjectIndex: anObject [
+
+	specialObjectIndex := anObject
 ]
 
 { #category : #acccessing }

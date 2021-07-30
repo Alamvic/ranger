@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'resultVariable'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Constraints'
 }
 
 { #category : #testing }

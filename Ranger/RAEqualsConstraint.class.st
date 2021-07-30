@@ -1,7 +1,7 @@
 Class {
 	#name : #RAEqualsConstraint,
 	#superclass : #RAPathConstraint,
-	#category : #Ranger
+	#category : #'Ranger-Constraints'
 }
 
 { #category : #converting }
@@ -32,6 +32,16 @@ RAEqualsConstraint >> addToSolver: aSolver withVariables: variables interpreter:
 RAEqualsConstraint >> invert [
 
 	^ RAEqualsConstraint operands: self operands reversed
+]
+
+{ #category : #microzinc }
+RAEqualsConstraint >> mzConstraintOnInterpreter: interpreter [ 
+
+	| leftOperand rightOperand |
+	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
+	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
+
+	^ leftOperand equals: rightOperand
 ]
 
 { #category : #converting }

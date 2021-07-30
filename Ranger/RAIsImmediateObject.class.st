@@ -1,13 +1,14 @@
 Class {
 	#name : #RAIsImmediateObject,
 	#superclass : #RAPathConstraint,
-	#category : #Ranger
+	#category : #'Ranger-VMSpecificConstraints'
 }
 
 { #category : #adding }
 RAIsImmediateObject >> addToSolver: aSolver withVariables: variables interpreter: interpreter [
 
 	| operand |
+	1halt.
 	operand := operands first
 		           addToSolver: aSolver
 		           withVariables: variables

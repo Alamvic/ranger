@@ -8,7 +8,7 @@ Class {
 		'pathConstraints',
 		'explorer'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Interpreter'
 }
 
 { #category : #constraints }
@@ -64,6 +64,9 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #stackTop put: #interpretStackTopWith:.
 	specialCases at: #stackValue: put: #interpretStackValueWith:.
 	specialCases at: #pop:thenPush: put: #interpretPopThenPushWith:.
+	specialCases at: #pop:thenPushBool: put: #interpretPopThenPushBoolWith:.
+	
+	"Object format"
 	specialCases at: #integerValueOf: put: #interpretIntegerValueOfWith:.
 	specialCases at: #integerObjectOf: put: #interpretIntegerValueOfWith:.
 	specialCases at: #isIntegerValue: put: #interpretIsIntegerValueWith:.
@@ -74,11 +77,13 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #areIntegers:and: put: #interpretAreIntegersAreWith:.
 	
 	"Object access"
+	specialCases at: #classIndexOf: put: #interpretClassIndexOfWith:.
 	specialCases at: #stObject:at: put: #interpretObjectAtWith:.
 	
 	"special variables"
 	specialCases at: #trueObj put: #interpretTrueObjectWith:.
 	specialCases at: #falseObj put: #interpretFalseObjectWith:.
+	specialCases at: #splObj: put: #interpretSpecialObjectWith:.
 	
 	"special simulation cases"
 	specialCases at: #cCode:inSmalltalk: put: #interpretCCodeInSmalltalkWith:.
@@ -108,7 +113,7 @@ RASinglePathExplorer >> interpretAreIntegersAreWith: aRBMessageNode [
 
 	aRBMessageNode arguments first acceptVisitor: self.
 	smallInteger := self popOperand.
-	aRBMessageNode arguments first acceptVisitor: self.
+	aRBMessageNode arguments second acceptVisitor: self.
 	smallInteger2 := self popOperand.
 	
 	concreteValue := receiver first areIntegers: smallInteger first and: smallInteger2 first.
@@ -123,8 +128,20 @@ RASinglePathExplorer >> interpretAreIntegersAreWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #visiting }
-RASinglePathExplorer >> interpretBlock: aBlockNode [
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretClassIndexOfWith: aRBMessageNode [ 
+	
+	| object vm |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	object := self popOperand.
+
+	self pushOperand: {
+		(vm first classIndexOf: object first).
+		RAClassIndexOf operands: { object second }
+	}
 ]
 
 { #category : #'special cases' }
@@ -170,7 +187,7 @@ RASinglePathExplorer >> interpretIfTrueifFalseWith: aRBMessageNode [
 				position: pathConstraints size. "taken"
 			self addPathConstraint: condition second.
 			self
-				interpretBlock: (DDBlockClosure
+				interpretBlock: (RABlockClosure
 					on: aRBMessageNode arguments first
 					home: self currentFrame)
 				receiver: self receiver
@@ -181,7 +198,7 @@ RASinglePathExplorer >> interpretIfTrueifFalseWith: aRBMessageNode [
 				position: pathConstraints size. "not taken"
 			self addPathConstraint: condition second negated.
 			self
-				interpretBlock: (DDBlockClosure
+				interpretBlock: (RABlockClosure
 					on: aRBMessageNode arguments second
 					home: self currentFrame)
 				receiver: self receiver
@@ -347,6 +364,34 @@ RASinglePathExplorer >> interpretOrWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretPopThenPushBoolWith: aRBMessageNode [ 
+
+	"Pop N elements from the operand stack.
+	Pushes the second argument to the stack.
+	
+	Pop: keep track of the operand stack and remove one element
+	Push: move the value to the physical register assigned to the current stack position"
+	
+	| elementsToPop vm boolean concreteBooleanObject |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	elementsToPop := self popOperand.
+	elementsToPop first isInteger
+		ifFalse: [ self error: 'expected an integer value' ].	
+	aRBMessageNode arguments second acceptVisitor: self.
+	self pop: elementsToPop first.
+	
+	boolean := self popOperand.
+	concreteBooleanObject := vm first objectMemory booleanObjectOf: boolean first.
+	self push: { concreteBooleanObject . RABooleanObjectOf operands: boolean second }.
+
+	"pop:thenPush: does not return an interesting value"
+	self pushOperand: self receiver.
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretPopThenPushWith: aRBMessageNode [ 
 
 	"Pop N elements from the operand stack.
@@ -368,7 +413,7 @@ RASinglePathExplorer >> interpretPopThenPushWith: aRBMessageNode [
 	self pushOperand: self receiver.
 ]
 
-{ #category : #initialization }
+{ #category : #visiting }
 RASinglePathExplorer >> interpretPrimitive: method receiver: receiver arguments: arguments [
 
 	| concreteReceiver concreteArguments concreteResult constraintArguments |
@@ -385,6 +430,26 @@ RASinglePathExplorer >> interpretPrimitive: method receiver: receiver arguments:
 		RAConstraint
 			operation: method selector
 			operands: ({ receiver second }, constraintArguments) }
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretSpecialObjectWith: aRBMessageNode [ 
+	
+	| vm index operand abstractSpecialObject |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand first.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	operand := self popOperand.
+	self assert: operand second isConstant.
+	index := operand first.
+	
+	abstractSpecialObject := (RAObject named: UUID new asString)
+		typeTag: 0 "Normal object";
+		specialObjectIndex: operand second;
+		yourself "Native value".
+	
+	self pushOperand: { vm splObj: index . abstractSpecialObject }
 ]
 
 { #category : #'special cases' }
@@ -441,7 +506,7 @@ RASinglePathExplorer >> push: anInteger [
 RASinglePathExplorer >> visitBlockNode: aRBBlockNode [ 
 	
 	| closure |
-	closure := DDBlockClosure on: aRBBlockNode home: self currentFrame.
+	closure := RABlockClosure on: aRBBlockNode home: self currentFrame.
 	self pushOperand: {closure . closure}
 ]
 

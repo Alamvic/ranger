@@ -1,7 +1,7 @@
 Class {
 	#name : #RAPathConstraint,
 	#superclass : #RAConstraint,
-	#category : #Ranger
+	#category : #'Ranger-Constraints'
 }
 
 { #category : #converting }

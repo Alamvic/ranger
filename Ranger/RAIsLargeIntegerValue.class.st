@@ -1,7 +1,7 @@
 Class {
 	#name : #RAIsLargeIntegerValue,
 	#superclass : #RAPathConstraint,
-	#category : #Ranger
+	#category : #'Ranger-VMSpecificConstraints'
 }
 
 { #category : #adding }
@@ -19,6 +19,16 @@ RAIsLargeIntegerValue >> addToSolver: aSolver withVariables: variables interpret
 	operand typeTag = 2 ifTrue: [ ^ self ].
 
 	aSolver addConstraint: (operand typeTag equals: 2) "Native integer"
+]
+
+{ #category : #microzinc }
+RAIsLargeIntegerValue >> mzConstraintOnInterpreter: interpreter [ 
+	
+	| operand |
+	operand := operands first mzConstraintOnInterpreter: interpreter.
+	^ (operand typeTag equals: 2)
+		and: ((operand integerValue greaterThan: interpreter objectMemory maxSmallInteger)
+		or: (operand integerValue lowerThan: interpreter objectMemory minSmallInteger))
 ]
 
 { #category : #negating }

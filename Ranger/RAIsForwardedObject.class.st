@@ -1,5 +1,5 @@
 Class {
 	#name : #RAIsForwardedObject,
 	#superclass : #RAPathConstraint,
-	#category : #Ranger
+	#category : #'Ranger-VMSpecificConstraints'
 }

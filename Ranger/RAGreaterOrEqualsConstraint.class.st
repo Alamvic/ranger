@@ -1,7 +1,7 @@
 Class {
 	#name : #RAGreaterOrEqualsConstraint,
 	#superclass : #RAPathConstraint,
-	#category : #Ranger
+	#category : #'Ranger-Constraints'
 }
 
 { #category : #converting }
@@ -26,6 +26,16 @@ RAGreaterOrEqualsConstraint >> invert [
 	^ (RALessConstraint operands: self operands reversed)
 			origin: origin;
 			yourself
+]
+
+{ #category : #microzinc }
+RAGreaterOrEqualsConstraint >> mzConstraintOnInterpreter: interpreter [
+	
+	| leftOperand rightOperand |
+	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
+	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
+
+	^ leftOperand integerValue greaterOrEquals: rightOperand integerValue
 ]
 
 { #category : #negating }

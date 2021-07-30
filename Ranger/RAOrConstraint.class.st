@@ -1,14 +1,14 @@
 Class {
-	#name : #RAAndConstraint,
+	#name : #RAOrConstraint,
 	#superclass : #RAConstraint,
 	#category : #'Ranger-Constraints'
 }
 
 { #category : #adding }
-RAAndConstraint >> addToSolver: aSolver withVariables: variables interpreter: interpreter [
+RAOrConstraint >> addToSolver: aSolver withVariables: variables interpreter: interpreter [
 
 	"In Cassowary this is by default an AND, no need to push another constraint"
-
+1halt.
 	operands first
 		addToSolver: aSolver
 		withVariables: variables
@@ -20,14 +20,14 @@ RAAndConstraint >> addToSolver: aSolver withVariables: variables interpreter: in
 ]
 
 { #category : #microzinc }
-RAAndConstraint >> mzConstraintOnInterpreter: anInterpreter [
+RAOrConstraint >> mzConstraintOnInterpreter: anInterpreter [
 	
 	^ (operands first mzConstraintOnInterpreter: anInterpreter)
-		and: (operands second mzConstraintOnInterpreter: anInterpreter)
+		or: (operands second mzConstraintOnInterpreter: anInterpreter)
 ]
 
 { #category : #negating }
-RAAndConstraint >> negated [
+RAOrConstraint >> negated [
 	
-	^ RAOrConstraint operands: (operands collect: [ :e | e negated ])
+	^ RAAndConstraint operands: (operands collect: [ :e | e negated ]) 
 ]

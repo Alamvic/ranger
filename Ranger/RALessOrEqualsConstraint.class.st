@@ -1,7 +1,7 @@
 Class {
 	#name : #RALessOrEqualsConstraint,
 	#superclass : #RAPathConstraint,
-	#category : #Ranger
+	#category : #'Ranger-Constraints'
 }
 
 { #category : #converting }
@@ -24,6 +24,16 @@ RALessOrEqualsConstraint >> addToSolver: aSolver withVariables: variables interp
 RALessOrEqualsConstraint >> invert [
 
 	^ RAGreaterConstraint operands: self operands reversed
+]
+
+{ #category : #microzinc }
+RALessOrEqualsConstraint >> mzConstraintOnInterpreter: interpreter [
+	
+	| leftOperand rightOperand |
+	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
+	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
+
+	^ leftOperand integerValue lessOrEquals: rightOperand integerValue
 ]
 
 { #category : #negating }

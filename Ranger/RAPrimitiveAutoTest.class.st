@@ -10,7 +10,7 @@ Class {
 		'objectBuilder',
 		'compilationResult'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Exploring'
 }
 
 { #category : #'building suites' }
@@ -21,9 +21,12 @@ RAPrimitiveAutoTest class >> testParameters [
 	interpreter32 := (suite detect: [:e | e setUp. e wordSize = 4]) interpreter.
 	interpreter64 := (suite detect: [:e | e setUp. e wordSize = 8]) interpreter.
 	matrix := ParametrizedTestMatrix new.
-	primitives := #( 
-		(primitiveAdd 			genPrimitiveAdd)
-		(primitiveSubtract 	genPrimitiveSubtract) ).
+	primitives := (60 to: 64) collect: [ :i |
+		{ 
+			StackInterpreter primitiveTable at: i + 1.
+			(interpreter32 cogit class primitiveTable at: i) primitiveGenerator.
+		}
+	].
 	primitives do: [ :p | | architectures |
 		architectures := {
 "		{ #ISA -> #'aarch64'. #wordSize -> 8}.

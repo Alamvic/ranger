@@ -1,7 +1,7 @@
 Class {
 	#name : #RABitAndConstraint,
 	#superclass : #RAValueConstraint,
-	#category : #Ranger
+	#category : #'Ranger-Constraints'
 }
 
 { #category : #adding }

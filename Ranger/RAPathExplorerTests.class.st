@@ -4,7 +4,7 @@ Class {
 	#instVars : [
 		'interpreter'
 	],
-	#category : #Ranger
+	#category : #'Ranger-Tests'
 }
 
 { #category : #tests }
