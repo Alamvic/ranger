@@ -38,7 +38,10 @@ RAConstant >> isVariable [
 { #category : #microzinc }
 RAConstant >> mzConstraintOnInterpreter: interpreter [
 	
-	^ value asMzValue
+	^ (RAObject named: UUID new asString)
+		  typeTag: 2 asMzValue;
+		  integerValue: value asMzValue;
+		  yourself "Native value"
 ]
 
 { #category : #negating }
