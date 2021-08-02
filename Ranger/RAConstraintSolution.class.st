@@ -30,19 +30,6 @@ RAConstraintSolution >> inspectionItems: aBuilder [
 	^ path inspectionItems: aBuilder
 ]
 
-{ #category : #'value-setup' }
-RAConstraintSolution >> instantiate: aRAObject [ 
-	
-	aRAObject typeTag = 0 ifTrue: [ 
-		^ objectBuilder
-			allocateNewSpaceSlots: 0 "It has slots, but we should not access them"
-			format: 1 "object with instance variables"
-			classIndex: objectBuilder nextOrdinaryClassIndex ].
-	aRAObject typeTag = 1 ifTrue: [ 
-		^ objectBuilder integerObjectOfTwoComplement: aRAObject integerValue ].
-	self halt.
-]
-
 { #category : #testing }
 RAConstraintSolution >> isEmpty [
 	

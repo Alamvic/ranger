@@ -28,14 +28,6 @@ RAObjectBuilder >> instantiate: aRAObject [
 	self halt.
 ]
 
-{ #category : #'value-setup' }
-RAObjectBuilder >> integerObjectOfTwoComplement: twoComplement [ 
-	
-	| pharoInteger |
-	pharoInteger := twoComplement integerOfTwoComplementOfBitSize: self memory numSmallIntegerBits.
-	^ self memory integerObjectOf: pharoInteger
-]
-
 { #category : #accessing }
 RAObjectBuilder >> interpreter [
 

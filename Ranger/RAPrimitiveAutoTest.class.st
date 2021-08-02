@@ -18,21 +18,32 @@ RAPrimitiveAutoTest class >> testParameters [
 
 	| interpreter solutions matrix primitives suite interpreter32 interpreter64 |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-	interpreter32 := (suite detect: [:e | e setUp. e wordSize = 4]) interpreter.
-	interpreter64 := (suite detect: [:e | e setUp. e wordSize = 8]) interpreter.
+	interpreter32 := (suite detect: [:e | 
+		e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
+		e wordSize = 4]) 
+			setUp; interpreter.
+	interpreter64 := (suite detect: [:e | 
+		e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
+		e wordSize = 8]) 
+			setUp; interpreter.
 	matrix := ParametrizedTestMatrix new.
-	primitives := (1 to: 6) collect: [ :i |
-		{ 
-			StackInterpreter primitiveTable at: i + 1.
-			(interpreter32 cogit class primitiveTable at: i) primitiveGenerator.
-		}
-	].
+	
+	primitives := (interpreter32 class primitiveTable withIndexCollect: [ :e :i | i -> e ])
+		select: [ :e | 
+			e value isSymbol
+				and: [(interpreter32 class lookupSelector: e value) hasPragmaNamed: #numberOfArguments:] ]
+		thenCollect: [ :e |
+			{ 
+				e value.
+				(interpreter32 cogit class primitiveTable at: e key - 1) primitiveGenerator.
+			}
+		].
 	primitives do: [ :p | | architectures |
 		architectures := {
-"		{ #ISA -> #'aarch64'. #wordSize -> 8}.
-"		{ #ISA -> #'IA32'. #wordSize -> 4}.
-"		{ #ISA -> #'X64'. #wordSize -> 8}.
-"		{ #ISA -> #'ARMv5'. #wordSize -> 4}}.
+		{ #ISA -> #'aarch64'. #wordSize -> 8}.
+		{ #ISA -> #'IA32'. #wordSize -> 4}.
+		{ #ISA -> #'X64'. #wordSize -> 8}.
+		{ #ISA -> #'ARMv5'. #wordSize -> 4}}.
 		architectures do: [ :arch |
 			interpreter := arch second value = 4
 				ifTrue: [ interpreter32 ]
@@ -73,14 +84,6 @@ RAPrimitiveAutoTest >> execute [
 { #category : #accessing }
 RAPrimitiveAutoTest >> generator: aString [ 
 	generator := aString
-]
-
-{ #category : #building }
-RAPrimitiveAutoTest >> integerObjectOfTwoComplement: twoComplement [ 
-	
-	| pharoInteger |
-	pharoInteger := twoComplement integerOfTwoComplementOfBitSize: memory numSmallIntegerBits.
-	^ memory integerObjectOf: pharoInteger
 ]
 
 { #category : #running }
