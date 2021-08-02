@@ -130,7 +130,8 @@ RAPrimitiveAutoTest >> testPrimitive [
 	primitiveAddress := self compile: [ 
 		compilationResult := cogit objectRepresentation perform: generator.
 		"If the primitive fails it continues, so we need to have an instruction to detect the end"
-		endInstruction := cogit Stop ].
+		endInstruction := cogit Stop ]
+		bytecodes: 15.
 	self prepareAutoCall.
 	self execute.
 ]
