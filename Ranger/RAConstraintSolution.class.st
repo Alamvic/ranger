@@ -56,10 +56,12 @@ RAConstraintSolution >> objectBuilder: builder [
 { #category : #testing }
 RAConstraintSolution >> parameterNames [
 	
-	^ ((numberOfArguments "0 based because of Receiver" to: 0 by: -1)
-		collect: [ :e | 'stack_', e asString, '_type' ]),
-			((numberOfArguments "0 based because of Receiver" to: 0 by: -1)
-				collect: [ :e | 'stack_', e asString, '_value' ])
+	^ (numberOfArguments "0 based because of Receiver" to: 0 by: -1)
+		flatCollect: [ :e | 
+			{'stack_', e asString, '_format'.
+			'stack_', e asString, '_classIndex'.
+			'stack_', e asString, '_type'.
+			'stack_', e asString, '_value'} ]
 ]
 
 { #category : #accessing }
@@ -119,6 +121,9 @@ RAConstraintSolution >> stackValue: anInteger [
 	^ (RAObject named: name)
 		typeTag: (self valueOf: name, '_type');
 		integerValue: (self valueOf: name, '_value');
+		format: (self valueOf: name, '_format');
+		classIndex: (self valueOf: name, '_classIndex');
+		numSlots: (self valueOf: name, '_numSlots');
 		yourself
 ]
 

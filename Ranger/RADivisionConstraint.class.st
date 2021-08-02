@@ -13,7 +13,7 @@ RADivisionConstraint >> mzConstraintOnInterpreter: interpreter [
 
 	leftValue := leftOperand integerValue.
 	rightValue := rightOperand integerValue.
-
+1halt.
 	^ (RAObject named: UUID new asString)
 		  typeTag: 2 asMzValue;
 		  integerValue: leftValue / rightValue;

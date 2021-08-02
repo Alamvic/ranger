@@ -32,20 +32,14 @@ RAPathExplorer >> explore: aSelector on: anObject [
 	
 	currentPath := RAPath new.
 	solution := currentPath solveWithInterpreter: anObject.
-	[[
+	[
 	currentPath := self exploreSolution: solution.
 	solution path: currentPath.
 	solution numberOfArguments: numberOfArguments.
 	solutions add: solution.
 	
 	solution := self solve: currentPath withInterpreter: anObject.
-	solution isEmpty ] whileFalse.]
-		 on: Exception do: [ :e |
-			solutions add: (RAErrorSolution new
-				selector: aSelector;
-				vm: anObject;
-				error: e freeze;
-				yourself) ].
+	solution isEmpty ] whileFalse.
 	^ solutions
 ]
 
@@ -82,19 +76,28 @@ RAPathExplorer >> initializeWithSelector: aSelector onVM: aVM [
 	numberOfArguments := (method ast pragmaNamed: #numberOfArguments:) arguments first value.
 	objectBuilder := RAObjectBuilder new
 		interpreter: aVM;
-		nextIndex: 17;
+		nextIndex: 100;
 		yourself
 ]
 
 { #category : #solving }
 RAPathExplorer >> solve: aRAPath withInterpreter: interpreter [
 	
+	^ self solveAtLeast: aRAPath pathConstraints size inPathConstraint: aRAPath withInterpreter: interpreter
+]
+
+{ #category : #solving }
+RAPathExplorer >> solveAtLeast: ktry inPathConstraint: aRAPath withInterpreter: interpreter [
+	
 	| nextPath solution j |
-	j := (executionStack lastIndexOf: false).
+	j := (executionStack lastIndexOf: false) min: ktry.
 	(j = 0 or: [j > aRAPath pathConstraints size]) ifTrue: [ ^ RAPath new solveWithInterpreter: interpreter ].
 
 	nextPath := (aRAPath copyWithNumberOfSegments: j) nextPath.
-	solution := nextPath solveWithInterpreter: interpreter.
+	[solution := nextPath solveWithInterpreter: interpreter]
+		on: MzUnsatisfiable do: [ :e |
+			^ self solveAtLeast: j - 1 inPathConstraint: aRAPath withInterpreter: interpreter ].
+	
 	executionStack := executionStack first: j.
 	"Now we expect that the next iteration will go over the other branch at j"
 	executionStack at: j put: (executionStack at: j) not.

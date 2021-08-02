@@ -6,12 +6,6 @@ Class {
 
 { #category : #microzinc }
 RAIsNonTaggedObject >> mzConstraintOnInterpreter: interpreter [ 
-
+1halt.
 	^ (operands first mzConstraintOnInterpreter: interpreter) typeTag equals: 0
-]
-
-{ #category : #negating }
-RAIsNonTaggedObject >> negated [
-	
-	^ RAIsIntegerObject operands: self operands
 ]

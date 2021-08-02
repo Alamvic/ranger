@@ -12,14 +12,17 @@ Class {
 }
 
 { #category : #constraints }
-RASinglePathExplorer >> addPathConstraint: aPathConstraint [ 
+RASinglePathExplorer >> addPathConstraint: aPathConstraint taken: aBoolean [
 
 	"Do not add constant conditions"
 	aPathConstraint isConstant
 		ifTrue: [ ^ self ].
-	(aPathConstraint operands allSatisfy: [ :e | e isConstant ])
+"	(aPathConstraint operands allSatisfy: [ :e | e isConstant ])
 		ifTrue: [ ^ self ].
-
+"
+	explorer
+		updateExecutionStackWithConditional: aBoolean
+		position: pathConstraints size.
 	aPathConstraint origin: thisContext stack copy.
 	pathConstraints add: aPathConstraint
 ]
@@ -67,6 +70,7 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #pop:thenPushBool: put: #interpretPopThenPushBoolWith:.
 	
 	"Object format"
+	specialCases at: #formatOfObject: put: #interpretFormatOfObjectWith:.
 	specialCases at: #integerValueOf: put: #interpretIntegerValueOfWith:.
 	specialCases at: #integerObjectOf: put: #interpretIntegerValueOfWith:.
 	specialCases at: #isIntegerValue: put: #interpretIsIntegerValueWith:.
@@ -75,11 +79,10 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #isImmediate: put: #interpretIsImmediateWith:.
 	specialCases at: #isForwarded: put: #interpretIsForwardedWith:.
 	specialCases at: #areIntegers:and: put: #interpretAreIntegersAreWith:.
-	
-	"Object access"
+	specialCases at: #isContextObject: put: #interpretIsContextObjectWith:.
+	specialCases at: #numSlotsOfAny: put: #interpretNumSlotsOfAnyWith:.
 	specialCases at: #classIndexOf: put: #interpretClassIndexOfWith:.
-	specialCases at: #stObject:at: put: #interpretObjectAtWith:.
-	
+		
 	"special variables"
 	specialCases at: #trueObj put: #interpretTrueObjectWith:.
 	specialCases at: #falseObj put: #interpretFalseObjectWith:.
@@ -93,15 +96,37 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #= put: #interpretEqualsWith:."
 	
 	specialCases at: #or: put: #interpretOrWith:.
+	specialCases at: #and: put: #interpretAndWith:.
 	specialCases at: #ifTrue: put: #interpretIfTrueWith:.
 	specialCases at: #ifFalse: put: #interpretIfFalseWith:.
 	specialCases at: #ifTrue:ifFalse: put: #interpretIfTrueifFalseWith:.
+	specialCases at: #ifNil: put: #interpretIfNilWith:.
+	specialCases at: #ifNotNil: put: #interpretIfNotNilWith:.
+	specialCases at: #ifNil:ifNotNil: put: #interpretIfNilIfNotNilWith:.
+	specialCases at: #cppIf:ifTrue: put: #interpretCppIfIfTrueWith:.
+	specialCases at: #cppIf:ifTrue:ifFalse: put: #interpretCppIfIfTrueIfFalseWith:.
+	
 ]
 
 { #category : #initialization }
 RASinglePathExplorer >> initializeVMStackWithArguments: values [ 
 	
 	values do: [ :e | self push: e ]
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretAndWith: aRBMessageNode [ 
+	
+	| condition |
+	aRBMessageNode receiver acceptVisitor: self.
+	condition := self popOperand.
+	condition first
+		ifTrue: [ 
+			self addPathConstraint: condition second taken: true.
+			aRBMessageNode arguments first body acceptVisitor: self ]
+		ifFalse: [ 
+			self addPathConstraint: condition second negated taken: false.
+			self pushOperand: condition ]
 ]
 
 { #category : #'special cases' }
@@ -117,13 +142,18 @@ RASinglePathExplorer >> interpretAreIntegersAreWith: aRBMessageNode [
 	smallInteger2 := self popOperand.
 	
 	concreteValue := receiver first areIntegers: smallInteger first and: smallInteger2 first.
-	
-	"intValue >= self minSmallInteger and: [intValue <= self maxSmallInteger"
+
 	self pushOperand: {
 		concreteValue.
-		RAAndConstraint operands: { 
-			RAIsIntegerObject operands: { smallInteger second }.
-			RAIsIntegerObject operands: { smallInteger2 second }.
+		RAAndConstraint operands: {
+			RAEqualsConstraint operands: { 
+				smallInteger second typeTag.
+				RAConstant value: 1
+			}.
+			RAEqualsConstraint operands: { 
+				smallInteger2 second typeTag.
+				RAConstant value: 1
+			}
 		}
 	}
 ]
@@ -139,8 +169,49 @@ RASinglePathExplorer >> interpretClassIndexOfWith: aRBMessageNode [
 	object := self popOperand.
 
 	self pushOperand: {
-		(vm first classIndexOf: object first).
-		RAClassIndexOf operands: { object second }
+		vm first classIndexOf: object first.
+		object second classIndex
+	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretCppIfIfTrueIfFalseWith: aRBMessageNode [ 
+
+	| condition |
+	aRBMessageNode arguments first acceptVisitor: self.
+	condition := self popOperand.
+	condition first
+		ifTrue: [ 
+			self addPathConstraint: condition second taken: true.
+			self
+				interpretBlock: (RABlockClosure
+					on: aRBMessageNode arguments second
+					home: self currentFrame)
+				receiver: self receiver
+				arguments: #() ]
+		ifFalse: [ 
+			self addPathConstraint: condition second negated taken: false.
+			self
+				interpretBlock: (RABlockClosure
+					on: aRBMessageNode arguments third
+					home: self currentFrame)
+				receiver: self receiver
+				arguments: #() ]
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretFormatOfObjectWith: aRBMessageNode [ 
+	
+	| oop receiver |
+	aRBMessageNode receiver acceptVisitor: self.
+	receiver := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	oop := self popOperand.
+
+	self pushOperand: {
+		(receiver first formatOfObject: oop first).
+		oop second format
 	}
 ]
 
@@ -152,11 +223,36 @@ RASinglePathExplorer >> interpretIfFalseWith: aRBMessageNode [
 	condition := self popOperand.
 	condition first
 		ifFalse: [ 
-			self addPathConstraint: condition second.
+			self addPathConstraint: condition second taken: true.
 			aRBMessageNode arguments first body acceptVisitor: self ]
 		ifTrue: [ 
-			self addPathConstraint: condition second negated.
+			self addPathConstraint: condition second negated taken: false.
 			self pushOperand: { nil . nil } ]
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretIfNilIfNotNilWith: aRBMessageNode [ 
+	
+	| condition |
+	aRBMessageNode receiver acceptVisitor: self.
+	condition := self popOperand.
+	condition first
+		ifNil: [ 
+			self addPathConstraint: condition second taken: true.
+			self
+				interpretBlock: (RABlockClosure
+					on: aRBMessageNode arguments first
+					home: self currentFrame)
+				receiver: self receiver
+				arguments: #() ]
+		ifNotNil: [ 
+			self addPathConstraint: condition second negated taken: false.
+			self
+				interpretBlock: (RABlockClosure
+					on: aRBMessageNode arguments second
+					home: self currentFrame)
+				receiver: self receiver
+				arguments: { condition } ]
 ]
 
 { #category : #'special cases' }
@@ -167,10 +263,10 @@ RASinglePathExplorer >> interpretIfTrueWith: aRBMessageNode [
 	condition := self popOperand.
 	condition first
 		ifTrue: [ 
-			self addPathConstraint: condition second.
+			self addPathConstraint: condition second taken: true.
 			aRBMessageNode arguments first body acceptVisitor: self ]
 		ifFalse: [ 
-			self addPathConstraint: condition second negated.
+			self addPathConstraint: condition second negated taken: false.
 			self pushOperand: { nil . nil } ]
 ]
 
@@ -182,10 +278,7 @@ RASinglePathExplorer >> interpretIfTrueifFalseWith: aRBMessageNode [
 	condition := self popOperand.
 	condition first
 		ifTrue: [ 
-			explorer
-				updateExecutionStackWithConditional: true
-				position: pathConstraints size. "taken"
-			self addPathConstraint: condition second.
+			self addPathConstraint: condition second taken: true.
 			self
 				interpretBlock: (RABlockClosure
 					on: aRBMessageNode arguments first
@@ -193,10 +286,7 @@ RASinglePathExplorer >> interpretIfTrueifFalseWith: aRBMessageNode [
 				receiver: self receiver
 				arguments: #() ]
 		ifFalse: [ 
-			explorer
-				updateExecutionStackWithConditional: false
-				position: pathConstraints size. "not taken"
-			self addPathConstraint: condition second negated.
+			self addPathConstraint: condition second negated taken: false.
 			self
 				interpretBlock: (RABlockClosure
 					on: aRBMessageNode arguments second
@@ -217,7 +307,10 @@ RASinglePathExplorer >> interpretIntegerObjectOfWith: aRBMessageNode [
 	
 	self pushOperand: {
 		(receiver first integerObjectOf: smallInteger first).
-		RAIntegerObjectOf operands: {smallInteger second}
+		(RAObject named: UUID new asString)
+		  typeTag: 1 asMzValue;
+		  integerValue: smallInteger second;
+		  yourself
 	}
 ]
 
@@ -233,7 +326,27 @@ RASinglePathExplorer >> interpretIntegerValueOfWith: aRBMessageNode [
 
 	self pushOperand: {
 		(receiver first integerValueOf: smallInteger first).
-		RAIntegerValueOf operands: { smallInteger second }
+		smallInteger second integerValue
+	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretIsContextObjectWith: aRBMessageNode [ 
+	
+	| receiver concreteValue oop |
+	aRBMessageNode receiver acceptVisitor: self.
+	receiver := self popOperand.
+
+	aRBMessageNode arguments first acceptVisitor: self.
+	oop := self popOperand.
+	
+	concreteValue := receiver first isContextObject: oop first.
+
+	self pushOperand: {
+		concreteValue.
+		RAEqualsConstraint operands: { 
+			oop second classIndex . 
+			RAConstant value: (receiver first class bindingOf: #ClassMethodContextCompactIndex) value }
 	}
 ]
 
@@ -270,7 +383,10 @@ RASinglePathExplorer >> interpretIsImmediateWith: aRBMessageNode [
 	"intValue >= self minSmallInteger and: [intValue <= self maxSmallInteger"
 	self pushOperand: {
 		concreteValue.
-		RAIsImmediateObject operands: { maybeImmediate second }
+		RAGreaterConstraint
+			operands: { 
+				maybeImmediate second typeTag.
+				RAConstant value: 0 }
 	}
 ]
 
@@ -289,7 +405,10 @@ RASinglePathExplorer >> interpretIsIntegerObjectWith: aRBMessageNode [
 	"intValue >= self minSmallInteger and: [intValue <= self maxSmallInteger"
 	self pushOperand: {
 		concreteValue.
-		RAIsIntegerObject operands: { smallInteger second }
+		RAEqualsConstraint operands: { 
+			smallInteger second typeTag.
+			RAConstant value: 1
+		}
 	}
 ]
 
@@ -322,17 +441,36 @@ RASinglePathExplorer >> interpretIsNonIntegerObjectWith: aRBMessageNode [
 	
 	concreteValue := receiver first isIntegerObject: smallInteger first.
 	
-	"intValue >= self minSmallInteger and: [intValue <= self maxSmallInteger"
 	self pushOperand: {
 		concreteValue.
-		(RAIsIntegerObject operands: { smallInteger second }) negated
+		RANotEqualsConstraint operands: { 
+			smallInteger second typeTag.
+			RAConstant value: 1
+		}
+	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretNumSlotsOfAnyWith: aRBMessageNode [ 
+	
+	| oop receiver |
+	aRBMessageNode receiver acceptVisitor: self.
+	receiver := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	oop := self popOperand.
+
+	self pushOperand: {
+		(receiver first numSlotsOfAny: oop first).
+		oop second numSlots
 	}
 ]
 
 { #category : #'special cases' }
 RASinglePathExplorer >> interpretObjectAtWith: aRBMessageNode [ 
 	
-	| condition vm oop index referencedObject |
+	| vm oop index referencedObject |
+	1halt.
 	aRBMessageNode receiver acceptVisitor: self.
 	vm := self popOperand.
 	
@@ -356,10 +494,10 @@ RASinglePathExplorer >> interpretOrWith: aRBMessageNode [
 	condition := self popOperand.
 	condition first
 		ifTrue: [ 
-			self addPathConstraint: condition second.
+			self addPathConstraint: condition second taken: true.
 			self pushOperand: condition ]
 		ifFalse: [ 
-			self addPathConstraint: condition second negated.
+			self addPathConstraint: condition second negated taken: false.
 			aRBMessageNode arguments first body acceptVisitor: self ]
 ]
 
@@ -443,7 +581,7 @@ RASinglePathExplorer >> interpretSpecialObjectWith: aRBMessageNode [
 	operand := self popOperand.
 	self assert: operand second isConstant.
 	index := operand first.
-	
+	1halt.
 	abstractSpecialObject := (RAObject named: UUID new asString)
 		typeTag: 0 "Normal object";
 		specialObjectIndex: operand second;
@@ -468,7 +606,7 @@ RASinglePathExplorer >> interpretStackValueWith: aRBMessageNode [
 	aRBMessageNode arguments first acceptVisitor: self.
 	value := self popOperand first.
 	value isInteger ifFalse: [ self error: 'expected an integer value' ].
-	
+
 	self pushOperand: {(vmStack at: value + 1) . RAObject named: 'stack_', value asString}
 ]
 

@@ -8,6 +8,7 @@ Class {
 RAIsLargeIntegerValue >> mzConstraintOnInterpreter: interpreter [ 
 	
 	| operand |
+	1halt.
 	operand := operands first mzConstraintOnInterpreter: interpreter.
 	^ (operand typeTag equals: 2)
 		and: ((operand integerValue greaterThan: interpreter objectMemory maxSmallInteger)

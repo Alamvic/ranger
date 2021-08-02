@@ -17,7 +17,7 @@ RALessConstraint >> mzConstraintOnInterpreter: interpreter [
 	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
 	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
 
-	^ leftOperand integerValue lowerThan: rightOperand integerValue
+	^ leftOperand lowerThan: rightOperand
 ]
 
 { #category : #negating }

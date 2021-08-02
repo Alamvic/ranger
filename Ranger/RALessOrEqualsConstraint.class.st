@@ -17,7 +17,7 @@ RALessOrEqualsConstraint >> mzConstraintOnInterpreter: interpreter [
 	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
 	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
 
-	^ leftOperand integerValue lessOrEquals: rightOperand integerValue
+	^ leftOperand lessOrEquals: rightOperand
 ]
 
 { #category : #negating }

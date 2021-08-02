@@ -17,12 +17,15 @@ RAObjectBuilder >> allocateNewSpaceSlots: anInteger format: anInteger2 classInde
 { #category : #'value-setup' }
 RAObjectBuilder >> instantiate: aRAObject [ 
 	
-	aRAObject typeTag = 0 ifTrue: [ 
+	aRAObject typeTag = 0 ifTrue: [ | classIndexToUse |
 		self assert: aRAObject specialObjectIndex ~= 0.
+		classIndexToUse := aRAObject classIndex = 0
+			ifTrue: [ self nextOrdinaryClassIndex ]
+			ifFalse: [ aRAObject classIndex ].
 		^ self
-			allocateNewSpaceSlots: 0 "It has slots, but we should not access them"
-			format: 1 "object with instance variables"
-			classIndex: self nextOrdinaryClassIndex ].
+			allocateNewSpaceSlots: aRAObject numSlots
+			format: aRAObject format "object with instance variables"
+			classIndex: classIndexToUse ].
 	aRAObject typeTag = 1 ifTrue: [ 
 		^ interpreter objectMemory integerObjectOf: aRAObject integerValue  ].
 	self halt.

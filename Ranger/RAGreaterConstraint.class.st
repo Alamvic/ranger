@@ -17,7 +17,7 @@ RAGreaterConstraint >> mzConstraintOnInterpreter: interpreter [
 	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
 	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
 
-	^ leftOperand integerValue greaterThan: rightOperand integerValue
+	^ leftOperand greaterThan: rightOperand
 ]
 
 { #category : #negating }

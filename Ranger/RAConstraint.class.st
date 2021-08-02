@@ -44,7 +44,7 @@ RAConstraint class >> operation: anOperation operands: operands [
 
 	^ (self constraintClassFor: anOperation) new
 		operands: operands;
-		normalize
+		yourself
 ]
 
 { #category : #adding }
@@ -79,12 +79,6 @@ RAConstraint >> negated [
 	self subclassResponsibility
 ]
 
-{ #category : #converting }
-RAConstraint >> normalize [
-
-	^ self
-]
-
 { #category : #accessing }
 RAConstraint >> operands [
 
@@ -116,7 +110,7 @@ RAConstraint >> prettyString [
 		str nextPutAll: self prettyIdentifier.
 		str nextPut: $(.
 		self operands
-			do: [ :op | str nextPutAll: op prettyString ]
+			do: [ :op | str nextPutAll: op printString ]
 			separatedBy: [ str nextPutAll: ', ' ].
 		str nextPut: $)
 	]
