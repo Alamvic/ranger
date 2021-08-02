@@ -48,17 +48,14 @@ RAPrimitiveAutoTest class >> testParameters [
 			interpreter := arch second value = 4
 				ifTrue: [ interpreter32 ]
 				ifFalse: [ interpreter64 ].
-			solutions := [RAPathExplorer explore: p first on: interpreter]
-				on: Error do: [ :e | 
-					"Let's continue, something failed"
-					#( #'failed!' ) ].
+			solutions := RAPathExplorer explore: p first on: interpreter.
 			solutions do: [ :e |
 				matrix addCase: {
 					arch first.
 					arch second.
 					#primitive -> p first.
 					#generator -> p second.
-					#solution -> e} ] ] ].
+					#solution -> e } ] ] ].
 	
 	^ matrix
 ]

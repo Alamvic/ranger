@@ -6,7 +6,12 @@ Class {
 		'constraints',
 		'paths',
 		'pathConstraints',
-		'executionStack'
+		'executionStack',
+		'solutions',
+		'objectBuilder',
+		'numberOfArguments',
+		'selector',
+		'vm'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -21,32 +26,41 @@ RAPathExplorer class >> explore: aSelector on: anObject [
 { #category : #api }
 RAPathExplorer >> explore: aSelector on: anObject [
 	
-	| method numberOfArguments currentPath initialValues solutions solution objectBuilder |
-	method := anObject class lookupSelector: aSelector.
-	numberOfArguments := (method ast pragmaNamed: #numberOfArguments:) arguments first value.
-	solutions := OrderedCollection new.
-
-	objectBuilder := RAObjectBuilder new
-		interpreter: anObject;
-		nextIndex: 17;
-		yourself.
+	| currentPath solution |
+	
+	self initializeWithSelector: aSelector onVM: anObject.
 	
 	currentPath := RAPath new.
 	solution := currentPath solveWithInterpreter: anObject.
-	[
-	initialValues := (numberOfArguments "0 based because of Receiver" to: 0 by: -1)
-		collect: [ :e | objectBuilder instantiate: (solution stackValue: e) ].
+	[[
+	currentPath := self exploreSolution: solution.
+	solution path: currentPath.
 	solution numberOfArguments: numberOfArguments.
 	solutions add: solution.
-	currentPath := RASinglePathExplorer new
-		explore: aSelector
-		on: anObject
-		withValues: initialValues
-		explorer: self.
-	solution path: currentPath.
+	
 	solution := self solve: currentPath withInterpreter: anObject.
-	solution isEmpty ] whileFalse.
+	solution isEmpty ] whileFalse.]
+		 on: Error do: [ :e |
+			solutions add: (RAErrorSolution new
+				selector: aSelector;
+				vm: anObject;
+				error: e freeze;
+				yourself) ].
 	^ solutions
+]
+
+{ #category : #api }
+RAPathExplorer >> exploreSolution: solution [
+
+	| initialValues |
+	initialValues := (numberOfArguments "0 based because of Receiver" to: 0 by: -1)
+		collect: [ :e | objectBuilder instantiate: (solution stackValue: e) ].
+	
+	^ RASinglePathExplorer new
+		explore: selector
+		on: vm
+		withValues: initialValues
+		explorer: self
 ]
 
 { #category : #api }
@@ -54,6 +68,22 @@ RAPathExplorer >> initialize [
 
 	super initialize.
 	executionStack := OrderedCollection new.
+	solutions := OrderedCollection new
+]
+
+{ #category : #api }
+RAPathExplorer >> initializeWithSelector: aSelector onVM: aVM [
+	
+	| method |
+	selector := aSelector.
+	vm := aVM.
+	
+	method := aVM class lookupSelector: aSelector.
+	numberOfArguments := (method ast pragmaNamed: #numberOfArguments:) arguments first value.
+	objectBuilder := RAObjectBuilder new
+		interpreter: aVM;
+		nextIndex: 17;
+		yourself
 ]
 
 { #category : #solving }
