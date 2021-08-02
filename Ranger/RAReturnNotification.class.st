@@ -1,6 +1,6 @@
 Class {
 	#name : #RAReturnNotification,
-	#superclass : #Exception,
+	#superclass : #Error,
 	#instVars : [
 		'frameToReturnTo'
 	],

@@ -15,29 +15,28 @@ Class {
 
 { #category : #'building suites' }
 RAPrimitiveAutoTest class >> testParameters [
-
-	| interpreter matrix primitives suite interpreter32 interpreter64 |
+	| suite matrix interpreter primitives |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-	interpreter32 := (suite detect: [:e | 
-		e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
-		e wordSize = 4]) 
-			setUp; interpreter.
-	interpreter64 := (suite detect: [:e | 
-		e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
-		e wordSize = 8]) 
-			setUp; interpreter.
 	matrix := ParametrizedTestMatrix new.
 	
-	primitives := (interpreter32 class primitiveTable withIndexCollect: [ :e :i | i -> e ])
+	"Find the list of primitives to test"
+	interpreter := suite anyOne setUp; interpreter.
+	primitives := (interpreter class primitiveTable withIndexCollect: [ :e :i | i -> e ])
 		select: [ :e | 
 			e value isSymbol
-				and: [(interpreter32 class lookupSelector: e value) hasPragmaNamed: #numberOfArguments:] ]
+				and: [(interpreter class lookupSelector: e value) hasPragmaNamed: #numberOfArguments:] ]
 		thenCollect: [ :e |
 			{ 
 				e value.
-				(interpreter32 cogit class primitiveTable at: e key - 1) primitiveGenerator.
+				(interpreter cogit class primitiveTable at: e key - 1) primitiveGenerator.
 			}
 		].
+
+	"Build the entire set of tests:
+	 - for each architecture
+	  - for each primitive to test
+	    - for each explored path
+	      => build a test case"
 	primitives do: [ :p | | architectures solutions |
 		architectures := {
 		{ #ISA -> #'aarch64'. #wordSize -> 8}.
@@ -45,9 +44,10 @@ RAPrimitiveAutoTest class >> testParameters [
 		{ #ISA -> #'X64'. #wordSize -> 8}.
 		{ #ISA -> #'ARMv5'. #wordSize -> 4}}.
 		architectures do: [ :arch |
-			interpreter := arch second value = 4
-				ifTrue: [ interpreter32 ]
-				ifFalse: [ interpreter64 ].
+			interpreter :=	(suite detect: [:e | 
+				e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
+				e wordSize = arch second value]) 
+					setUp; interpreter.
 			solutions := RAPathExplorer explore: p first on: interpreter.
 			solutions do: [ :e |
 				matrix addCase: {

@@ -40,7 +40,7 @@ RAPathExplorer >> explore: aSelector on: anObject [
 	
 	solution := self solve: currentPath withInterpreter: anObject.
 	solution isEmpty ] whileFalse.]
-		 on: Error do: [ :e |
+		 on: Exception do: [ :e |
 			solutions add: (RAErrorSolution new
 				selector: aSelector;
 				vm: anObject;
