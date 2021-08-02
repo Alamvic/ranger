@@ -16,7 +16,7 @@ Class {
 { #category : #'building suites' }
 RAPrimitiveAutoTest class >> testParameters [
 
-	| interpreter solutions matrix primitives suite interpreter32 interpreter64 |
+	| interpreter matrix primitives suite interpreter32 interpreter64 |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
 	interpreter32 := (suite detect: [:e | 
 		e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
@@ -38,7 +38,7 @@ RAPrimitiveAutoTest class >> testParameters [
 				(interpreter32 cogit class primitiveTable at: e key - 1) primitiveGenerator.
 			}
 		].
-	primitives do: [ :p | | architectures |
+	primitives do: [ :p | | architectures solutions |
 		architectures := {
 		{ #ISA -> #'aarch64'. #wordSize -> 8}.
 		{ #ISA -> #'IA32'. #wordSize -> 4}.
@@ -48,7 +48,10 @@ RAPrimitiveAutoTest class >> testParameters [
 			interpreter := arch second value = 4
 				ifTrue: [ interpreter32 ]
 				ifFalse: [ interpreter64 ].
-			solutions := RAPathExplorer explore: p first on: interpreter.	
+			solutions := [RAPathExplorer explore: p first on: interpreter]
+				on: Error do: [ :e | 
+					"Let's continue, something failed"
+					#( #'failed!' ) ].
 			solutions do: [ :e |
 				matrix addCase: {
 					arch first.
