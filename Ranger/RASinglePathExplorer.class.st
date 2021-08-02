@@ -439,7 +439,7 @@ RASinglePathExplorer >> interpretIsNonIntegerObjectWith: aRBMessageNode [
 	aRBMessageNode arguments first acceptVisitor: self.
 	smallInteger := self popOperand.
 	
-	concreteValue := receiver first isIntegerObject: smallInteger first.
+	concreteValue := receiver first isNonIntegerObject: smallInteger first.
 	
 	self pushOperand: {
 		concreteValue.
