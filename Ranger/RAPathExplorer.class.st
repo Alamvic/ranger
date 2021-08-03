@@ -11,7 +11,8 @@ Class {
 		'objectBuilder',
 		'numberOfArguments',
 		'selector',
-		'vm'
+		'vm',
+		'failOnError'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -25,42 +26,64 @@ RAPathExplorer class >> explore: aSelector on: anObject [
 
 { #category : #api }
 RAPathExplorer >> explore: aSelector on: anObject [
-	
-	| currentPath solution |
-	
+
+	| currentPath solution currentConstraints |
 	self initializeWithSelector: aSelector onVM: anObject.
-	
-	currentPath := RAPath new.
-	solution := currentPath solveWithInterpreter: anObject.
-	[
-	currentPath := self exploreSolution: solution.
-	solution path: currentPath.
-	solution numberOfArguments: numberOfArguments.
-	solutions add: solution.
-	
+
+	solution := RAConstraintSolution new solver: #initial.
+	currentConstraints := (numberOfArguments to: 0 by: -1)
+		collect: [ :e | | smallInteger |
+			smallInteger := objectBuilder newAbstractObject.
+			smallInteger typeTag value: 1.
+			smallInteger integerValue value: 0.
+			smallInteger ].	
+	[ 
+	[ | initialValues |
+	initialValues := currentConstraints
+		collect: [ :e | objectBuilder instantiate: e ].
+	currentPath := RASinglePathExplorer new
+		               explore: selector
+		               on: vm
+		               withValues: initialValues
+		               explorer: self.
+	solutions add: (RAConstraintSolution new
+		inputConstraints: currentConstraints;
+		path: currentPath;
+		solver: solution solver;
+		yourself).
+
+	"Negate and solve constraints!"
 	solution := self solve: currentPath withInterpreter: anObject.
-	solution isEmpty ] whileFalse.
+	currentConstraints := currentPath inputs collect: [ :e | e second ].
+	solution isEmpty ] whileFalse ]
+		on: Exception
+		do: [ :e | 
+			failOnError ifTrue: [ e pass ].
+			solutions add: (RAErrorSolution new
+					 vm: vm;
+					 selector: selector;
+					 error: e freeze;
+					 yourself) ].
 	^ solutions
 ]
 
-{ #category : #api }
-RAPathExplorer >> exploreSolution: solution [
+{ #category : #accessing }
+RAPathExplorer >> failOnError [
 
-	| initialValues |
-	initialValues := (numberOfArguments "0 based because of Receiver" to: 0 by: -1)
-		collect: [ :e | objectBuilder instantiate: (solution stackValue: e) ].
-	
-	^ RASinglePathExplorer new
-		explore: selector
-		on: vm
-		withValues: initialValues
-		explorer: self
+	^ failOnError
+]
+
+{ #category : #accessing }
+RAPathExplorer >> failOnError: anObject [
+
+	failOnError := anObject
 ]
 
 { #category : #api }
 RAPathExplorer >> initialize [
 
 	super initialize.
+	failOnError := true.
 	executionStack := OrderedCollection new.
 	solutions := OrderedCollection new
 ]
@@ -82,7 +105,7 @@ RAPathExplorer >> initializeWithSelector: aSelector onVM: aVM [
 
 { #category : #solving }
 RAPathExplorer >> solve: aRAPath withInterpreter: interpreter [
-	
+
 	^ self solveAtLeast: aRAPath pathConstraints size inPathConstraint: aRAPath withInterpreter: interpreter
 ]
 
@@ -90,30 +113,32 @@ RAPathExplorer >> solve: aRAPath withInterpreter: interpreter [
 RAPathExplorer >> solveAtLeast: ktry inPathConstraint: aRAPath withInterpreter: interpreter [
 	
 	| nextPath solution j |
-	j := (executionStack lastIndexOf: false) min: ktry.
-	(j = 0 or: [j > aRAPath pathConstraints size]) ifTrue: [ ^ RAPath new solveWithInterpreter: interpreter ].
+	j := (executionStack first: ktry) lastIndexOf: false.
+	(j = 0 or: [j > aRAPath pathConstraints size])
+		ifTrue: [ ^ RAPath new solveWithInterpreter: interpreter ].
 
 	nextPath := (aRAPath copyWithNumberOfSegments: j) nextPath.
+
 	[solution := nextPath solveWithInterpreter: interpreter]
 		on: MzUnsatisfiable do: [ :e |
 			^ self solveAtLeast: j - 1 inPathConstraint: aRAPath withInterpreter: interpreter ].
-	
+
 	executionStack := executionStack first: j.
 	"Now we expect that the next iteration will go over the other branch at j"
-	executionStack at: j put: (executionStack at: j) not.
+	"executionStack at: j put: (executionStack at: j) not."
 	^ solution
 ]
 
 { #category : #'execution stack' }
 RAPathExplorer >> updateExecutionStackWithConditional: taken position: stackPosition [
 
-	executionStack size <= stackPosition ifTrue: [ 
+	stackPosition "k" < executionStack size ifFalse: [ 
 		executionStack add: false.
 		^ self ].
 
 	"Assert we are taking the branch we expect."
-	"self assert: (executionStack at: stackPosition + 1) = taken."
+	"self assert: (executionStack at: stackPosition ""k"" + 1) = taken."
 
-	(executionStack size = (stackPosition + 1)) ifTrue: [
+	(executionStack size - 1) = stackPosition "k" ifTrue: [
 		executionStack at: stackPosition + 1 put: true ].
 ]

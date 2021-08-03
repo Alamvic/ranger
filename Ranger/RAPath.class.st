@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'pathConstraints',
 		'parent',
-		'failure'
+		'failure',
+		'inputs'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -13,6 +14,7 @@ Class {
 RAPath >> copyWithNumberOfSegments: anInteger [ 
 	
 	^ self copy
+		inputs: self inputs deepCopy;
 		pathConstraints: (self pathConstraints first: anInteger);
 		yourself
 ]
@@ -35,6 +37,18 @@ RAPath >> initialize [
 	super initialize.
 	parent := self.
 	pathConstraints := #()
+]
+
+{ #category : #accessing }
+RAPath >> inputs [
+
+	^ inputs
+]
+
+{ #category : #accessing }
+RAPath >> inputs: anObject [
+
+	inputs := anObject
 ]
 
 { #category : #copying }
@@ -123,10 +137,7 @@ RAPath >> printOn: aStream [
 { #category : #solving }
 RAPath >> solveWithInterpreter: interpreter [
 
-	| constraintVariables solver |
-	constraintVariables := pathConstraints
-		                       flatCollect: [ :e | e variables ]
-		                       as: Set.
+	| solver |
 	solver := MzSolver new.
 	pathConstraints do: [ :e | 
 		solver addConstraint: (e mzConstraintOnInterpreter: interpreter). ].
@@ -136,6 +147,5 @@ RAPath >> solveWithInterpreter: interpreter [
 	^ RAConstraintSolution new
 		  path: self;
 		  solver: solver;
-		  variables: constraintVariables;
 		  yourself
 ]
