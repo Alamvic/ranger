@@ -36,6 +36,7 @@ RAConstraint class >> operands: operands [
 
 	^ self new
 		operands: operands;
+		origin: thisContext stack copy;
 		yourself
 ]
 
