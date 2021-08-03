@@ -23,15 +23,17 @@ RAASTInterpreter >> currentFrame [
 { #category : #visiting }
 RAASTInterpreter >> doBasicMessageSend: aRBMessageNode [
 
-	| method receiver arguments |
+	| method receiver arguments lookupClass |
 	aRBMessageNode receiver acceptVisitor: self. "Resolve it as a normal send"
 	receiver := self popOperand.
 	arguments := aRBMessageNode arguments collect: [ :e | 
 		             e acceptVisitor: self.
 		             self popOperand ].
-	aRBMessageNode isSuperSend ifTrue: [ self halt ].
-	method := self lookupSelector: aRBMessageNode selector inReceiver: receiver.
-	(method selector = #value and: [ receiver first class == RABlockClosure ]) 
+	lookupClass := aRBMessageNode isSuperSend
+		ifTrue: [ self currentFrame method methodClass superclass ]
+		ifFalse: [ receiver first class ].
+	method := self lookupSelector: aRBMessageNode selector inClass: lookupClass.
+	(method selector = #value and: [ lookupClass == RABlockClosure ]) 
 		ifTrue: [ 
 			^ self
 				  interpretBlock: receiver first
