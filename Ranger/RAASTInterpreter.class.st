@@ -243,7 +243,7 @@ RAASTInterpreter >> visitMessageNode: aRBMessageNode [
 		^ self perform: mapping withArguments: { aRBMessageNode } ].
 	
 	"Stop here if we are going far too low level..."
-	self haltIf: [ #(assert: rawNumSlotsOf: byteAt: longAt: long32At: long64At:) includes: aRBMessageNode selector ].
+	self haltIf: [ #(fetchPointer:ofObject: rawNumSlotsOf: byteAt: longAt: long32At: long64At:) includes: aRBMessageNode selector ].
 	^ self doBasicMessageSend: aRBMessageNode
 ]
 
@@ -288,7 +288,8 @@ RAASTInterpreter >> visitSequenceNode: aRBSequenceNode [
 
 { #category : #visiting }
 RAASTInterpreter >> visitSuperNode: aRBVariableNode [ 
-	self shouldBeImplemented.
+	
+	self pushOperand: self receiver
 ]
 
 { #category : #visiting }
