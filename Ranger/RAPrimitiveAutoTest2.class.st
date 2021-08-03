@@ -37,18 +37,20 @@ RAPrimitiveAutoTest2 class >> testParameters [
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	primitives do: [ :p | | architectures solutions |
+	(primitives first: 5) do: [ :p | | architectures solutions |
 		architectures := {
-		{ #ISA -> #'aarch64'. #wordSize -> 8}.
+		"{ #ISA -> #'aarch64'. #wordSize -> 8}."
 		{ #ISA -> #'IA32'. #wordSize -> 4}.
-		{ #ISA -> #'X64'. #wordSize -> 8}.
+		"{ #ISA -> #'X64'. #wordSize -> 8}."
 		{ #ISA -> #'ARMv5'. #wordSize -> 4}}.
 		architectures do: [ :arch |
 			interpreter :=	(suite detect: [:e | 
 				e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
 				e wordSize = arch second value]) 
 					setUp; interpreter.
-			solutions := RAPathExplorer explore: p first on: interpreter.
+			solutions := RAPathExplorer new
+				failOnError: true;
+				explore: p first on: interpreter.
 			solutions do: [ :e |
 				matrix addCase: {
 					arch first.
@@ -90,8 +92,8 @@ RAPrimitiveAutoTest2 >> generator: aString [
 RAPrimitiveAutoTest2 >> prepareAutoCall [
 
 	self
-		prepareStackForSendReceiver: (objectBuilder instantiate: solution receiver)
-		arguments: (solution arguments collect: [:e | objectBuilder instantiate: e ]).
+		prepareStackForSendReceiver: (objectBuilder instantiate: solution receiver) first
+		arguments: (solution arguments collect: [:e | (objectBuilder instantiate: e) first ]).
 ]
 
 { #category : #accessing }
@@ -110,8 +112,7 @@ RAPrimitiveAutoTest2 >> runCaseManaged [
 RAPrimitiveAutoTest2 >> setUp [
 
 	super setUp.
-	solution objectBuilder: self.
-	cogit receiverTags: solution receiverTags.
+	cogit receiverTags: (solution receiverTags value ifNil: [0]).
 	objectBuilder := RAObjectBuilder new
 		interpreter: interpreter;
 		nextIndex: nextIndex;

@@ -48,7 +48,9 @@ RAPrimitiveAutoTest class >> testParameters [
 				e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
 				e wordSize = arch second value]) 
 					setUp; interpreter.
-			solutions := RAPathExplorer explore: p first on: interpreter.
+			solutions := RAPathExplorer new
+				failOnError: false;
+				explore: p first on: interpreter.
 			solutions do: [ :e |
 				matrix addCase: {
 					arch first.
