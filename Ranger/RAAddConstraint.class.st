@@ -7,17 +7,11 @@ Class {
 { #category : #microzinc }
 RAAddConstraint >> mzConstraintOnInterpreter: interpreter [ 
 	
-	| leftOperand rightOperand leftValue rightValue |
+	| leftOperand rightOperand |
 	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
 	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
 
-	leftValue := leftOperand integerValue.
-	rightValue := rightOperand integerValue.
-1halt.
-	^ (RAObject named: UUID new asString)
-		  typeTag: 2 asMzValue;
-		  integerValue: leftValue + rightValue;
-		  yourself "Native value"
+	^ leftOperand + rightOperand
 ]
 
 { #category : #adding }
