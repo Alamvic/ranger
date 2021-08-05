@@ -61,6 +61,9 @@ RAConstraintSolution >> path: aRAPath [
 RAConstraintSolution >> printOn: aStream [
 
 	super printOn: aStream.
+	
+	path ifNil: [ ^ self ].
+	
 	aStream nextPut: $(.
 	self parameterNames
 		do: [ :e | aStream print: e]

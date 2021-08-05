@@ -31,40 +31,54 @@ RAPathExplorer >> explore: aSelector on: anObject [
 	self initializeWithSelector: aSelector onVM: anObject.
 
 	solution := RAConstraintSolution new solver: #initial.
-	currentConstraints := (numberOfArguments to: 0 by: -1)
-		collect: [ :e | | smallInteger |
-			smallInteger := objectBuilder newAbstractObject.
-			smallInteger typeTag value: 1.
-			smallInteger integerValue value: 0.
-			smallInteger ].	
+	currentConstraints := (numberOfArguments to: 0 by: -1) collect: [ :e | 
+		                      | smallInteger |
+		                      smallInteger := objectBuilder
+			                                      newAbstractObject.
+		                      smallInteger typeTag value: 1.
+		                      smallInteger integerValue value: 0.
+		                      smallInteger ].
 	[ 
-	[ | initialValues |
-	initialValues := currentConstraints
-		collect: [ :e | objectBuilder instantiate: e ].
-	currentPath := RASinglePathExplorer new
-		               explore: selector
-		               on: vm
-		               withValues: initialValues
-		               explorer: self.
-	solutions add: (RAConstraintSolution new
-		inputConstraints: currentConstraints;
-		path: currentPath;
-		solver: solution solver;
-		yourself).
+	currentPath := (self
+		 explorePathWithConstraints: currentConstraints
+		 solver: solution solver)
+			ifNil: [ (currentPath ifNil: [ RAPath new ]) nextPath ].
 
 	"Negate and solve constraints!"
 	solution := self solve: currentPath withInterpreter: anObject.
-	currentConstraints := solution path inputs collect: [ :e | e second].
-	solution isEmpty ] whileFalse ]
+	currentConstraints := solution path inputs collect: [ :e | e second ].
+	solution isEmpty ] whileFalse.
+	^ solutions
+]
+
+{ #category : #api }
+RAPathExplorer >> explorePathWithConstraints: constraintsToExplore solver: solver [
+
+	| values path |
+	[ 
+	values := constraintsToExplore collect: [ :e | 
+		          objectBuilder instantiate: e ].
+	path := RASinglePathExplorer new
+		        explore: selector
+		        on: vm
+		        withValues: values
+		        explorer: self ]
 		on: Exception
 		do: [ :e | 
 			failOnError ifTrue: [ e pass ].
-			solutions add: (RAErrorSolution new
+			self recordSolution: (RAErrorSolution new
+					 inputConstraints: constraintsToExplore;
 					 vm: vm;
 					 selector: selector;
 					 error: e freeze;
 					 yourself) ].
-	^ solutions
+
+	self recordSolution: (RAConstraintSolution new
+			 inputConstraints: constraintsToExplore;
+			 path: path;
+			 solver: solver;
+			 yourself).
+	^ path
 ]
 
 { #category : #accessing }
@@ -104,6 +118,12 @@ RAPathExplorer >> initializeWithSelector: aSelector onVM: aVM [
 ]
 
 { #category : #solving }
+RAPathExplorer >> recordSolution: aSolution [
+
+	solutions add: aSolution
+]
+
+{ #category : #solving }
 RAPathExplorer >> solve: aRAPath withInterpreter: interpreter [
 
 	^ self solveAtLeast: aRAPath pathConstraints size inPathConstraint: aRAPath withInterpreter: interpreter
@@ -111,17 +131,36 @@ RAPathExplorer >> solve: aRAPath withInterpreter: interpreter [
 
 { #category : #solving }
 RAPathExplorer >> solveAtLeast: ktry inPathConstraint: aRAPath withInterpreter: interpreter [
-	
+
 	| nextPath solution j |
-	j := (executionStack first: ktry) lastIndexOf: false.
-	(j = 0 or: [j > aRAPath pathConstraints size])
-		ifTrue: [ ^ RAPath new solveWithInterpreter: interpreter ].
+	j := (executionStack first: (executionStack size min: ktry)) lastIndexOf: false.
+	(j = 0 or: [ j > aRAPath pathConstraints size ]) ifTrue: [ 
+		^ RAPath new solveWithInterpreter: interpreter ].
 
 	nextPath := (aRAPath copyWithNumberOfSegments: j) nextPath.
 
-	[solution := nextPath solveWithInterpreter: interpreter]
-		on: MzUnsatisfiable do: [ :e |
-			^ self solveAtLeast: j - 1 inPathConstraint: aRAPath withInterpreter: interpreter ].
+	[ 
+	[ solution := nextPath solveWithInterpreter: interpreter ]
+		on: MzUnsatisfiable
+		do: [ :e | 
+			^ self
+				  solveAtLeast: j - 1
+				  inPathConstraint: aRAPath
+				  withInterpreter: interpreter ] ]
+		on: Exception
+		do: [ :e |
+			"If there is a timeout, record that this path has shown a bug in the solver
+			Then retry with the next one"
+			self recordSolution: (RAErrorSolution new
+					 path: aRAPath;
+					 vm: vm;
+					 selector: selector;
+					 error: e freeze;
+					 yourself).
+			^ self
+				  solveAtLeast: j - 1
+				  inPathConstraint: aRAPath
+				  withInterpreter: interpreter ].
 
 	executionStack := executionStack first: j.
 	"Now we expect that the next iteration will go over the other branch at j"

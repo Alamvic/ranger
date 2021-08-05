@@ -39,9 +39,9 @@ RAPrimitiveAutoTest class >> testParameters [
 	      => build a test case"
 	primitives do: [ :p | | architectures solutions |
 		architectures := {
-		{ #ISA -> #'aarch64'. #wordSize -> 8}.
+		"{ #ISA -> #'aarch64'. #wordSize -> 8}."
 		{ #ISA -> #'IA32'. #wordSize -> 4}.
-		{ #ISA -> #'X64'. #wordSize -> 8}.
+		"{ #ISA -> #'X64'. #wordSize -> 8}."
 		{ #ISA -> #'ARMv5'. #wordSize -> 4}}.
 		architectures do: [ :arch |
 			interpreter :=	(suite detect: [:e | 
@@ -57,7 +57,8 @@ RAPrimitiveAutoTest class >> testParameters [
 					arch second.
 					#primitive -> p first.
 					#generator -> p second.
-					#solution -> e } ] ] ].
+					#solution -> e } ] ] ]
+		displayingProgress: [ :p |  (p first -> p second) asString ].
 	
 	^ matrix
 ]

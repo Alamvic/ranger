@@ -4,7 +4,9 @@ Class {
 	#instVars : [
 		'selector',
 		'vm',
-		'error'
+		'error',
+		'path',
+		'inputConstraints'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -19,6 +21,30 @@ RAErrorSolution >> error [
 RAErrorSolution >> error: anObject [
 
 	error := anObject
+]
+
+{ #category : #accessing }
+RAErrorSolution >> inputConstraints [
+
+	^ inputConstraints
+]
+
+{ #category : #accessing }
+RAErrorSolution >> inputConstraints: anObject [
+
+	inputConstraints := anObject
+]
+
+{ #category : #accessing }
+RAErrorSolution >> path [
+
+	^ path
+]
+
+{ #category : #accessing }
+RAErrorSolution >> path: anObject [
+
+	path := anObject
 ]
 
 { #category : #accessing }
