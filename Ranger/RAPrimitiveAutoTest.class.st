@@ -92,8 +92,8 @@ RAPrimitiveAutoTest >> generator: aString [
 RAPrimitiveAutoTest >> prepareAutoCall [
 
 	self
-		prepareStackForSendReceiver: (objectBuilder instantiate: solution receiver)
-		arguments: (solution arguments collect: [:e | objectBuilder instantiate: e ]).
+		prepareStackForSendReceiver: (objectBuilder instantiate: solution receiver) first
+		arguments: (solution arguments collect: [:e | (objectBuilder instantiate: e) first ]).
 ]
 
 { #category : #accessing }
@@ -112,8 +112,7 @@ RAPrimitiveAutoTest >> runCaseManaged [
 RAPrimitiveAutoTest >> setUp [
 
 	super setUp.
-	solution objectBuilder: self.
-	cogit receiverTags: solution receiverTags.
+	cogit receiverTags: (solution receiverTags value ifNil: [0]).
 	objectBuilder := RAObjectBuilder new
 		interpreter: interpreter;
 		nextIndex: nextIndex;

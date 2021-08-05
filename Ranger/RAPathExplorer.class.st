@@ -54,7 +54,7 @@ RAPathExplorer >> explore: aSelector on: anObject [
 
 	"Negate and solve constraints!"
 	solution := self solve: currentPath withInterpreter: anObject.
-	currentConstraints := currentPath inputs collect: [ :e | e second ].
+	currentConstraints := solution path inputs collect: [ :e | e second].
 	solution isEmpty ] whileFalse ]
 		on: Exception
 		do: [ :e | 

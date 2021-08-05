@@ -9,7 +9,8 @@ Class {
 		'classIndex',
 		'slots',
 		'numSlots',
-		'classObject'
+		'classObject',
+		'long32Slots'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -54,6 +55,22 @@ RAObject >> classObject: anObject [
 	classObject := anObject
 ]
 
+{ #category : #slots }
+RAObject >> fetchLong32: aConcreteAbstractPair [
+	
+	| long32 |
+	long32 := MzVariable new
+		name: variableName , '_long32_', aConcreteAbstractPair first asString;
+		type: '-100000..100000' "quite a range for 32 bit integers";
+		yourself.
+	long32Slots at: aConcreteAbstractPair first ifPresent: [ self halt ].
+	long32Slots at: aConcreteAbstractPair first put: (RASlot new
+		index: aConcreteAbstractPair second;
+		value: long32;
+		yourself).
+	^ long32
+]
+
 { #category : #accessing }
 RAObject >> format [
 
@@ -69,6 +86,7 @@ RAObject >> initializeWithVariableName: aName [
 		              type: '0..1000000' "A million slots is more than enough to test...";
 		              yourself.
 	slots := Dictionary new.
+	long32Slots := Dictionary new.
 
 	typeTag := MzVariable new
 		           name: variableName , '_type';

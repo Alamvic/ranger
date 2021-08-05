@@ -50,6 +50,7 @@ RAObjectBuilder >> instantiate: aRAObject [
 	
 		classIndex := self allocateClassObject: aRAObject classObject.
 		self haltIf: [ classIndex = 0 ].
+		self haltIf: [ aRAObject specialObjectIndex value notNil ].
 		^ {self
 			allocateNewSpaceSlots: (aRAObject numSlots value ifNil: [ 0 ])
 			format: (aRAObject format value ifNil: [ 0 ]) "object with instance variables"

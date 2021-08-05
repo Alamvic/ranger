@@ -71,9 +71,12 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #pop:thenPushBool: put: #interpretPopThenPushBoolWith:.
 	
 	"Object format"
-	specialCases at: #formatOfObject: put: #interpretFormatOfObjectWith:.
+	specialCases at: #formatOf: put: #interpretFormatOfObjectWith:.
 	specialCases at: #fetchClassOfNonImm: put: #interpretFetchClassOfNonImmWith:.
 	specialCases at: #fixedFieldsOfClass: put: #interpretFixedFieldsOfClassWith:.
+	specialCases at: #numSlotsOf: put: #interpretNumSlotsOfWith:.
+	
+	specialCases at: #fetchLong32:ofObject: put: #interpretFetchLong32OfObjectWith:.
 	
 	specialCases at: #integerValueOf: put: #interpretIntegerValueOfWith:.
 	specialCases at: #integerObjectOf: put: #interpretIntegerObjectOfWith:.
@@ -94,6 +97,9 @@ RASinglePathExplorer >> initializeSpecialCases [
 	
 	"special simulation cases"
 	specialCases at: #cCode:inSmalltalk: put: #interpretCCodeInSmalltalkWith:.
+	specialCases at: #sizeof: put: #interpretSizeofWith:.
+	specialCases at: #cCoerceSimple:to: put: #interpretCCoerceSimpleToWith:.
+
 	
 	"Conditions -- to add constraints"
 "	specialCases at: #~= put: #interpretNotEqualsWith:.
@@ -163,6 +169,26 @@ RASinglePathExplorer >> interpretAreIntegersAreWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretCCoerceSimpleToWith: aRBMessageNode [ 
+	
+	| object vm concreteValue type |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	object := self popOperand.
+
+	aRBMessageNode arguments second acceptVisitor: self.
+	type := self popOperand.
+
+	concreteValue := vm first cCoerceSimple: object first to: type first.
+	self pushOperand: {
+		concreteValue.
+		RAConstant value: concreteValue
+	}
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretClassIndexOfWith: aRBMessageNode [ 
 	
 	| object vm |
@@ -222,6 +248,27 @@ RASinglePathExplorer >> interpretFetchClassOfNonImmWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretFetchLong32OfObjectWith: aRBMessageNode [ 
+
+	| oop vm concreteValue index |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	index := self popOperand.
+	
+	aRBMessageNode arguments second acceptVisitor: self.
+	oop := self popOperand.
+
+	concreteValue := vm first fetchLong32: index first ofObject: oop first.	
+	
+	self pushOperand: {
+		concreteValue.
+		oop second fetchLong32: index
+	}
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretFixedFieldsOfClassWith: aRBMessageNode [ 
 
 	| oop vm concreteValue |
@@ -250,7 +297,7 @@ RASinglePathExplorer >> interpretFormatOfObjectWith: aRBMessageNode [
 	oop := self popOperand.
 
 	self pushOperand: {
-		(receiver first formatOfObject: oop first).
+		(receiver first formatOf: oop first).
 		oop second format
 	}
 ]
@@ -500,6 +547,24 @@ RASinglePathExplorer >> interpretNumSlotsOfAnyWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretNumSlotsOfWith: aRBMessageNode [ 
+
+	| oop vm concreteValue |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	oop := self popOperand.
+
+	concreteValue := vm first numSlotsOf: oop first.	
+	
+	self pushOperand: {
+		concreteValue.
+		oop second numSlots
+	}
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretOrWith: aRBMessageNode [ 
 	
 	| condition |
@@ -584,6 +649,23 @@ RASinglePathExplorer >> interpretPrimitive: method receiver: receiver arguments:
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretSizeofWith: aRBMessageNode [ 
+	
+	| object vm concreteSizeOf |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	object := self popOperand.
+
+	concreteSizeOf := vm first sizeof: object first.
+	self pushOperand: {
+		concreteSizeOf.
+		RAConstant value: concreteSizeOf
+	}
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretSpecialObjectWith: aRBMessageNode [ 
 	
 	| vm index operand abstractSpecialObject |
@@ -595,11 +677,10 @@ RASinglePathExplorer >> interpretSpecialObjectWith: aRBMessageNode [
 	self assert: operand second isConstant.
 	index := operand first.
 
-	1halt.
 	abstractSpecialObject := (RAObject named: UUID new asString)
-		typeTag: 0 "Normal object";
+		typeTag: 0;
 		specialObjectIndex: operand second;
-		yourself "Native value".
+		yourself.
 	
 	self pushOperand: { vm splObj: index . abstractSpecialObject }
 ]

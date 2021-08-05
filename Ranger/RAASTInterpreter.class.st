@@ -231,8 +231,8 @@ RAASTInterpreter >> visitLiteralValueNode: aRBLiteralValueNode [
 { #category : #visiting }
 RAASTInterpreter >> visitMessageNode: aRBMessageNode [
 
-	(aRBMessageNode selector = #assert:) ifTrue: [ 
-		"If this is an assert, ignore it.
+	(#(flag: assert:) includes: aRBMessageNode selector) ifTrue: [ 
+		"If this is an assert or flag, ignore it.
 		Make sure it is a stament, otherwise its value is used???"
 		self assert: aRBMessageNode parent isSequence.
 		self pushOperand: nil.

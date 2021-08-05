@@ -14,7 +14,6 @@ Class {
 RAPath >> copyWithNumberOfSegments: anInteger [ 
 	
 	^ self copy
-		inputs: self inputs deepCopy;
 		pathConstraints: (self pathConstraints first: anInteger);
 		yourself
 ]
@@ -36,7 +35,8 @@ RAPath >> initialize [
 
 	super initialize.
 	parent := self.
-	pathConstraints := #()
+	inputs := pathConstraints := #().
+
 ]
 
 { #category : #accessing }
@@ -142,6 +142,7 @@ RAPath >> solveWithInterpreter: interpreter [
 	pathConstraints do: [ :e | 
 		solver addConstraint: (e mzConstraintOnInterpreter: interpreter). ].
 
+	solver timeout: 2 seconds.
 	solver satisfy.
 
 	^ RAConstraintSolution new
