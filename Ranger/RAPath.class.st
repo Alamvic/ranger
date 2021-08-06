@@ -73,21 +73,14 @@ RAPath >> isEmpty [
 { #category : #negating }
 RAPath >> negateLastSegmentInCommonWith: aParent [ 
 	
-	| newConstraintPath i |
-	newConstraintPath := OrderedCollection new.
-	i := 1.
-	[ pathConstraints size >= i
-		and: [ aParent pathConstraints size >= i
-			and: [ (pathConstraints at: i) = (aParent pathConstraints at: i) ]]]
-				whileTrue: [ 
-					newConstraintPath add: (pathConstraints at: i).
-					i := i + 1 ].
-			
-	newConstraintPath ifNotEmpty: [ 
-		newConstraintPath := newConstraintPath
-			copyReplaceAll: { newConstraintPath last }
-			with: { newConstraintPath last negated } ].
-	pathConstraints := newConstraintPath.
+	| newPathConstraints |
+	pathConstraints ifEmpty: [ ^ self ].
+	
+	newPathConstraints := pathConstraints copy.
+	newPathConstraints
+		at: pathConstraints size
+		put: pathConstraints last negated.
+	pathConstraints := newPathConstraints.
 ]
 
 { #category : #searching }
