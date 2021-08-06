@@ -141,9 +141,9 @@ RAPathExplorer >> solveAtLeast: ktry inPathConstraint: aRAPath withInterpreter: 
 		do: [ :e |
 			^ self
 				  solveAtLeast: j - 1
-				  inPathConstraint: nextPath
+				  inPathConstraint: aRAPath
 				  withInterpreter: interpreter ] ]
-		on: Exception
+		on: Error
 		do: [ :e |
 			"If there is a timeout, record that this path has shown a bug in the solver
 			Then retry with the next one"
