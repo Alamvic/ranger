@@ -2,8 +2,8 @@ Class {
 	#name : #RABlockClosure,
 	#superclass : #Object,
 	#instVars : [
-		'home',
-		'ast'
+		'ast',
+		'outerContext'
 	],
 	#category : #'Ranger-Interpreter'
 }
@@ -13,7 +13,7 @@ RABlockClosure class >> on: aRBBlockNode home: aFrame [
 
 	^ self new
 		ast: aRBBlockNode;
-		home: aFrame;
+		outerContext: aFrame;
 		yourself
 ]
 
@@ -36,13 +36,13 @@ RABlockClosure >> cull: arg [
 { #category : #accessing }
 RABlockClosure >> home [
 
-	^ home
+	^ outerContext home
 ]
 
 { #category : #accessing }
-RABlockClosure >> home: anObject [
+RABlockClosure >> outerContext: anObject [
 
-	home := anObject
+	outerContext := anObject
 ]
 
 { #category : #evaluating }
