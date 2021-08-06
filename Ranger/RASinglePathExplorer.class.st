@@ -70,6 +70,7 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #pop:thenPush: put: #interpretPopThenPushWith:.
 	specialCases at: #pop:thenPushBool: put: #interpretPopThenPushBoolWith:.
 	specialCases at: #pop:thenPushFloat: put: #interpretPopThenPushFloatWith:.
+	specialCases at: #pop:thenPushInteger: put: #interpretPopThenPushIntWith:.
 	
 	"Object format"
 	specialCases at: #formatOf: put: #interpretFormatOfObjectWith:.
@@ -77,6 +78,7 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #fetchClassOf: put: #interpretFetchClassOfWith:.
 	specialCases at: #fixedFieldsOfClass: put: #interpretFixedFieldsOfClassWith:.
 	specialCases at: #numSlotsOf: put: #interpretNumSlotsOfWith:.
+	specialCases at: #numBytesOfBytes: put: #interpretNumBytesOfBytesWith:.
 	specialCases at: #rawHashBitsOf: put: #interpretRawHashBitsOfWith:.
 	
 	specialCases at: #fetchLong32:ofObject: put: #interpretFetchLong32OfObjectWith:.
@@ -87,6 +89,10 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #isIntegerValue: put: #interpretIsIntegerValueWith:.
 	specialCases at: #isIntegerObject: put: #interpretIsIntegerObjectWith:.
 	specialCases at: #isNonIntegerObject: put: #interpretIsNonIntegerObjectWith:.
+
+	specialCases at: #isCharacterObject: put: #interpretIsCharacterObjectWith:.
+	specialCases at: #characterValueOf: put: #interpretCharacterValueOfWith:.
+
 	specialCases at: #isImmediate: put: #interpretIsImmediateWith:.
 	specialCases at: #isNonImmediate: put: #interpretIsNonImmediateWith:.
 	specialCases at: #isForwarded: put: #interpretIsForwardedWith:.
@@ -628,6 +634,38 @@ RASinglePathExplorer >> interpretIsNonIntegerObjectWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretNumBytesOfBytesWith: aRBMessageNode [ 
+
+	"Special case to avoid interpreting bit ands"
+	| oop vm concreteValue |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	oop := self popOperand.
+
+	concreteValue := vm first numBytesOfBytes: oop first.	
+	
+	"
+	This should compute: 
+		slots << shiftForWord - (format bitAnd: 7)
+	However, we only do on the abstract side: 
+		slots * (2 ^ shiftForWord)
+	This makes the result less exact but easier to interpret/solve.
+	The constraint solver does not manage bit wise operations (yet).
+	Thus
+	 - transform the bit shift into a multiplication
+	 - do not remove the padding because is computed as format bitAnd: 7"
+	self pushOperand: {
+		concreteValue.
+		RAMultiplicationConstraint operands: { 
+			oop second numSlots.
+			RAConstant value: (2 raisedTo: vm first shiftForWord)
+		}
+	}
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretNumSlotsOfAnyWith: aRBMessageNode [ 
 	
 	| oop receiver |
@@ -727,6 +765,34 @@ RASinglePathExplorer >> interpretPopThenPushFloatWith: aRBMessageNode [
 	float := self popOperand.
 	concreteFloatObject := vm first objectMemory floatObjectOf: float first.
 	self push: { concreteFloatObject . RAFloatObjectOf operands: float second }.
+
+	"pop:thenPush: does not return an interesting value"
+	self pushOperand: self receiver.
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretPopThenPushIntWith: aRBMessageNode [ 
+
+	"Pop N elements from the operand stack.
+	Pushes the second argument to the stack.
+	
+	Pop: keep track of the operand stack and remove one element
+	Push: move the value to the physical register assigned to the current stack position"
+	
+	| elementsToPop vm float concreteIntegerObject |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	elementsToPop := self popOperand.
+	elementsToPop first isInteger
+		ifFalse: [ self error: 'expected an integer value' ].	
+	aRBMessageNode arguments second acceptVisitor: self.
+	self pop: elementsToPop first.
+
+	float := self popOperand.
+	concreteIntegerObject := vm first objectMemory integerObjectOf: float first.
+	self push: { concreteIntegerObject . RAIntegerObjectOf operands: float second }.
 
 	"pop:thenPush: does not return an interesting value"
 	self pushOperand: self receiver.
