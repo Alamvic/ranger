@@ -185,7 +185,7 @@ RAPrimitiveAutoTest >> solution: aSolution [
 RAPrimitiveAutoTest >> testPrimitive [
 
 	primitiveAddress := self compile: [ 
-		compilationResult := cogit objectRepresentation perform: generator.
+		compilationResult := cogit objectRepresentation perform: generator "#genPrimitiveBitShift".
 		"If the primitive fails it continues, so we need to have an instruction to detect the end"
 		endInstruction := cogit Stop ]
 		bytecodes: 15.
