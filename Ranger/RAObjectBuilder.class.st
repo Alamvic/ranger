@@ -44,6 +44,10 @@ RAObjectBuilder >> defaultFormatForClassIndex: anInteger [
 	"If it is the boxed float class, we set first long format by default"
 	anInteger = 34 ifTrue: [ 
 		^ interpreter objectMemory firstLongFormat ].
+	anInteger = 33 ifTrue: [ 
+		^ interpreter objectMemory firstByteFormat ].
+	anInteger = 32 ifTrue: [ 
+		^ interpreter objectMemory firstByteFormat ].
 	
 	"object with instance variables"
 	^ 0
