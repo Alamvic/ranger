@@ -243,7 +243,8 @@ RAASTInterpreter >> visitMessageNode: aRBMessageNode [
 		^ self perform: mapping withArguments: { aRBMessageNode } ].
 	
 	"Stop here if we are going far too low level..."
-	self haltIf: [ #(fetchPointer:ofObject: rawNumSlotsOf: byteAt: longAt: long32At: long64At:) includes: aRBMessageNode selector ].
+	(#(fetchPointer:ofObject: storePointer:ofObject:withValue: rawNumSlotsOf: byteAt: longAt: long32At: long64At: unsignedLongAt:) includes: aRBMessageNode selector)
+		ifTrue: [ self halt. ^ self pushOperand: { 0 . nil } ].
 	^ self doBasicMessageSend: aRBMessageNode
 ]
 
