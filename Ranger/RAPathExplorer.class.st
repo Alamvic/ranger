@@ -18,14 +18,7 @@ Class {
 }
 
 { #category : #api }
-RAPathExplorer class >> explore: aSelector on: anObject [
-	
-	^ self new
-		explore: aSelector on: anObject
-]
-
-{ #category : #api }
-RAPathExplorer >> explore: aSelector on: anObject [
+RAPathExplorer >> explore: aSelector on: anObject vmBuildingBlock: aBuildingBlock [
 
 	| currentPath solution currentConstraints |
 	self initializeWithSelector: aSelector onVM: anObject.
@@ -45,10 +38,10 @@ RAPathExplorer >> explore: aSelector on: anObject [
 			ifNil: [ (currentPath ifNil: [ RAPath new ]) nextPath ].
 
 	"Negate and solve constraints!"
-	vm objectMemory instSpecOfClass: (vm objectMemory knownClassAtIndex: 34).
-	
 	solution := self solve: currentPath withInterpreter: anObject.
 	currentConstraints := solution path inputs collect: [ :e | e second ].
+	self initializeWithSelector: aSelector onVM: aBuildingBlock value.
+	
 	solution isEmpty ] whileFalse.
 	^ solutions
 ]

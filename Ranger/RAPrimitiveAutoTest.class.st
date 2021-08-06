@@ -31,8 +31,13 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 		               setUp;
 		               interpreter.
 	^ RAPathExplorer new
-		  failOnError: true;
-		  explore: aPrimitive on: interpreter
+		  failOnError: false;
+		  explore: aPrimitive on: interpreter vmBuildingBlock: [ 
+			  (suite detect: [ :e | 
+					   e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
+					   e wordSize = aWordSize ])
+				  setUp;
+				  interpreter ]
 ]
 
 { #category : #'building suites' }
@@ -79,15 +84,22 @@ RAPrimitiveAutoTest class >> testParameters [
 					                 (#wordSize -> 4) } }.
 			"{ #ISA -> #'aarch64'. #wordSize -> 8}."
 			architectures do: [ :arch | 
-				interpreter := (suite detect: [ :e | 
-						                e parametersToUse do: [ :aParameter | 
-								                aParameter applyTo: e ].
-						                e wordSize = arch second value ])
+				| theSetUpTest |
+				theSetUpTest := suite detect: [ :e | 
+					                e parametersToUse do: [ :aParameter | 
+						                aParameter applyTo: e ].
+					                e wordSize = arch second value ].
+				interpreter := theSetUpTest
 					               setUp;
 					               interpreter.
 				solutions := RAPathExplorer new
 					             failOnError: false;
-					             explore: p first on: interpreter.
+					             explore: p first
+					             on: interpreter
+					             vmBuildingBlock: [ 
+						             theSetUpTest
+							             setUp;
+							             interpreter ].
 				solutions do: [ :e | 
 					matrix addCase: { 
 							arch first.
