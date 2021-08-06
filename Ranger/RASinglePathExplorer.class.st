@@ -194,6 +194,22 @@ RASinglePathExplorer >> interpretCCoerceSimpleToWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretCharacterValueOfWith: aRBMessageNode [ 
+	
+	| smallInteger receiver |
+	aRBMessageNode receiver acceptVisitor: self.
+	receiver := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	smallInteger := self popOperand.
+
+	self pushOperand: {
+		(receiver first characterValueOf: smallInteger first).
+		smallInteger second integerValue
+	}
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretClassIndexOfWith: aRBMessageNode [ 
 	
 	| object vm |
@@ -458,6 +474,23 @@ RASinglePathExplorer >> interpretIntegerValueOfWith: aRBMessageNode [
 	self pushOperand: {
 		(receiver first integerValueOf: smallInteger first).
 		smallInteger second integerValue
+	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretIsCharacterObjectWith: aRBMessageNode [ 
+	
+	| smallInteger receiver concreteValue |
+	aRBMessageNode receiver acceptVisitor: self.
+	receiver := self popOperand.
+
+	aRBMessageNode arguments first acceptVisitor: self.
+	smallInteger := self popOperand.
+	concreteValue := receiver first isCharacterObject: smallInteger first.
+	
+	self pushOperand: {
+		concreteValue.
+		RAIsCharacterObject operands: { smallInteger second }
 	}
 ]
 

@@ -74,6 +74,11 @@ RAObjectBuilder >> instantiate: aRAObject [
 		concreteInteger := interpreter objectMemory integerObjectOf: (aRAObject integerValue value ifNil: [0]).
 		abstractInteger := self newAbstractObject.
 		^ { concreteInteger . abstractInteger }  ].
+	typeTag = 2 ifTrue: [ 
+		| concreteCharacter abstractCharacter |
+		concreteCharacter := interpreter objectMemory characterObjectOf: (aRAObject integerValue value ifNil: [0]).
+		abstractCharacter := self newAbstractObject.
+		^ { concreteCharacter . abstractCharacter }  ].
 	self halt.
 ]
 
