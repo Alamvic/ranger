@@ -89,14 +89,18 @@ RAObject >> initializeWithVariableName: aName [
 	variableName := aName.
 	numSlots := MzVariable new
 		              name: variableName , '_numSlots';
-		              type: '0..1000000' "A million slots is more than enough to test...";
+		              type: '0..300' "300 slots is enough to hit large objects";
 		              yourself.
 	slots := Dictionary new.
 	long32Slots := Dictionary new.
 
+	"
+	- 0 is normal object
+	- 1 is small integer
+	- 2 is character"
 	typeTag := MzVariable new
 		           name: variableName , '_type';
-		           type: '0..1';
+		           type: '0..2';
 		           yourself.
 
 	integerValue := MzVariable new
