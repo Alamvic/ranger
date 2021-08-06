@@ -46,7 +46,7 @@ RAConstraint class >> operation: anOperation operands: operands [
 
 	^ (self constraintClassFor: anOperation) new
 		operands: operands;
-		yourself
+		simplify
 ]
 
 { #category : #adding }
@@ -128,6 +128,12 @@ RAConstraint >> printOn: aStream [
 		separatedBy: [ aStream nextPutAll: ', ' ].
 	aStream nextPut: $).
 	
+]
+
+{ #category : #'as yet unclassified' }
+RAConstraint >> simplify [
+
+	^ self
 ]
 
 { #category : #testing }
