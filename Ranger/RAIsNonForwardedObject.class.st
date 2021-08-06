@@ -6,5 +6,6 @@ Class {
 
 { #category : #negating }
 RAIsNonForwardedObject >> negated [
-	self shouldBeImplemented.
+	
+	^ RAIsForwardedObject operands: self operands
 ]
