@@ -45,6 +45,8 @@ RAPathExplorer >> explore: aSelector on: anObject [
 			ifNil: [ (currentPath ifNil: [ RAPath new ]) nextPath ].
 
 	"Negate and solve constraints!"
+	vm objectMemory instSpecOfClass: (vm objectMemory knownClassAtIndex: 34).
+	
 	solution := self solve: currentPath withInterpreter: anObject.
 	currentConstraints := solution path inputs collect: [ :e | e second ].
 	solution isEmpty ] whileFalse.
@@ -71,7 +73,9 @@ RAPathExplorer >> explorePathWithConstraints: constraintsToExplore solver: solve
 					 vm: vm;
 					 selector: selector;
 					 error: e freeze;
-					 yourself) ].
+					 yourself).
+			"Could not explore this path!"
+			^ nil ].
 
 	self recordSolution: (RAConstraintSolution new
 			 inputConstraints: constraintsToExplore;
@@ -108,7 +112,6 @@ RAPathExplorer >> initializeWithSelector: aSelector onVM: aVM [
 	| method |
 	selector := aSelector.
 	vm := aVM.
-	
 	method := aVM class lookupSelector: aSelector.
 	numberOfArguments := (method ast pragmaNamed: #numberOfArguments:) arguments first value.
 	objectBuilder := RAObjectBuilder new
@@ -142,21 +145,22 @@ RAPathExplorer >> solveAtLeast: ktry inPathConstraint: aRAPath withInterpreter: 
 	[ 
 	[ solution := nextPath solveWithInterpreter: interpreter ]
 		on: MzUnsatisfiable
-		do: [ :e | 
+		do: [ :e |
 			^ self
 				  solveAtLeast: j - 1
-				  inPathConstraint: aRAPath
+				  inPathConstraint: nextPath
 				  withInterpreter: interpreter ] ]
 		on: Exception
 		do: [ :e |
 			"If there is a timeout, record that this path has shown a bug in the solver
 			Then retry with the next one"
 			self recordSolution: (RAErrorSolution new
-					 path: aRAPath;
+					 path: nextPath;
 					 vm: vm;
 					 selector: selector;
 					 error: e freeze;
 					 yourself).
+
 			^ self
 				  solveAtLeast: j - 1
 				  inPathConstraint: aRAPath

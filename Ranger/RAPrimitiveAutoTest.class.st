@@ -14,52 +14,89 @@ Class {
 }
 
 { #category : #'building suites' }
+RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: aWordSize [
+
+	| suite interpreter |
+	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
+
+	"Find the list of primitives to test"
+	interpreter := suite anyOne
+		               setUp;
+		               interpreter.
+
+	interpreter := (suite detect: [ :e | 
+			                e parametersToUse do: [ :aParameter | 
+					                aParameter applyTo: e ].
+			                e wordSize = aWordSize ])
+		               setUp;
+		               interpreter.
+	^ RAPathExplorer new
+		  failOnError: true;
+		  explore: aPrimitive on: interpreter
+]
+
+{ #category : #'building suites' }
 RAPrimitiveAutoTest class >> testParameters [
+
 	| suite matrix interpreter primitives |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
 	matrix := ParametrizedTestMatrix new.
-	
+
 	"Find the list of primitives to test"
-	interpreter := suite anyOne setUp; interpreter.
-	primitives := (interpreter class primitiveTable withIndexCollect: [ :e :i | i -> e ])
-		select: [ :e | 
-			e value isSymbol
-				and: [(interpreter class lookupSelector: e value) hasPragmaNamed: #numberOfArguments:] ]
-		thenCollect: [ :e |
-			{ 
-				e value.
-				(interpreter cogit class primitiveTable at: e key - 1) primitiveGenerator.
-			}
-		].
+	interpreter := suite anyOne
+		               setUp;
+		               interpreter.
+	primitives := (interpreter class primitiveTable withIndexCollect: [ 
+		               :e 
+		               :i | i -> e ])
+		              select: [ :e | 
+			              e value isSymbol and: [ 
+				              ((interpreter class lookupSelector: e value) 
+					               hasPragmaNamed: #numberOfArguments:) and: [ 
+					              (interpreter cogit class primitiveTable at:
+						               e key - 1) primitiveGenerator notNil ] ] ]
+		              thenCollect: [ :e | 
+			              { 
+				              e value.
+				              (interpreter cogit class primitiveTable at:
+					               e key - 1) primitiveGenerator } ].
 
 	"Build the entire set of tests:
 	 - for each architecture
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	primitives do: [ :p | | architectures solutions |
-		architectures := {
-		"{ #ISA -> #'aarch64'. #wordSize -> 8}."
-		{ #ISA -> #'IA32'. #wordSize -> 4}.
-		"{ #ISA -> #'X64'. #wordSize -> 8}."
-		{ #ISA -> #'ARMv5'. #wordSize -> 4}}.
-		architectures do: [ :arch |
-			interpreter :=	(suite detect: [:e | 
-				e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
-				e wordSize = arch second value]) 
-					setUp; interpreter.
-			solutions := RAPathExplorer new
-				failOnError: false;
-				explore: p first on: interpreter.
-			solutions do: [ :e |
-				matrix addCase: {
-					arch first.
-					arch second.
-					#primitive -> p first.
-					#generator -> p second.
-					#solution -> e } ] ] ]
-		displayingProgress: [ :p |  (p first -> p second) asString ].
-	
+	primitives
+		do: [ :p | 
+			| architectures solutions |
+			architectures := { 
+				                 { 
+					                 (#ISA -> #IA32).
+					                 (#wordSize -> 4) }.
+				                 "{ #ISA -> #'X64'. #wordSize -> 8}."
+				                 { 
+					                 (#ISA -> #ARMv5).
+					                 (#wordSize -> 4) } }.
+			"{ #ISA -> #'aarch64'. #wordSize -> 8}."
+			architectures do: [ :arch | 
+				interpreter := (suite detect: [ :e | 
+						                e parametersToUse do: [ :aParameter | 
+								                aParameter applyTo: e ].
+						                e wordSize = arch second value ])
+					               setUp;
+					               interpreter.
+				solutions := RAPathExplorer new
+					             failOnError: false;
+					             explore: p first on: interpreter.
+				solutions do: [ :e | 
+					matrix addCase: { 
+							arch first.
+							arch second.
+							(#primitive -> p first).
+							(#generator -> p second).
+							(#solution -> e) } ] ] ]
+		displayingProgress: [ :p | (p first -> p second) asString ].
+
 	^ matrix
 ]
 
@@ -113,11 +150,17 @@ RAPrimitiveAutoTest >> runCaseManaged [
 RAPrimitiveAutoTest >> setUp [
 
 	super setUp.
-	cogit receiverTags: (solution receiverTags value ifNil: [0]).
+	self installFloatClass.
+	memory classExternalAddress: (self
+			 newClassInOldSpaceWithSlots: 0
+			 instSpec: (memory byteFormatForNumBytes: 0)).
+
+
+	cogit receiverTags: (solution receiverTags value ifNil: [ 0 ]).
 	objectBuilder := RAObjectBuilder new
-		interpreter: interpreter;
-		nextIndex: nextIndex;
-		yourself
+		                 interpreter: interpreter;
+		                 nextIndex: nextIndex;
+		                 yourself
 ]
 
 { #category : #running }
@@ -134,6 +177,7 @@ RAPrimitiveAutoTest >> testPrimitive [
 		"If the primitive fails it continues, so we need to have an instruction to detect the end"
 		endInstruction := cogit Stop ]
 		bytecodes: 15.
+
 	self prepareAutoCall.
 	self execute.
 ]

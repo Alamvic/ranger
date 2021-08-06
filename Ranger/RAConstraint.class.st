@@ -28,6 +28,7 @@ RAConstraint class >> constraintClassFor: anOperation [
 		#/ -> RADivisionConstraint.
 		#'\\' -> RAModuloConstraint.
 		#'//' -> RAQuotientConstraint.
+		#asFloat -> RAIntegerToFloatConstraint.
 	 } asDictionary at: anOperation
 ]
 

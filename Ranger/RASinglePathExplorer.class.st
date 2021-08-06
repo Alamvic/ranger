@@ -69,14 +69,18 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #stackValue: put: #interpretStackValueWith:.
 	specialCases at: #pop:thenPush: put: #interpretPopThenPushWith:.
 	specialCases at: #pop:thenPushBool: put: #interpretPopThenPushBoolWith:.
+	specialCases at: #pop:thenPushFloat: put: #interpretPopThenPushFloatWith:.
 	
 	"Object format"
 	specialCases at: #formatOf: put: #interpretFormatOfObjectWith:.
 	specialCases at: #fetchClassOfNonImm: put: #interpretFetchClassOfNonImmWith:.
+	specialCases at: #fetchClassOf: put: #interpretFetchClassOfWith:.
 	specialCases at: #fixedFieldsOfClass: put: #interpretFixedFieldsOfClassWith:.
 	specialCases at: #numSlotsOf: put: #interpretNumSlotsOfWith:.
+	specialCases at: #rawHashBitsOf: put: #interpretRawHashBitsOfWith:.
 	
 	specialCases at: #fetchLong32:ofObject: put: #interpretFetchLong32OfObjectWith:.
+	specialCases at: #fetchFloat:into: put: #interpretFetchFloatIntoWith:.
 	
 	specialCases at: #integerValueOf: put: #interpretIntegerValueOfWith:.
 	specialCases at: #integerObjectOf: put: #interpretIntegerObjectOfWith:.
@@ -84,6 +88,7 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #isIntegerObject: put: #interpretIsIntegerObjectWith:.
 	specialCases at: #isNonIntegerObject: put: #interpretIsNonIntegerObjectWith:.
 	specialCases at: #isImmediate: put: #interpretIsImmediateWith:.
+	specialCases at: #isNonImmediate: put: #interpretIsNonImmediateWith:.
 	specialCases at: #isForwarded: put: #interpretIsForwardedWith:.
 	specialCases at: #areIntegers:and: put: #interpretAreIntegersAreWith:.
 	specialCases at: #isContextObject: put: #interpretIsContextObjectWith:.
@@ -136,7 +141,7 @@ RASinglePathExplorer >> interpretAndWith: aRBMessageNode [
 			aRBMessageNode arguments first body acceptVisitor: self ]
 		ifFalse: [ 
 			self addPathConstraint: condition second negated taken: false.
-			self pushOperand: condition ]
+			self pushOperand: { condition first. condition second copy } ]
 ]
 
 { #category : #'special cases' }
@@ -248,6 +253,45 @@ RASinglePathExplorer >> interpretFetchClassOfNonImmWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretFetchClassOfWith: aRBMessageNode [ 
+	
+	| oop vm concreteValue |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	oop := self popOperand.
+
+	concreteValue := vm first fetchClassOf: oop first.	
+	
+	self pushOperand: {
+		concreteValue.
+		oop second classObject
+	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretFetchFloatIntoWith: aRBMessageNode [ 
+
+	| float vm concreteValue floatoop |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	floatoop := self popOperand.
+	
+	aRBMessageNode arguments second acceptVisitor: self.
+	float := self popOperand.
+
+	concreteValue := vm first fetchFloat: floatoop first into: float first.	
+	
+	self pushOperand: {
+		concreteValue.
+		floatoop second
+	}
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretFetchLong32OfObjectWith: aRBMessageNode [ 
 
 	| oop vm concreteValue index |
@@ -310,10 +354,10 @@ RASinglePathExplorer >> interpretIfFalseWith: aRBMessageNode [
 	condition := self popOperand.
 	condition first
 		ifFalse: [ 
-			self addPathConstraint: condition second taken: true.
+			self addPathConstraint: condition second negated taken: true.
 			aRBMessageNode arguments first body acceptVisitor: self ]
 		ifTrue: [ 
-			self addPathConstraint: condition second negated taken: false.
+			self addPathConstraint: condition second taken: false.
 			self pushOperand: { nil . nil } ]
 ]
 
@@ -448,7 +492,7 @@ RASinglePathExplorer >> interpretIsForwardedWith: aRBMessageNode [
 	maybeImmediate := self popOperand.
 	
 	concreteValue := receiver first isForwarded: maybeImmediate first.
-1halt.
+
 	self pushOperand: {
 		concreteValue.
 		RAIsForwardedObject operands: { maybeImmediate second }
@@ -485,7 +529,6 @@ RASinglePathExplorer >> interpretIsIntegerObjectWith: aRBMessageNode [
 
 	aRBMessageNode arguments first acceptVisitor: self.
 	smallInteger := self popOperand.
-	
 	concreteValue := receiver first isIntegerObject: smallInteger first.
 	
 	self pushOperand: {
@@ -509,6 +552,27 @@ RASinglePathExplorer >> interpretIsIntegerValueWith: aRBMessageNode [
 		self
 			isInSmallIntegerRangeConstraintFor: smallInteger second
 			inInterpreter: receiver first
+	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretIsNonImmediateWith: aRBMessageNode [ 
+	
+	| maybeImmediate receiver concreteValue |
+	aRBMessageNode receiver acceptVisitor: self.
+	receiver := self popOperand.
+
+	aRBMessageNode arguments first acceptVisitor: self.
+	maybeImmediate := self popOperand.
+	
+	concreteValue := receiver first isNonImmediate: maybeImmediate first.
+
+	self pushOperand: {
+		concreteValue.
+		RAEqualsConstraint
+			operands: { 
+				maybeImmediate second typeTag.
+				RAConstant value: 0 }
 	}
 ]
 
@@ -608,6 +672,34 @@ RASinglePathExplorer >> interpretPopThenPushBoolWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretPopThenPushFloatWith: aRBMessageNode [ 
+
+	"Pop N elements from the operand stack.
+	Pushes the second argument to the stack.
+	
+	Pop: keep track of the operand stack and remove one element
+	Push: move the value to the physical register assigned to the current stack position"
+	
+	| elementsToPop vm float concreteFloatObject |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	elementsToPop := self popOperand.
+	elementsToPop first isInteger
+		ifFalse: [ self error: 'expected an integer value' ].	
+	aRBMessageNode arguments second acceptVisitor: self.
+	self pop: elementsToPop first.
+	
+	float := self popOperand.
+	concreteFloatObject := vm first objectMemory floatObjectOf: float first.
+	self push: { concreteFloatObject . RAFloatObjectOf operands: float second }.
+
+	"pop:thenPush: does not return an interesting value"
+	self pushOperand: self receiver.
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretPopThenPushWith: aRBMessageNode [ 
 
 	"Pop N elements from the operand stack.
@@ -632,7 +724,7 @@ RASinglePathExplorer >> interpretPopThenPushWith: aRBMessageNode [
 { #category : #visiting }
 RASinglePathExplorer >> interpretPrimitive: method receiver: receiver arguments: arguments [
 
-	| concreteReceiver concreteArguments concreteResult constraintArguments |
+	| concreteReceiver concreteArguments concreteResult constraintArguments constraintOperands constraint |
 	concreteReceiver := receiver first.
 	concreteArguments := arguments collect: [ :e | e first ].
 	concreteResult := concreteReceiver
@@ -641,11 +733,34 @@ RASinglePathExplorer >> interpretPrimitive: method receiver: receiver arguments:
 	
 	constraintArguments := arguments collect: [ :e | e second ].
 
-	^ self pushOperand: {
-		concreteResult.
-		RAConstraint
-			operation: method selector
-			operands: ({ receiver second }, constraintArguments) }
+	"Do constant folding if possible"
+	constraintOperands := { receiver second }, constraintArguments.
+	constraint :=(constraintOperands allSatisfy: [ :e | e isConstant ])
+		ifTrue: [ RAConstant value: concreteResult ]
+		ifFalse: [ 
+			RAConstraint
+				operation: method selector
+				operands: constraintOperands ].
+
+	^ self pushOperand: { concreteResult . constraint }
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretRawHashBitsOfWith: aRBMessageNode [ 
+
+	| oop vm concreteValue |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	oop := self popOperand.
+
+	concreteValue := vm first rawHashBitsOf: oop first.	
+	
+	self pushOperand: {
+		concreteValue.
+		oop second hashBits
+	}
 ]
 
 { #category : #'special cases' }
@@ -773,6 +888,12 @@ RASinglePathExplorer >> visitClassVariableNode: aRBVariableNode [
 		value.
 		RAConstant value: value
 		}
+]
+
+{ #category : #visiting }
+RASinglePathExplorer >> visitGlobalVariableNode: aRBVariableNode [ 
+
+	^ self visitClassVariableNode: aRBVariableNode
 ]
 
 { #category : #visiting }

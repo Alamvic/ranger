@@ -17,10 +17,13 @@ RAObjectBuilder >> allocateClassObject: aClassObject [
 			or: [ aClassObject classIndex value = 0 ] ])
 				ifTrue: [ classIndex := self nextOrdinaryClassIndex ]
 				ifFalse: [ classIndex := aClassObject classIndex value ].
+
+	"If it is float, do not override it"
+	classIndex = 34 ifTrue: [ ^ 34 ].
 	
 	aClass := self
 		newClassInOldSpaceWithSlots: 0
-		instSpec: 0 "format".
+		instSpec: (aClassObject format value ifNil: [0]).
 	self memory setHashBitsOf: aClass to: classIndex.
 	self memory
 		storePointer: classIndex
@@ -33,6 +36,17 @@ RAObjectBuilder >> allocateClassObject: aClassObject [
 RAObjectBuilder >> allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 [ 
 	
 	^ self memory allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 
+]
+
+{ #category : #'default-values' }
+RAObjectBuilder >> defaultFormatForClassIndex: anInteger [ 
+	
+	"If it is the boxed float class, we set first long format by default"
+	anInteger = 34 ifTrue: [ 
+		^ interpreter objectMemory firstLongFormat ].
+	
+	"object with instance variables"
+	^ 0
 ]
 
 { #category : #'value-setup' }
@@ -53,7 +67,7 @@ RAObjectBuilder >> instantiate: aRAObject [
 		self haltIf: [ aRAObject specialObjectIndex value notNil ].
 		^ {self
 			allocateNewSpaceSlots: (aRAObject numSlots value ifNil: [ 0 ])
-			format: (aRAObject format value ifNil: [ 0 ]) "object with instance variables"
+			format: (aRAObject format value ifNil: [ self defaultFormatForClassIndex: classIndex ])
 			classIndex: classIndex . self newAbstractObject } ].
 	typeTag = 1 ifTrue: [ 
 		| concreteInteger abstractInteger |

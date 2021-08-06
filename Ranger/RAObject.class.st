@@ -6,11 +6,11 @@ Class {
 		'typeTag',
 		'integerValue',
 		'specialObjectIndex',
-		'classIndex',
 		'slots',
 		'numSlots',
 		'classObject',
-		'long32Slots'
+		'long32Slots',
+		'hashBits'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -35,12 +35,6 @@ RAObject >> = anotherVariable [
 RAObject >> classIndex [
 
 	^ classObject classIndex
-]
-
-{ #category : #accessing }
-RAObject >> classIndex: anObject [
-
-	classIndex := anObject
 ]
 
 { #category : #accessing }
@@ -77,6 +71,18 @@ RAObject >> format [
 	^ classObject format
 ]
 
+{ #category : #accessing }
+RAObject >> hashBits [
+
+	^ hashBits
+]
+
+{ #category : #accessing }
+RAObject >> hashBits: anObject [
+
+	hashBits := anObject
+]
+
 { #category : #printing }
 RAObject >> initializeWithVariableName: aName [
 
@@ -101,7 +107,12 @@ RAObject >> initializeWithVariableName: aName [
 	specialObjectIndex := MzVariable new
 		                      name: variableName , '_specialObjectIndex';
 		                      type: 'int';
-		                      yourself
+		                      yourself.
+
+	hashBits := MzVariable new
+		              name: variableName , '_hashBits';
+		              type: '0..1000000' "A million is more than enough to test...";
+		              yourself.
 ]
 
 { #category : #accessing }
@@ -125,6 +136,18 @@ RAObject >> isConstant [
 RAObject >> isVariable [
 	
 	^ true
+]
+
+{ #category : #accessing }
+RAObject >> long32Slots [
+
+	^ long32Slots
+]
+
+{ #category : #accessing }
+RAObject >> long32Slots: anObject [
+
+	long32Slots := anObject
 ]
 
 { #category : #microzinc }

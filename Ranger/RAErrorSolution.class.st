@@ -1,12 +1,10 @@
 Class {
 	#name : #RAErrorSolution,
-	#superclass : #Object,
+	#superclass : #RAConstraintSolution,
 	#instVars : [
 		'selector',
 		'vm',
-		'error',
-		'path',
-		'inputConstraints'
+		'error'
 	],
 	#category : #'Ranger-Exploring'
 }

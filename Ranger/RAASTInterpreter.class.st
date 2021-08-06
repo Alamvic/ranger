@@ -273,6 +273,9 @@ RAASTInterpreter >> visitSelfNode: aRBVariableNode [
 { #category : #visiting }
 RAASTInterpreter >> visitSequenceNode: aRBSequenceNode [ 
 
+	aRBSequenceNode statements ifEmpty: [ 
+		self pushOperand: self receiver.
+		^ self ].
 	
 	aRBSequenceNode statements allButLastDo: [ :each |
 		each acceptVisitor: self.
@@ -283,7 +286,7 @@ RAASTInterpreter >> visitSequenceNode: aRBSequenceNode [
 	It is up to the caller to decide what to do with it.
 	If it is a block, it should return it to its caller.
 	If it is a method, it should pop it and ignore it."
-	aRBSequenceNode statements last acceptVisitor: self.
+	aRBSequenceNode statements last acceptVisitor: self
 ]
 
 { #category : #visiting }

@@ -1,11 +1,10 @@
 Class {
-	#name : #RAIsForwardedObject,
+	#name : #RAIsNonForwardedObject,
 	#superclass : #RAPathConstraint,
 	#category : #'Ranger-VMSpecificConstraints'
 }
 
 { #category : #negating }
-RAIsForwardedObject >> negated [
-	
-	^ RAIsNonForwardedObject operands: self operands
+RAIsNonForwardedObject >> negated [
+	self shouldBeImplemented.
 ]
