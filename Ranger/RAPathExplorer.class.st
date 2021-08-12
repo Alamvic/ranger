@@ -12,28 +12,98 @@ Class {
 		'numberOfArguments',
 		'selector',
 		'vm',
-		'failOnError'
+		'failOnError',
+		'constraintBuilder'
 	],
 	#category : #'Ranger-Exploring'
 }
 
 { #category : #api }
-RAPathExplorer >> explore: aSelector on: anObject vmBuildingBlock: aBuildingBlock [
+RAPathExplorer >> exploreBytecode: aBytecode on: aVM vmBuildingBlock: aBuildingBlock [
+
+	| currentPath solution previousRunFrameConstraints exploredPath aFrame |
+	selector := aVM class bytecodeTable at: aBytecode + 1.
+
+	solution := RAConstraintSolution new solver: #initial.
+
+	previousRunFrameConstraints := RAVMFrameConstraint new.
+	previousRunFrameConstraints receiver: constraintBuilder newAbstractSmallInteger.
+	previousRunFrameConstraints method: constraintBuilder newAbstractMethod.
+
+	[
+	self initializeWithBytecodeSelector: selector onVM: aBuildingBlock value.
+	vm currentBytecode: aBytecode.
+	aFrame := previousRunFrameConstraints
+		instantiateWith: objectBuilder
+		constraintBuilder: constraintBuilder.
+	exploredPath := self
+		 explorePathWithFrame: aFrame
+		 solver: solution solver.
+	currentPath := exploredPath ifNil: [ (currentPath ifNil: [ RAPath new ]) nextPath ].
+
+	"Negate and solve constraints!"
+	solution := self solve: currentPath withInterpreter: aVM.
+	previousRunFrameConstraints := aFrame frameConstraints.	
+	solution isEmpty ] whileFalse.
+	^ solutions
+]
+
+{ #category : #api }
+RAPathExplorer >> explorePathWithFrame: aFrame solver: solver [
+
+	| explorer |
+	[
+	explorer := RASinglePathExplorer new.
+	explorer
+		explore: selector
+		on: vm
+		withFrame: aFrame
+		explorer: self.
+	self recordSolution: (RAConstraintSolution new
+			 inputConstraints: aFrame frameConstraints;
+			 path: explorer path;
+			 solver: solver;
+			 yourself) ]
+		on: Exception
+		do: [ :e | 
+			failOnError ifTrue: [ e pass ].
+			self recordSolution: (RAErrorSolution new
+					 inputConstraints: aFrame frameConstraints;
+					 vm: vm;
+					 selector: selector;
+					 error: e freeze;
+					 yourself) ].
+	^ explorer path
+]
+
+{ #category : #api }
+RAPathExplorer >> explorePrimitive: aSelector on: anObject vmBuildingBlock: aBuildingBlock [
 
 	| currentPath solution currentConstraints |
 	self initializeWithSelector: aSelector onVM: anObject.
 
 	solution := RAConstraintSolution new solver: #initial.
-	currentConstraints := (numberOfArguments to: 0 by: -1) collect: [ :e | 
+	currentConstraints := {
+		"Frame number of arguments. Start with 0"
+		objectBuilder newAbstractSmallIntegerWithValue: 0.
+		"Frame number of locals. Start with 0"
+		objectBuilder newAbstractSmallIntegerWithValue: 0.
+		"Receiver"
+		objectBuilder newAbstractSmallInteger.
+		"Method"
+		objectBuilder newAbstractMethod.
+	},
+	"Arguments"
+	((numberOfArguments to: 0 by: -1) collect: [ :e | 
 		                      | smallInteger |
 		                      smallInteger := objectBuilder
 			                                      newAbstractObject.
 		                      smallInteger typeTag value: 1.
 		                      smallInteger integerValue value: 0.
-		                      smallInteger ].
+		                      smallInteger ]).
 	[ 
 	currentPath := (self
-		 explorePathWithConstraints: currentConstraints
+		 explorePathWithFrame: currentConstraints
 		 solver: solution solver)
 			ifNil: [ (currentPath ifNil: [ RAPath new ]) nextPath ].
 
@@ -44,38 +114,6 @@ RAPathExplorer >> explore: aSelector on: anObject vmBuildingBlock: aBuildingBloc
 	
 	solution isEmpty ] whileFalse.
 	^ solutions
-]
-
-{ #category : #api }
-RAPathExplorer >> explorePathWithConstraints: constraintsToExplore solver: solver [
-
-	| values path |
-	[ 
-	values := constraintsToExplore collect: [ :e | 
-		          objectBuilder instantiate: e ].
-	path := RASinglePathExplorer new
-		        explore: selector
-		        on: vm
-		        withValues: values
-		        explorer: self ]
-		on: Exception
-		do: [ :e | 
-			failOnError ifTrue: [ e pass ].
-			self recordSolution: (RAErrorSolution new
-					 inputConstraints: constraintsToExplore;
-					 vm: vm;
-					 selector: selector;
-					 error: e freeze;
-					 yourself).
-			"Could not explore this path!"
-			^ nil ].
-
-	self recordSolution: (RAConstraintSolution new
-			 inputConstraints: constraintsToExplore;
-			 path: path;
-			 solver: solver;
-			 yourself).
-	^ path
 ]
 
 { #category : #accessing }
@@ -96,7 +134,22 @@ RAPathExplorer >> initialize [
 	super initialize.
 	failOnError := true.
 	executionStack := OrderedCollection new.
-	solutions := OrderedCollection new
+	solutions := OrderedCollection new.
+	constraintBuilder := RAConstraintBuilder new
+]
+
+{ #category : #api }
+RAPathExplorer >> initializeWithBytecodeSelector: aSelector onVM: aVM [
+	
+	| method |
+	selector := aSelector.
+	vm := aVM.
+	method := aVM class lookupSelector: aSelector.
+	numberOfArguments := (method ast pragmaNamed: #pops:thenPush:) arguments first value.
+	objectBuilder := RAObjectBuilder new
+		interpreter: aVM;
+		nextIndex: 100;
+		yourself
 ]
 
 { #category : #api }

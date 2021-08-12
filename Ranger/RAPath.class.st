@@ -4,8 +4,8 @@ Class {
 	#instVars : [
 		'pathConstraints',
 		'parent',
-		'failure',
-		'inputs'
+		'inputs',
+		'exitCondition'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -19,15 +19,14 @@ RAPath >> copyWithNumberOfSegments: anInteger [
 ]
 
 { #category : #accessing }
-RAPath >> failure [
-
-	^ failure
+RAPath >> exitCondition [
+	^ exitCondition
 ]
 
 { #category : #accessing }
-RAPath >> failure: anObject [
-
-	failure := anObject
+RAPath >> exitCondition: anError [ 
+	
+	exitCondition := anError
 ]
 
 { #category : #testing }
@@ -40,15 +39,15 @@ RAPath >> initialize [
 ]
 
 { #category : #accessing }
-RAPath >> inputs [
+RAPath >> inputFrame: anObject [
 
-	^ inputs
+	inputs := anObject
 ]
 
 { #category : #accessing }
-RAPath >> inputs: anObject [
+RAPath >> inputs [
 
-	inputs := anObject
+	^ inputs
 ]
 
 { #category : #copying }
@@ -68,6 +67,12 @@ RAPath >> inspectionItems: aBuilder [
 RAPath >> isEmpty [
 	
 	^ pathConstraints isEmpty
+]
+
+{ #category : #accessing }
+RAPath >> isFailure [
+
+	^ exitCondition isFailure
 ]
 
 { #category : #negating }

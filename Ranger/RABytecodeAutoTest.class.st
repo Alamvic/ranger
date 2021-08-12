@@ -1,20 +1,20 @@
 Class {
-	#name : #RAPrimitiveAutoTest,
+	#name : #RABytecodeAutoTest,
 	#superclass : #VMSimpleStackBasedCogitAbstractTest,
 	#instVars : [
 		'solution',
 		'endInstruction',
-		'primitiveAddress',
 		'generator',
 		'primitive',
 		'objectBuilder',
-		'compilationResult'
+		'compilationResult',
+		'methodAddress'
 	],
 	#category : #'Ranger-Exploring'
 }
 
 { #category : #'building suites' }
-RAPrimitiveAutoTest class >> exploreCasesForBytecode: aBytecode withWordSize: aWordSize [
+RABytecodeAutoTest class >> exploreCasesForBytecode: aBytecode withWordSize: aWordSize [
 
 	| suite interpreter |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
@@ -31,7 +31,7 @@ RAPrimitiveAutoTest class >> exploreCasesForBytecode: aBytecode withWordSize: aW
 		               setUp;
 		               interpreter.
 	^ RAPathExplorer new
-		  failOnError: false;
+		  failOnError: true;
 		  exploreBytecode: aBytecode on: interpreter vmBuildingBlock: [ 
 			  (suite detect: [ :e | 
 					   e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
@@ -41,7 +41,7 @@ RAPrimitiveAutoTest class >> exploreCasesForBytecode: aBytecode withWordSize: aW
 ]
 
 { #category : #'building suites' }
-RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: aWordSize [
+RABytecodeAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: aWordSize [
 
 	| suite interpreter |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
@@ -68,7 +68,7 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 ]
 
 { #category : #'building suites' }
-RAPrimitiveAutoTest class >> testParameters [
+RABytecodeAutoTest class >> testParameters [
 
 	| suite matrix interpreter primitives |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
@@ -140,13 +140,13 @@ RAPrimitiveAutoTest class >> testParameters [
 ]
 
 { #category : #building }
-RAPrimitiveAutoTest >> allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 [ 
+RABytecodeAutoTest >> allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 [ 
 	
 	^ memory allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest >> execute [
+RABytecodeAutoTest >> execute [
 
 	| stopAddress |
 	stopAddress := solution isFailure
@@ -157,16 +157,16 @@ RAPrimitiveAutoTest >> execute [
 			endInstruction address ]
 		ifFalse: [ callerAddress ].
 	
-	self runFrom: primitiveAddress until: stopAddress
+	self runFrom: methodAddress until: stopAddress
 ]
 
 { #category : #accessing }
-RAPrimitiveAutoTest >> generator: aString [ 
+RABytecodeAutoTest >> generator: aString [ 
 	generator := aString
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest >> prepareAutoCall [
+RABytecodeAutoTest >> prepareAutoCall [
 
 	self
 		prepareStackForSendReceiver: (objectBuilder instantiate: solution receiver) first
@@ -174,19 +174,19 @@ RAPrimitiveAutoTest >> prepareAutoCall [
 ]
 
 { #category : #accessing }
-RAPrimitiveAutoTest >> primitive: aString [ 
+RABytecodeAutoTest >> primitive: aString [ 
 	
 	primitive := aString
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest >> runCaseManaged [ 
+RABytecodeAutoTest >> runCaseManaged [ 
 
 	^ self runCase
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest >> setUp [
+RABytecodeAutoTest >> setUp [
 
 	super setUp.
 	self installFloatClass.
@@ -203,18 +203,19 @@ RAPrimitiveAutoTest >> setUp [
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest >> solution: aSolution [
+RABytecodeAutoTest >> solution: aSolution [
 
 	solution := aSolution
 ]
 
 { #category : #running }
-RAPrimitiveAutoTest >> testPrimitive [
+RABytecodeAutoTest >> testPrimitive [
 
-	primitiveAddress := self compile: [ 
-		compilationResult := cogit objectRepresentation perform: generator "#genPrimitiveBitShift".
-		"If the primitive fails it continues, so we need to have an instruction to detect the end"
-		endInstruction := cogit Stop ]
+	methodAddress := self compile: [ 
+		1halt.
+		"should push before so many elements as the bytecode needs"
+		compilationResult := cogit objectRepresentation perform: generator
+		"should return top if the bytecode returns something to be able to test it!" ]
 		bytecodes: 15.
 
 	self prepareAutoCall.

@@ -49,6 +49,12 @@ RAObject >> classObject: anObject [
 	classObject := anObject
 ]
 
+{ #category : #accessing }
+RAObject >> classTag [
+
+	^ self classObject classIndex
+]
+
 { #category : #slots }
 RAObject >> fetchLong32: aConcreteAbstractPair [
 	
@@ -63,6 +69,14 @@ RAObject >> fetchLong32: aConcreteAbstractPair [
 		value: long32;
 		yourself).
 	^ long32
+]
+
+{ #category : #accessing }
+RAObject >> fetchPointer: aRAConstant [ 
+
+	^ MzVariable new
+		name: variableName , '_somepointer';
+		yourself
 ]
 
 { #category : #accessing }

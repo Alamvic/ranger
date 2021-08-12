@@ -2,11 +2,13 @@ Class {
 	#name : #RASinglePathExplorer,
 	#superclass : #RAASTInterpreter,
 	#instVars : [
-		'vmStack',
 		'constraints',
 		'paths',
 		'pathConstraints',
-		'explorer'
+		'explorer',
+		'vmFrame',
+		'path',
+		'interpreter'
 	],
 	#category : #'Ranger-Interpreter'
 }
@@ -34,20 +36,41 @@ RASinglePathExplorer >> basicNewFrame [
 ]
 
 { #category : #api }
-RASinglePathExplorer >> explore: aSelector on: anObject withValues: values explorer: anExplorer [
+RASinglePathExplorer >> exitCondition [
+	
+	^ interpreter primFailCode ~= 0
+		ifTrue: [ RAPrimitiveFailure new ]
+		ifFalse: [ RASuccess new "Could be a primitive or a bytecode success!" ]
+		
+]
+
+{ #category : #api }
+RASinglePathExplorer >> explore: aSelector on: vm withFrame: aFrame explorer: anExplorer [
 
 	| method |
 	explorer := anExplorer.
-	method := anObject class lookupSelector: aSelector.
-	self initializeVMStackWithArguments: values.
-	anObject primFailCode: 0.
-	anObject argumentCount: values size - 1.
-	self interpretMethod: method ast receiver: { anObject . RAConstant value: anObject }.
-	^ RAPath new
-		inputs: values;
-		pathConstraints: pathConstraints;
-		failure: anObject primFailCode ~= 0;
-		yourself
+	interpreter := vm.
+	method := vm class lookupSelector: aSelector.
+
+	vmFrame := aFrame.
+
+	vm primFailCode: 0.
+	vm argumentCount: aFrame operandStackSize - 1 "Should not count the message receiver".
+
+	path := RAPath new.
+	path inputFrame: aFrame.
+	path pathConstraints: pathConstraints.
+	[ 
+		self interpretMethod: method ast receiver: { 
+			vm.
+			(RAConstant value: vm) }.
+		path exitCondition: self exitCondition
+	]	on: Exception
+		do: [ :error | 
+			path exitCondition: error freeze.
+			(error isKindOf: RAInterpreterEndError)
+				ifFalse: [ error pass ] ].
+	^ path
 ]
 
 { #category : #api }
@@ -57,7 +80,7 @@ RASinglePathExplorer >> initialize [
 	constraints := OrderedCollection new.
 	pathConstraints := OrderedCollection new.
 	
-	vmStack := Stack new.
+	vmFrame := RAVMFrame new.
 	paths := OrderedCollection new
 ]
 
@@ -65,24 +88,52 @@ RASinglePathExplorer >> initialize [
 RASinglePathExplorer >> initializeSpecialCases [
 
 	"Stack access"
+	specialCases at: #receiver put: #interpretReceiverWith:.
+	specialCases at: #iframeNumArgs: put: #interpretiFrameNumArgsWith:.
+	specialCases
+		at: #iArgumentForFramePointer:atOffset:
+		put: #interpretiArgumentForFramePointerAtOffsetWith:.
+	specialCases
+		at: #iLocalForFramePointer:atOffset:
+		put: #interpretiLocalForFramePointerAtOffsetWith:.
+	specialCases at: #literal: put: #interpretLiteralWith:.
+
 	specialCases at: #stackTop put: #interpretStackTopWith:.
 	specialCases at: #stackValue: put: #interpretStackValueWith:.
+	specialCases at: #internalStackTop put: #interpretStackTopWith:.
+	specialCases at: #internalStackValue: put: #interpretStackValueWith:.
+
 	specialCases at: #pop:thenPush: put: #interpretPopThenPushWith:.
+	specialCases at: #internalPop:thenPush: put: #interpretPopThenPushWith:.
+	
 	specialCases at: #pop:thenPushBool: put: #interpretPopThenPushBoolWith:.
 	specialCases at: #pop:thenPushFloat: put: #interpretPopThenPushFloatWith:.
 	specialCases at: #pop:thenPushInteger: put: #interpretPopThenPushIntWith:.
+	specialCases at: #internalPush: put: #interpretInternalPushWith:.
+	
+	specialCases at: #fetchByte put: #interpretNoopWith:.
+	specialCases at: #externalizeIPandSP put: #interpretNoopWith:.
+	specialCases at: #internalizeIPandSP put: #interpretNoopWith:.
 	
 	"Object format"
 	specialCases at: #formatOf: put: #interpretFormatOfObjectWith:.
 	specialCases at: #fetchClassOfNonImm: put: #interpretFetchClassOfNonImmWith:.
 	specialCases at: #fetchClassOf: put: #interpretFetchClassOfWith:.
+	specialCases at: #fetchClassTagOf: put: #interpretFetchClassTagOfWith:.
+	
 	specialCases at: #fixedFieldsOfClass: put: #interpretFixedFieldsOfClassWith:.
+
 	specialCases at: #numSlotsOf: put: #interpretNumSlotsOfWith:.
+	specialCases at: #lengthOf:format: put: #interpretLengthOfFormatWith:.
+	specialCases at: #numSlotsOfAny: put: #interpretNumSlotsOfAnyWith:.
+
 	specialCases at: #numBytesOfBytes: put: #interpretNumBytesOfBytesWith:.
 	specialCases at: #rawHashBitsOf: put: #interpretRawHashBitsOfWith:.
+
 	
 	specialCases at: #fetchLong32:ofObject: put: #interpretFetchLong32OfObjectWith:.
 	specialCases at: #fetchFloat:into: put: #interpretFetchFloatIntoWith:.
+	specialCases at: #fetchPointer:ofObject: put: #interpretFetchPointerOfObjectWith:.
 	
 	specialCases at: #integerValueOf: put: #interpretIntegerValueOfWith:.
 	specialCases at: #integerObjectOf: put: #interpretIntegerObjectOfWith:.
@@ -98,13 +149,16 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #isForwarded: put: #interpretIsForwardedWith:.
 	specialCases at: #areIntegers:and: put: #interpretAreIntegersAreWith:.
 	specialCases at: #isContextObject: put: #interpretIsContextObjectWith:.
-	specialCases at: #numSlotsOfAny: put: #interpretNumSlotsOfAnyWith:.
 	specialCases at: #classIndexOf: put: #interpretClassIndexOfWith:.
+	
+	specialCases at: #byteSwapped32IfBigEndian: put: #interpretByteSwapped32IfBigEndianWith:.
+	specialCases at: #byteSwapped64IfBigEndian: put: #interpretByteSwapped64IfBigEndianWith:.
 		
 	"special variables"
 	specialCases at: #trueObj put: #interpretTrueObjectWith:.
 	specialCases at: #falseObj put: #interpretFalseObjectWith:.
 	specialCases at: #splObj: put: #interpretSpecialObjectWith:.
+	specialCases at: #specialSelector: put: #interpretSpecialSelectorWith:.
 	
 	"special simulation cases"
 	specialCases at: #cCode:inSmalltalk: put: #interpretCCodeInSmalltalkWith:.
@@ -127,12 +181,7 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #cppIf:ifTrue: put: #interpretCppIfIfTrueWith:.
 	specialCases at: #cppIf:ifTrue:ifFalse: put: #interpretCppIfIfTrueIfFalseWith:.
 	
-]
-
-{ #category : #initialization }
-RASinglePathExplorer >> initializeVMStackWithArguments: values [ 
-	
-	values do: [ :e | self push: e ]
+	specialCases at: #commonSendOrdinary put: #interpretCommonSendOrdinaryWith:
 ]
 
 { #category : #'special cases' }
@@ -176,6 +225,44 @@ RASinglePathExplorer >> interpretAreIntegersAreWith: aRBMessageNode [
 				RAConstant value: 1
 			}
 		}
+	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretByteSwapped32IfBigEndianWith: aRBMessageNode [ 
+	
+	| value vm concreteValue |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	value := self popOperand.
+
+	concreteValue := vm first byteSwapped32IfBigEndian: value first.
+	
+	self pushOperand: {
+		concreteValue.
+		"Do nothing"
+		value
+	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretByteSwapped64IfBigEndianWith: aRBMessageNode [ 
+	
+	| value vm concreteValue |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	value := self popOperand.
+
+	concreteValue := vm first byteSwapped64IfBigEndian: value first.
+	
+	self pushOperand: {
+		concreteValue.
+		"Do nothing"
+		value
 	}
 ]
 
@@ -229,6 +316,12 @@ RASinglePathExplorer >> interpretClassIndexOfWith: aRBMessageNode [
 		vm first classIndexOf: object first.
 		object second classIndex
 	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretCommonSendOrdinaryWith: aRBMessageNode [ 
+	
+	RASendExit signal
 ]
 
 { #category : #'special cases' }
@@ -293,6 +386,24 @@ RASinglePathExplorer >> interpretFetchClassOfWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretFetchClassTagOfWith: aRBMessageNode [ 
+	
+	| oop vm concreteValue |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	oop := self popOperand.
+
+	concreteValue := vm first fetchClassTagOf: oop first.	
+	
+	self pushOperand: {
+		concreteValue.
+		oop second classTag
+	}
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretFetchFloatIntoWith: aRBMessageNode [ 
 
 	| float vm concreteValue floatoop |
@@ -332,6 +443,57 @@ RASinglePathExplorer >> interpretFetchLong32OfObjectWith: aRBMessageNode [
 		concreteValue.
 		oop second fetchLong32: index
 	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretFetchPointerOfObjectWith: aRBMessageNode [
+
+	| oop vm concreteValue index numberOfPointersInObject constraint |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+
+	aRBMessageNode arguments first acceptVisitor: self.
+	index := self popOperand.
+
+	aRBMessageNode arguments second acceptVisitor: self.
+	oop := self popOperand.
+
+	"Checked access. If we access an immediate or outside the bounds of the object just use 0 as concrete value.
+	The abstract value will contain bound checks"
+	(vm first isImmediate: oop first)
+		ifTrue: [ "Record it was an immediate"
+			self
+				addPathConstraint: (RANotEqualsConstraint operands: { 
+							 oop second typeTag.
+							 (RAConstant value: 0) })
+				taken: true.
+			"Push 0 "
+			self pushOperand: { 
+					0.
+					(RAObject named: 'invalid') } ]
+		ifFalse: [ 
+			self
+				addPathConstraint: (RAEqualsConstraint operands: { 
+							 oop second typeTag.
+							 (RAConstant value: 0) })
+				taken: true.
+			constraint := RALessConstraint operands: { 
+				index second.
+				oop second numSlots }.
+			numberOfPointersInObject := vm first numSlotsOfAny: oop first.
+			concreteValue := index first < numberOfPointersInObject
+				                 ifTrue: [ 
+					                 self
+						                 addPathConstraint: constraint
+						                 taken: true.
+					                 vm first
+						                 fetchPointer: index first
+						                 ofObject: oop first ]
+				                 ifFalse: [ 
+					                 self
+						                 addPathConstraint: constraint negated
+						                 taken: false.
+					                 RAInvalidMemoryAccess signal ] ]
 ]
 
 { #category : #'special cases' }
@@ -484,6 +646,18 @@ RASinglePathExplorer >> interpretIntegerValueOfWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretInternalPushWith: aRBMessageNode [ 
+	
+	| elementsToPop elementToPush |
+	aRBMessageNode arguments first acceptVisitor: self.
+	elementToPush := self popOperand.
+	self push: elementToPush.
+
+	"pop:thenPush: does not return an interesting value"
+	self pushOperand: self receiver.
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretIsCharacterObjectWith: aRBMessageNode [ 
 	
 	| smallInteger receiver concreteValue |
@@ -631,6 +805,71 @@ RASinglePathExplorer >> interpretIsNonIntegerObjectWith: aRBMessageNode [
 		concreteValue.
 		RAIsNonIntegerObject operands: { smallInteger second }
 	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretLengthOfFormatWith: aRBMessageNode [ 
+
+	| oop vm concreteValue format |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	oop := self popOperand.
+	
+	aRBMessageNode arguments second acceptVisitor: self.
+	format := self popOperand.
+
+	concreteValue := vm first lengthOf: oop first format: format first.
+	
+	self pushOperand: {
+		concreteValue.
+		oop second numSlots
+	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretLiteralWith: aRBMessageNode [
+
+	| vm concreteValue index numberOfLiterals |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+
+	aRBMessageNode arguments first acceptVisitor: self.
+	index := self popOperand.
+
+	"Checked access. If we access an immediate or outside the bounds of the object just use 0 as concrete value.
+	The abstract value will contain bound checks"
+	numberOfLiterals := vm first objectMemory literalCountOf: vmFrame method first.
+	concreteValue := index first < numberOfLiterals
+		                 ifTrue: [ 
+			                 self
+				                 addPathConstraint:
+					                 (RALessConstraint operands: { 
+							                  index second.
+							                  vmFrame method second numSlots })
+				                 taken: true.
+			                 vm first
+				                 literal: index first
+				                 ofMethod: vmFrame method first ]
+		                 ifFalse: [ 
+			                 self
+				                 addPathConstraint:
+					                 (RAGreaterOrEqualsConstraint operands: { 
+							                  index second.
+							                  vmFrame method second numSlots })
+				                 taken: false.
+			                 RAInvalidMemoryAccess signal ].
+
+	self pushOperand: { 
+			concreteValue.
+			vmFrame method second fetchPointer: index second }
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretNoopWith: aRBMessageNode [ 
+
+	self pushOperand: self receiver
 ]
 
 { #category : #'special cases' }
@@ -863,6 +1102,12 @@ RASinglePathExplorer >> interpretRawHashBitsOfWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretReceiverWith: aRBMessageNode [ 
+
+	self pushOperand: vmFrame receiver
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretSizeofWith: aRBMessageNode [ 
 	
 	| object vm concreteSizeOf |
@@ -900,9 +1145,26 @@ RASinglePathExplorer >> interpretSpecialObjectWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretSpecialSelectorWith: aRBMessageNode [ 
+	
+	| receiver selectorIndex |
+	aRBMessageNode receiver acceptVisitor: self.
+	receiver := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	selectorIndex := self popOperand.
+
+	self pushOperand: {
+		"Just push a small integer that represents the index"
+		(receiver first objectMemory integerObjectOf: selectorIndex first).
+		RAConstant value: selectorIndex.
+	}
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretStackTopWith: aRBMessageNode [ 
 
-	self pushOperand: vmStack top
+	self pushOperand: vmFrame top
 ]
 
 { #category : #'special cases' }
@@ -911,12 +1173,109 @@ RASinglePathExplorer >> interpretStackValueWith: aRBMessageNode [
 	"Interpret messages of the form 
 	interpreter stackValue: xxx.
 	"	
-	| value |
+	| index constraint |
 	aRBMessageNode arguments first acceptVisitor: self.
-	value := self popOperand first.
-	value isInteger ifFalse: [ self error: 'expected an integer value' ].
+	index := self popOperand.
 
-	self pushOperand: (vmStack at: value + 1)
+	constraint := RAAndConstraint operands: {
+		RAGreaterOrEqualsConstraint operands: { 
+			index second.
+			RAConstant value: 0
+		}.
+		(RALessConstraint operands: { 
+			 index second.
+			 vmFrame operandStackSize second })
+	}.
+	(index first between: 0 and: vmFrame operandStackSize first - 1)
+		ifTrue: [ 
+			self
+				addPathConstraint: constraint
+				taken: true.
+			self pushOperand: (vmFrame operandAt: index first + 1) ]
+		ifFalse: [ 
+			self
+				addPathConstraint: constraint negated
+				taken: true.
+			RAInvalidMemoryAccess signal ]
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretiArgumentForFramePointerAtOffsetWith: aRBMessageNode [ 
+	
+	| vm index constraint |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+
+	aRBMessageNode arguments second acceptVisitor: self.
+	index := self popOperand.
+
+	constraint := RAAndConstraint operands: { 
+		(RAGreaterOrEqualsConstraint operands: { 
+			 index second.
+			 RAConstant value: 0 }).
+		(RALessOrEqualsConstraint operands: { 
+			 index second.
+			 vmFrame numberOfArguments second })
+	}.
+	(index first between: 0 and: vmFrame numberOfArguments first)
+		ifTrue: [ 
+			self
+				addPathConstraint: constraint
+				taken: true.
+			self pushOperand: (vmFrame argumentAt: index first) ]
+		ifFalse: [ 
+			self
+				addPathConstraint: constraint negated
+				taken: true.
+			RAInvalidMemoryAccess signal ]
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretiFrameNumArgsWith: aRBMessageNode [ 
+	
+	| vm theMessageFP |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	theMessageFP := self popOperand.
+	
+	"We only implement single frames for now, if it wants to access some other frame, we need to implement it"
+	self assert: vm first localFP = theMessageFP first.
+
+	self pushOperand: vmFrame numberOfArguments.
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretiLocalForFramePointerAtOffsetWith: aRBMessageNode [
+
+	| vm index constraint |
+	aRBMessageNode receiver acceptVisitor: self.
+	vm := self popOperand.
+
+	aRBMessageNode arguments second acceptVisitor: self.
+	index := self popOperand.
+
+	constraint := RAAndConstraint operands: {
+		RAGreaterOrEqualsConstraint operands: { 
+			index second.
+			RAConstant value: 0
+		}.
+		(RALessConstraint operands: { 
+			 index second.
+			 vmFrame numberOfLocals second })
+	}.
+	(index first between: 0 and: vmFrame numberOfLocals first - 1)
+		ifTrue: [ 
+			self
+				addPathConstraint: constraint
+				taken: true.
+			self pushOperand: (vmFrame localAt: index second) ]
+		ifFalse: [ 
+			self
+				addPathConstraint: constraint negated
+				taken: true.
+			RAInvalidMemoryAccess signal ]
 ]
 
 { #category : #'special cases' }
@@ -947,6 +1306,12 @@ RASinglePathExplorer >> lookupSelector: aString inReceiver: aReceiver [
 ]
 
 { #category : #accessing }
+RASinglePathExplorer >> path [
+	
+	^ path
+]
+
+{ #category : #accessing }
 RASinglePathExplorer >> paths [
 	
 	^ paths
@@ -955,7 +1320,7 @@ RASinglePathExplorer >> paths [
 { #category : #'vm stack' }
 RASinglePathExplorer >> pop: anInteger [ 
 	
-	anInteger timesRepeat: [ vmStack pop ]
+	anInteger timesRepeat: [ vmFrame pop ]
 ]
 
 { #category : #initialization }
@@ -967,7 +1332,7 @@ RASinglePathExplorer >> popAbstractOperand [
 { #category : #'vm stack' }
 RASinglePathExplorer >> push: anInteger [ 
 	
-	vmStack push: anInteger
+	vmFrame push: anInteger
 ]
 
 { #category : #visiting }

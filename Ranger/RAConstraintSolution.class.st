@@ -25,6 +25,7 @@ RAConstraintSolution >> inputConstraints: aCollection [
 RAConstraintSolution >> inspectionItems: aBuilder [
 	<inspectorPresentationOrder: 0 title: 'Path'> 
 	
+	path ifNil: [ ^ SpTablePresenter new ].
 	^ path inspectionItems: aBuilder
 ]
 
@@ -37,7 +38,7 @@ RAConstraintSolution >> isEmpty [
 { #category : #testing }
 RAConstraintSolution >> isFailure [
 	
-	^ path failure
+	^ path isFailure
 ]
 
 { #category : #testing }
@@ -57,18 +58,14 @@ RAConstraintSolution >> path: aRAPath [
 	path := aRAPath
 ]
 
-{ #category : #testing }
+{ #category : #accessing }
 RAConstraintSolution >> printOn: aStream [
 
 	super printOn: aStream.
-	
-	path ifNil: [ ^ self ].
-	
-	aStream nextPut: $(.
-	self parameterNames
-		do: [ :e | aStream print: e]
-		separatedBy: [ aStream nextPutAll: ', ' ].
-	aStream nextPut: $)
+	aStream
+		nextPutAll: '(';
+		print: path exitCondition;
+		nextPutAll: ')'
 ]
 
 { #category : #'value-accessing' }

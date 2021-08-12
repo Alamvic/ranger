@@ -1,0 +1,189 @@
+Class {
+	#name : #RAVMFrameConstraint,
+	#superclass : #Object,
+	#instVars : [
+		'receiver',
+		'operandStack',
+		'method',
+		'arguments',
+		'locals',
+		'numberOfLocals',
+		'numberOfArguments',
+		'operandStackSize'
+	],
+	#category : #'Ranger-Interpreter'
+}
+
+{ #category : #accessing }
+RAVMFrameConstraint >> arguments [
+
+	^ arguments
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> arguments: aCollection [
+
+	arguments := aCollection
+]
+
+{ #category : #initialization }
+RAVMFrameConstraint >> initialize [
+
+	super initialize.
+	operandStack := Stack new.
+	locals := OrderedCollection new.
+	arguments := #().
+	numberOfArguments := MzVariable new
+		name: 'frame_number_of_arguments';
+		type: '0..1000' "A thousand arguments variables is more than enough to test...";
+		yourself.
+	numberOfLocals := MzVariable new
+		name: 'frame_number_of_locals';
+		type: '0..1000' "A thousand local variables is more than enough to test...";
+		yourself. 
+	operandStackSize := MzVariable new
+		name: 'frame_operand_stack_size';
+		type: '0..1000' "A thousand stack elements is more than enough to test...";
+		yourself. 
+]
+
+{ #category : #instantiation }
+RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAConstraintBuilder [
+	
+	| frame newConstraints concreteLocals abstractLocals concreteArguments abstractArguments |
+	newConstraints := RAVMFrameConstraint new.
+	frame := RAVMFrame new.
+	frame frameConstraints: newConstraints.
+	
+	frame receiver: (aRAObjectBuilder instantiate: receiver).
+	newConstraints receiver: aRAConstraintBuilder newAbstractObject.
+	
+	frame method: (aRAObjectBuilder instantiate: method).
+	newConstraints method: aRAConstraintBuilder newAbstractMethod.
+	
+	concreteLocals := OrderedCollection new.
+	abstractLocals := OrderedCollection new.
+	((1 to: (numberOfLocals value ifNil: [ 0 ])) collect: [ :e |
+		concreteLocals add: (aRAObjectBuilder
+			instantiate: (self localAt: e ifAbsent: [ aRAConstraintBuilder newSmallInteger ])).
+		abstractLocals add: aRAConstraintBuilder newAbstractObject.
+	]).
+	frame locals: concreteLocals.
+	newConstraints locals: abstractLocals.
+
+	concreteArguments := OrderedCollection new.
+	abstractArguments := OrderedCollection new.
+	((1 to: (numberOfArguments value ifNil: [ 0 ])) collect: [ :e |
+		concreteArguments add: (aRAObjectBuilder 
+			instantiate: (self argumentAt: e ifAbsent: [ aRAConstraintBuilder newSmallInteger ])).
+		abstractArguments add: aRAConstraintBuilder newAbstractObject.
+	]).
+	frame arguments: concreteArguments.
+	newConstraints arguments: abstractArguments.
+	
+	((1 to: (operandStackSize value ifNil: [ 0 ])) collect: [ :e |
+		frame push: (aRAObjectBuilder instantiate: 
+			(self operandAt: e ifAbsent: [ aRAConstraintBuilder newAbstractSmallInteger ])).
+		newConstraints push: aRAObjectBuilder newAbstractObject.
+	]).
+
+	^ frame
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> localAt: aConstraint [
+	
+	| newObject |
+	newObject := RAObject named: 'local_xxx'.
+	locals add: { aConstraint. newObject }.
+	^ newObject
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> locals [
+
+	^ locals
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> locals: aCollection [ 
+	locals := aCollection
+]
+
+{ #category : #method }
+RAVMFrameConstraint >> method [
+	
+	^ method
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> method: anObject [
+
+	method := anObject
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> numberOfArguments [
+
+	^ numberOfArguments
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> numberOfLocals [
+	
+	^ numberOfLocals
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> operandAt: anInteger [ 
+	
+	^ operandStack at: anInteger
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> operandAt: anInteger ifAbsent: aBlock [
+	
+	^ operandStack at: anInteger ifAbsent: aBlock
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> operandStack [
+
+	^ operandStack
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> operandStack: anObject [
+
+	operandStack := anObject
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> operandStackSize [
+	
+	^ operandStackSize
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> operandStackSize: anObject [
+
+	operandStackSize := anObject
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> push: anOperandConstraint [
+
+	operandStack push: anOperandConstraint
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> receiver [
+
+	^ receiver
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> receiver: anObject [
+
+	receiver := anObject
+]
