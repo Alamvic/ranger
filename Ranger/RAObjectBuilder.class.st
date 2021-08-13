@@ -66,15 +66,11 @@ RAObjectBuilder >> initializeConcreteObject: anOop withConstraints: aRAObject [
 				ofObject: anOop
 				withValue: (interpreter objectMemory integerObjectOf: numberOfLiterals - 1).
 		1 to: numberOfLiterals do: [ :index | 
-			| theLiteral |
-			theLiteral := self newAbstractObject.
-			theLiteral typeTag value: 1.
-			theLiteral integerValue value: 0.
-
+			"For now it's just a small integer"
 			interpreter objectMemory
 				storePointer: index
 				ofObject: anOop
-				withValue: (self instantiate: theLiteral) ] ]
+				withValue: (interpreter objectMemory integerObjectOf: 0) ] ]
 ]
 
 { #category : #'value-setup' }
@@ -109,9 +105,6 @@ RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 					 aRAObject numSlots value = 0 ] ] ]).
 
 	classIndex := self allocateClassObject: aRAObject classObject.
-	self haltIf: [ classIndex = 0 ].
-	self haltIf: [ aRAObject specialObjectIndex value notNil ].
-
 	newConcreteObject := self
 		allocateNewSpaceSlots: (self numberOfSlotsOf: aRAObject)
 		format: (aRAObject format value ifNil: [ 
@@ -148,43 +141,6 @@ RAObjectBuilder >> memory [
 	^ interpreter objectMemory
 ]
 
-{ #category : #abstract }
-RAObjectBuilder >> newAbstractMethod [
-
-	| smallInteger |
-	smallInteger := self newAbstractObject.
-	smallInteger typeTag value: 0.
-	smallInteger classObject format value: interpreter objectMemory firstCompiledMethodFormat.
-	^ smallInteger
-]
-
-{ #category : #abstract }
-RAObjectBuilder >> newAbstractObject [
-
-	^ RAObject new
-		initializeWithVariableName: 't', self nextOrdinaryClassIndex asString;
-		classObject: (RAClassObject new
-			initializeWithVariableName: 't', self nextOrdinaryClassIndex asString;
-			yourself);
-		yourself
-]
-
-{ #category : #abstract }
-RAObjectBuilder >> newAbstractSmallInteger [
-
-	^ self newAbstractSmallIntegerWithValue: 0
-]
-
-{ #category : #abstract }
-RAObjectBuilder >> newAbstractSmallIntegerWithValue: aValue [
-
-	| smallInteger |
-	smallInteger := self newAbstractObject.
-	smallInteger typeTag value: 1.
-	smallInteger integerValue value: aValue.
-	^ smallInteger
-]
-
 { #category : #building }
 RAObjectBuilder >> newClassInOldSpaceWithSlots: numberOfSlots instSpec: format [
 	| newClass formatWithSlots |
@@ -210,18 +166,6 @@ RAObjectBuilder >> newClassInOldSpaceWithSlots: numberOfSlots instSpec: format [
 		withValue: (self memory integerObjectOf: formatWithSlots).
 		
 	^ newClass	
-]
-
-{ #category : #instantiation }
-RAObjectBuilder >> newMethod [
-	
-	^ self instantiate: self newAbstractMethod
-]
-
-{ #category : #instantiation }
-RAObjectBuilder >> newSmallInteger [
-	
-	^ self instantiate: self newAbstractSmallInteger
 ]
 
 { #category : #accessing }

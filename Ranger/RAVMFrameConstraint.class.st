@@ -15,6 +15,12 @@ Class {
 }
 
 { #category : #accessing }
+RAVMFrameConstraint >> argumentAt: anInteger ifAbsent: aFullBlockClosure [ 
+	
+	^ arguments at: anInteger ifAbsent: aFullBlockClosure 
+]
+
+{ #category : #accessing }
 RAVMFrameConstraint >> arguments [
 
 	^ arguments
@@ -65,7 +71,7 @@ RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAC
 	abstractLocals := OrderedCollection new.
 	((1 to: (numberOfLocals value ifNil: [ 0 ])) collect: [ :e |
 		concreteLocals add: (aRAObjectBuilder
-			instantiate: (self localAt: e ifAbsent: [ aRAConstraintBuilder newSmallInteger ])).
+			instantiate: (self localAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ])).
 		abstractLocals add: aRAConstraintBuilder newAbstractObject.
 	]).
 	frame locals: concreteLocals.
@@ -75,7 +81,7 @@ RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAC
 	abstractArguments := OrderedCollection new.
 	((1 to: (numberOfArguments value ifNil: [ 0 ])) collect: [ :e |
 		concreteArguments add: (aRAObjectBuilder 
-			instantiate: (self argumentAt: e ifAbsent: [ aRAConstraintBuilder newSmallInteger ])).
+			instantiate: (self argumentAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ])).
 		abstractArguments add: aRAConstraintBuilder newAbstractObject.
 	]).
 	frame arguments: concreteArguments.
@@ -83,7 +89,7 @@ RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAC
 	
 	(((operandStackSize value ifNil: [ 0 ]) to: 1 by: -1) collect: [ :e |
 		frame push: (aRAObjectBuilder instantiate: 
-			(self operandAt: e ifAbsent: [ aRAConstraintBuilder newAbstractSmallInteger ])).
+			(self operandAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ])).
 		newConstraints push: aRAObjectBuilder newAbstractObject.
 	]).
 
@@ -94,9 +100,16 @@ RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAC
 RAVMFrameConstraint >> localAt: aConstraint [
 	
 	| newObject |
+	1halt.
 	newObject := RAObject named: 'local_xxx'.
 	locals add: { aConstraint. newObject }.
 	^ newObject
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> localAt: anInteger ifAbsent: aFullBlockClosure [ 
+	
+	^ locals at: anInteger ifAbsent: aFullBlockClosure
 ]
 
 { #category : #accessing }

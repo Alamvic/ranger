@@ -1,5 +1,5 @@
 Class {
-	#name : #RAConstraintBuilder,
+	#name : #RAConstraintFactory,
 	#superclass : #Object,
 	#instVars : [
 		'interpreter',
@@ -9,25 +9,25 @@ Class {
 }
 
 { #category : #accessing }
-RAConstraintBuilder >> interpreter [
+RAConstraintFactory >> interpreter [
 
 	^ interpreter
 ]
 
 { #category : #accessing }
-RAConstraintBuilder >> interpreter: anObject [
+RAConstraintFactory >> interpreter: anObject [
 
 	interpreter := anObject
 ]
 
 { #category : #testing }
-RAConstraintBuilder >> isCompiledMethod: aRAObject [ 
+RAConstraintFactory >> isCompiledMethod: aRAObject [ 
 	
 	^ aRAObject classObject format value = interpreter objectMemory firstCompiledMethodFormat
 ]
 
 { #category : #abstract }
-RAConstraintBuilder >> newAbstractMethod [
+RAConstraintFactory >> newAbstractMethod [
 
 	| smallInteger |
 	smallInteger := self newAbstractObject.
@@ -37,9 +37,10 @@ RAConstraintBuilder >> newAbstractMethod [
 ]
 
 { #category : #abstract }
-RAConstraintBuilder >> newAbstractObject [
+RAConstraintFactory >> newAbstractObject [
 
 	^ RAObject new
+		constraintFactory: self;
 		initializeWithVariableName: 't', self nextOrdinaryClassIndex asString;
 		classObject: (RAClassObject new
 			initializeWithVariableName: 't', self nextOrdinaryClassIndex asString;
@@ -48,13 +49,13 @@ RAConstraintBuilder >> newAbstractObject [
 ]
 
 { #category : #abstract }
-RAConstraintBuilder >> newAbstractSmallInteger [
+RAConstraintFactory >> newAbstractSmallInteger [
 
 	^ self newAbstractSmallIntegerWithValue: 0
 ]
 
 { #category : #abstract }
-RAConstraintBuilder >> newAbstractSmallIntegerWithValue: aValue [
+RAConstraintFactory >> newAbstractSmallIntegerWithValue: aValue [
 
 	| smallInteger |
 	smallInteger := self newAbstractObject.
@@ -63,20 +64,30 @@ RAConstraintBuilder >> newAbstractSmallIntegerWithValue: aValue [
 	^ smallInteger
 ]
 
+{ #category : #abstract }
+RAConstraintFactory >> newAbstractSmallIntegerWithValueVariable: aValueVariable [
+
+	| smallInteger |
+	smallInteger := self newAbstractObject.
+	smallInteger typeTag value: 1.
+	smallInteger integerValue: aValueVariable.
+	^ smallInteger
+]
+
 { #category : #accessing }
-RAConstraintBuilder >> nextIndex [
+RAConstraintFactory >> nextIndex [
 
 	^ nextIndex
 ]
 
 { #category : #accessing }
-RAConstraintBuilder >> nextIndex: anObject [
+RAConstraintFactory >> nextIndex: anObject [
 
 	^ nextIndex := anObject
 ]
 
 { #category : #'value-setup' }
-RAConstraintBuilder >> nextOrdinaryClassIndex [
+RAConstraintFactory >> nextOrdinaryClassIndex [
 	
 	^ nextIndex
 		ifNil: [ nextIndex := 100 ]

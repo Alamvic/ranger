@@ -14,37 +14,6 @@ Class {
 }
 
 { #category : #'building suites' }
-RAPrimitiveAutoTest class >> exploreCasesForBytecode: aBytecode withWordSize: aWordSize [
-
-	| suite interpreter |
-	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-
-	"Find the list of primitives to test"
-	interpreter := suite anyOne
-		               setUp;
-		               interpreter.
-
-	interpreter := (suite detect: [ :e | 
-			                e parametersToUse do: [ :aParameter | 
-					                aParameter applyTo: e ].
-			                e wordSize = aWordSize ])
-		               setUp;
-		               interpreter.
-	^ RAPathExplorer new
-		  failOnError: false;
-		  explore: (RABytecodeConcolicCase new
-				   bytecode: aBytecode;
-				   vm: interpreter;
-				   yourself)
-		  vmBuildingBlock: [ 
-			  (suite detect: [ :e | 
-					   e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
-					   e wordSize = aWordSize ])
-				  setUp;
-				  interpreter ]
-]
-
-{ #category : #'building suites' }
 RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: aWordSize [
 
 	| suite interpreter |

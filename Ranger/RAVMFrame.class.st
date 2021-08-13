@@ -70,6 +70,7 @@ RAVMFrame >> initialize [
 RAVMFrame >> localAt: aConstraint [
 	
 	| newObject |
+	1halt.
 	newObject := RAObject named: 'local_xxx'.
 	locals add: { aConstraint. newObject }.
 	^ newObject
@@ -169,7 +170,7 @@ RAVMFrame >> push: aValue [
 { #category : #accessing }
 RAVMFrame >> receiver [
 
-	^ receiver
+	^ {receiver . frameConstraints receiver}
 ]
 
 { #category : #accessing }

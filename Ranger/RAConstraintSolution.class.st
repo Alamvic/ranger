@@ -10,9 +10,14 @@ Class {
 }
 
 { #category : #accessing }
-RAConstraintSolution >> arguments [
+RAConstraintSolution >> exitCondition [
 	
-	^ inputConstraints allButFirst
+	^ path exitCondition
+]
+
+{ #category : #accessing }
+RAConstraintSolution >> inputConstraints [
+	^ inputConstraints
 ]
 
 { #category : #accessing }
@@ -42,6 +47,12 @@ RAConstraintSolution >> isFailure [
 ]
 
 { #category : #testing }
+RAConstraintSolution >> isInvalid [
+	
+	^ path exitCondition isInvalid
+]
+
+{ #category : #testing }
 RAConstraintSolution >> parameterNames [
 	
 	^ path inputs
@@ -62,22 +73,11 @@ RAConstraintSolution >> path: aRAPath [
 RAConstraintSolution >> printOn: aStream [
 
 	super printOn: aStream.
+	path ifNil: [ ^ self ].
 	aStream
 		nextPutAll: '(';
 		print: path exitCondition;
 		nextPutAll: ')'
-]
-
-{ #category : #'value-accessing' }
-RAConstraintSolution >> receiver [
-	
-	^ inputConstraints first
-]
-
-{ #category : #'value-accessing' }
-RAConstraintSolution >> receiverTags [
-	
-	^ self receiver typeTag
 ]
 
 { #category : #accessing }

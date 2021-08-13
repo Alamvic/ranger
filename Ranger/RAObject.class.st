@@ -10,7 +10,8 @@ Class {
 		'numSlots',
 		'classObject',
 		'long32Slots',
-		'hashBits'
+		'hashBits',
+		'constraintFactory'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -55,6 +56,11 @@ RAObject >> classTag [
 	^ self classObject classIndex
 ]
 
+{ #category : #accessing }
+RAObject >> constraintFactory: aRAConstraintFactory [ 
+	constraintFactory := aRAConstraintFactory
+]
+
 { #category : #slots }
 RAObject >> fetchLong32: aConcreteAbstractPair [
 	
@@ -72,11 +78,11 @@ RAObject >> fetchLong32: aConcreteAbstractPair [
 ]
 
 { #category : #accessing }
-RAObject >> fetchPointer: aRAConstant [ 
+RAObject >> fetchPointer: anIndex [
 
-	^ MzVariable new
-		name: variableName , '_somepointer';
-		yourself
+	^ slots at: anIndex ifAbsentPut: [
+		constraintFactory newAbstractObject
+	]
 ]
 
 { #category : #accessing }
@@ -105,8 +111,8 @@ RAObject >> initializeWithVariableName: aName [
 		              name: variableName , '_numSlots';
 		              type: '0..300' "300 slots is enough to hit large objects";
 		              yourself.
-	slots := Dictionary new.
-	long32Slots := Dictionary new.
+	slots := OrderedCollection new.
+	long32Slots := OrderedCollection new.
 
 	"
 	- 0 is normal object
@@ -205,14 +211,6 @@ RAObject >> printOn: aStream [
 	aStream nextPut: $(.
 	aStream print: variableName.
 	aStream nextPut: $).
-]
-
-{ #category : #accessing }
-RAObject >> slotAt: aRAObject [ 
-	1halt.
-	^ slots
-		at: aRAObject integerValue
-		ifAbsentPut: [ RAObject named: variableName, '_slot', slots size asString ]
 ]
 
 { #category : #accessing }

@@ -185,7 +185,9 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #cppIf:ifTrue: put: #interpretCppIfIfTrueWith:.
 	specialCases at: #cppIf:ifTrue:ifFalse: put: #interpretCppIfIfTrueIfFalseWith:.
 	
-	specialCases at: #commonSendOrdinary put: #interpretCommonSendOrdinaryWith:
+	"Stop cases"
+	specialCases at: #commonSendOrdinary put: #interpretCommonSendOrdinaryWith:.
+	specialCases at: #commonReturn put: #interpretCommonReturnWith:
 ]
 
 { #category : #'special cases' }
@@ -320,6 +322,12 @@ RASinglePathExplorer >> interpretClassIndexOfWith: aRBMessageNode [
 		vm first classIndexOf: object first.
 		object second classIndex
 	}
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretCommonReturnWith: aRBMessageNode [ 
+	
+	RAMethodReturnExit signal
 ]
 
 { #category : #'special cases' }
@@ -464,40 +472,33 @@ RASinglePathExplorer >> interpretFetchPointerOfObjectWith: aRBMessageNode [
 
 	"Checked access. If we access an immediate or outside the bounds of the object just use 0 as concrete value.
 	The abstract value will contain bound checks"
-	(vm first isImmediate: oop first)
-		ifTrue: [ "Record it was an immediate"
-			self
-				addPathConstraint: (RANotEqualsConstraint operands: { 
-							 oop second typeTag.
-							 (RAConstant value: 0) })
-				taken: true.
-			"Push 0 "
-			self pushOperand: { 
-					0.
-					(RAObject named: 'invalid') } ]
-		ifFalse: [ 
-			self
-				addPathConstraint: (RAEqualsConstraint operands: { 
-							 oop second typeTag.
-							 (RAConstant value: 0) })
-				taken: true.
-			constraint := RALessConstraint operands: { 
-				index second.
-				oop second numSlots }.
-			numberOfPointersInObject := vm first numSlotsOfAny: oop first.
-			concreteValue := index first < numberOfPointersInObject
-				                 ifTrue: [ 
-					                 self
-						                 addPathConstraint: constraint
-						                 taken: true.
-					                 vm first
-						                 fetchPointer: index first
-						                 ofObject: oop first ]
-				                 ifFalse: [ 
-					                 self
-						                 addPathConstraint: constraint negated
-						                 taken: false.
-					                 RAInvalidMemoryAccess signal ] ]
+	(vm first isImmediate: oop first) ifTrue: [ "Record it was an immediate"
+		self
+			addPathConstraint: (RANotEqualsConstraint operands: { 
+						 oop second typeTag.
+						 (RAConstant value: 0) })
+			taken: true.
+		RAInvalidMemoryAccess signal ].
+	self
+		addPathConstraint: (RAEqualsConstraint operands: { 
+					 oop second typeTag.
+					 (RAConstant value: 0) })
+		taken: true.
+	constraint := RALessConstraint operands: { 
+			              index second.
+			              oop second numSlots }.
+	numberOfPointersInObject := vm first numSlotsOfAny: oop first.
+	index first < numberOfPointersInObject ifFalse: [ 
+		self addPathConstraint: constraint negated taken: false.
+		RAInvalidMemoryAccess signal ].
+	
+	self addPathConstraint: constraint taken: true.
+	self pushOperand: {
+		vm first
+			fetchPointer: index first
+			ofObject: oop first.
+		oop second fetchPointer: index first
+	}
 ]
 
 { #category : #'special cases' }
@@ -626,10 +627,7 @@ RASinglePathExplorer >> interpretIntegerObjectOfWith: aRBMessageNode [
 
 	self pushOperand: {
 		(receiver first integerObjectOf: smallInteger first).
-		(RAObject named: UUID new asString)
-		  typeTag: 1 asMzValue;
-		  integerValue: smallInteger second;
-		  yourself
+		self constraintFactory newAbstractSmallIntegerWithValueVariable: smallInteger second
 	}
 ]
 

@@ -11,7 +11,7 @@ Class {
 		'selector',
 		'vm',
 		'failOnError',
-		'constraintBuilder'
+		'constraintFactory'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -26,9 +26,9 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 
 	previousInputFrameConstraints := RAVMFrameConstraint new.
 	previousInputFrameConstraints receiver:
-		constraintBuilder newAbstractSmallInteger.
+		constraintFactory newAbstractSmallInteger.
 	previousInputFrameConstraints method:
-		constraintBuilder newAbstractMethod.
+		constraintFactory newAbstractMethod.
 
 	[ 
 	| objectBuilder |
@@ -40,7 +40,7 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	aConcolicCase initializeVM: vm.
 	inputFrame := previousInputFrameConstraints
 		              instantiateWith: objectBuilder
-		              constraintBuilder: constraintBuilder.
+		              constraintBuilder: constraintFactory.
 	outputFrame := inputFrame copy.
 	exploredPath := self
 		                explorePathWithFrame: outputFrame
@@ -106,7 +106,7 @@ RAPathExplorer >> initialize [
 	failOnError := true.
 	executionStack := OrderedCollection new.
 	solutions := OrderedCollection new.
-	constraintBuilder := RAConstraintBuilder new
+	constraintFactory := RAConstraintFactory new
 ]
 
 { #category : #solving }

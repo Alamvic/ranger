@@ -3,9 +3,8 @@ Class {
 	#superclass : #VMSimpleStackBasedCogitAbstractTest,
 	#instVars : [
 		'solution',
+		'bytecode',
 		'endInstruction',
-		'generator',
-		'primitive',
 		'objectBuilder',
 		'compilationResult',
 		'methodAddress'
@@ -14,70 +13,9 @@ Class {
 }
 
 { #category : #'building suites' }
-RABytecodeAutoTest class >> exploreCasesForBytecode: aBytecode withWordSize: aWordSize [
-
-	| suite interpreter |
-	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-
-	"Find the list of primitives to test"
-	interpreter := suite anyOne
-		               setUp;
-		               interpreter.
-
-	interpreter := (suite detect: [ :e | 
-			                e parametersToUse do: [ :aParameter | 
-					                aParameter applyTo: e ].
-			                e wordSize = aWordSize ])
-		               setUp;
-		               interpreter.
-	^ RAPathExplorer new
-			failOnError: true;
-			explore: (RABytecodeConcolicCase new
-				bytecode: aBytecode;
-				vm: interpreter;
-				yourself)
-			vmBuildingBlock: [ 
-			  (suite detect: [ :e | 
-					   e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
-					   e wordSize = aWordSize ])
-				  setUp;
-				  interpreter ]
-]
-
-{ #category : #'building suites' }
-RABytecodeAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: aWordSize [
-
-	| suite interpreter |
-	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-
-	"Find the list of primitives to test"
-	interpreter := suite anyOne
-		               setUp;
-		               interpreter.
-
-	interpreter := (suite detect: [ :e | 
-			                e parametersToUse do: [ :aParameter | 
-					                aParameter applyTo: e ].
-			                e wordSize = aWordSize ])
-		               setUp;
-		               interpreter.
-	^ RAPathExplorer new
-		  failOnError: false;
-		  explore: (RAPrimitiveConcolicCase new
-				   selector: aPrimitive;
-				   yourself)
-		  vmBuildingBlock: [ 
-			  (suite detect: [ :e | 
-					   e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
-					   e wordSize = aWordSize ])
-				  setUp;
-				  interpreter ]
-]
-
-{ #category : #'building suites' }
 RABytecodeAutoTest class >> testParameters [
 
-	| suite matrix interpreter primitives |
+	| suite matrix interpreter |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
 	matrix := ParametrizedTestMatrix new.
 
@@ -85,28 +23,14 @@ RABytecodeAutoTest class >> testParameters [
 	interpreter := suite anyOne
 		               setUp;
 		               interpreter.
-	primitives := (interpreter class primitiveTable withIndexCollect: [ 
-		               :e 
-		               :i | i -> e ])
-		              select: [ :e | 
-			              e value isSymbol and: [ 
-				              ((interpreter class lookupSelector: e value) 
-					               hasPragmaNamed: #numberOfArguments:) and: [ 
-					              (interpreter cogit class primitiveTable at:
-						               e key - 1) primitiveGenerator notNil ] ] ]
-		              thenCollect: [ :e | 
-			              { 
-				              e value.
-				              (interpreter cogit class primitiveTable at:
-					               e key - 1) primitiveGenerator } ].
 
 	"Build the entire set of tests:
 	 - for each architecture
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	primitives
-		do: [ :p | 
+	(1 to: 10)
+		do: [ :bytecode | 
 			| architectures solutions |
 			architectures := { 
 				                 { 
@@ -128,21 +52,21 @@ RABytecodeAutoTest class >> testParameters [
 					               interpreter.
 				solutions := RAPathExplorer new
 					             failOnError: false;
-					             explore: (RAPrimitiveConcolicCase new
-							              selector: p first;
-							              yourself)
+					             explore: (RABytecodeConcolicCase new
+	              	              	vm: interpreter;
+	              	              	bytecode: bytecode;
+											yourself)
 					             vmBuildingBlock: [ 
-					             theSetUpTest
-						             setUp;
-						             interpreter ].
+						             theSetUpTest
+							             setUp;
+							             interpreter ].
 				solutions do: [ :e | 
 					matrix addCase: { 
 							arch first.
 							arch second.
-							(#primitive -> p first).
-							(#generator -> p second).
+							(#bytecode -> bytecode).
 							(#solution -> e) } ] ] ]
-		displayingProgress: [ :p | (p first -> p second) asString ].
+		displayingProgress: [ :bytecode | bytecode asString ].
 
 	^ matrix
 ]
@@ -153,38 +77,33 @@ RABytecodeAutoTest >> allocateNewSpaceSlots: anInteger format: anInteger2 classI
 	^ memory allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 
 ]
 
-{ #category : #running }
-RABytecodeAutoTest >> execute [
+{ #category : #accessing }
+RABytecodeAutoTest >> bytecode [
 
-	| stopAddress |
-	stopAddress := solution isFailure
-		ifTrue: [ 
-			compilationResult = UnimplementedPrimitive ifTrue: [ 
-				"Its ok, do not execute anything. This path was a failure and was not compiled"
-				^ self ].
-			endInstruction address ]
-		ifFalse: [ callerAddress ].
-	
-	self runFrom: methodAddress until: stopAddress
+	^ bytecode
 ]
 
 { #category : #accessing }
-RABytecodeAutoTest >> generator: aString [ 
-	generator := aString
+RABytecodeAutoTest >> bytecode: anObject [
+
+	bytecode := anObject
+]
+
+{ #category : #running }
+RABytecodeAutoTest >> execute [
+
+	self runFrom: methodAddress until: callerAddress.
+	self assert: machineSimulator receiverRegisterValue equals: 17.
 ]
 
 { #category : #running }
 RABytecodeAutoTest >> prepareAutoCall [
 
+	self assert: (solution inputConstraints numberOfArguments value ifNil: [ 0 ]) = 0.
+	self assert: (solution inputConstraints numberOfLocals value ifNil: [ 0 ]) = 0.
 	self
-		prepareStackForSendReceiver: (objectBuilder instantiate: solution receiver) first
-		arguments: (solution arguments collect: [:e | (objectBuilder instantiate: e) first ]).
-]
-
-{ #category : #accessing }
-RABytecodeAutoTest >> primitive: aString [ 
-	
-	primitive := aString
+		prepareStackForSendReceiver: (objectBuilder instantiate: solution inputConstraints receiver)
+		arguments: (solution inputConstraints arguments collect: [:e | (objectBuilder instantiate: e) ]).
 ]
 
 { #category : #running }
@@ -203,7 +122,7 @@ RABytecodeAutoTest >> setUp [
 			 instSpec: (memory byteFormatForNumBytes: 0)).
 
 
-	cogit receiverTags: (solution receiverTags value ifNil: [ 0 ]).
+	cogit receiverTags: (solution inputConstraints receiver typeTag value ifNil: [ 0 ]).
 	objectBuilder := RAObjectBuilder new
 		                 interpreter: interpreter;
 		                 nextIndex: nextIndex;
@@ -217,14 +136,17 @@ RABytecodeAutoTest >> solution: aSolution [
 ]
 
 { #category : #running }
-RABytecodeAutoTest >> testPrimitive [
+RABytecodeAutoTest >> testBytecode [
 
-	methodAddress := self compile: [ 
-		1halt.
-		"should push before so many elements as the bytecode needs"
-		compilationResult := cogit objectRepresentation perform: generator
-		"should return top if the bytecode returns something to be able to test it!" ]
-		bytecodes: 15.
+	solution isInvalid ifTrue: [ ^ self ].
+	
+	self assert: (solution inputConstraints operandStackSize value ifNil: [ 0 ]) = 0.
+	methodAddress := self compile: [ | descriptor result |
+		cogit byte0: bytecode.
+		descriptor := cogit generatorAt: bytecode.
+		result := cogit perform: descriptor generator.
+		solution exitCondition returnResultInto: cogit
+	] bytecodes: 15.
 
 	self prepareAutoCall.
 	self execute.
