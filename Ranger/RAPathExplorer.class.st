@@ -8,8 +8,6 @@ Class {
 		'pathConstraints',
 		'executionStack',
 		'solutions',
-		'objectBuilder',
-		'numberOfArguments',
 		'selector',
 		'vm',
 		'failOnError',
@@ -19,33 +17,44 @@ Class {
 }
 
 { #category : #api }
-RAPathExplorer >> exploreBytecode: aBytecode on: aVM vmBuildingBlock: aBuildingBlock [
+RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 
-	| currentPath solution previousRunFrameConstraints exploredPath inputFrame outputFrame |
-	selector := aVM class bytecodeTable at: aBytecode + 1.
-
+	| currentPath solution previousInputFrameConstraints exploredPath inputFrame outputFrame |
+	selector := aConcolicCase selector.
+	currentPath := RAPath new.
 	solution := RAConstraintSolution new solver: #initial.
 
-	previousRunFrameConstraints := RAVMFrameConstraint new.
-	previousRunFrameConstraints receiver: constraintBuilder newAbstractSmallInteger.
-	previousRunFrameConstraints method: constraintBuilder newAbstractMethod.
+	previousInputFrameConstraints := RAVMFrameConstraint new.
+	previousInputFrameConstraints receiver:
+		constraintBuilder newAbstractSmallInteger.
+	previousInputFrameConstraints method:
+		constraintBuilder newAbstractMethod.
 
-	[
-		1halt.
-	self initializeWithBytecodeSelector: selector onVM: aBuildingBlock value.
-	vm currentBytecode: aBytecode.
-	inputFrame := previousRunFrameConstraints
-		instantiateWith: objectBuilder
-		constraintBuilder: constraintBuilder.
+	[ 
+	| objectBuilder |
+	vm := aBuildingBlock value.
+	objectBuilder := RAObjectBuilder new
+		                 interpreter: vm;
+		                 nextIndex: 100;
+		                 yourself.
+	aConcolicCase initializeVM: vm.
+	inputFrame := previousInputFrameConstraints
+		              instantiateWith: objectBuilder
+		              constraintBuilder: constraintBuilder.
 	outputFrame := inputFrame copy.
 	exploredPath := self
-		 explorePathWithFrame: outputFrame
-		 solver: solution solver.
-	currentPath := exploredPath ifNil: [ (currentPath ifNil: [ RAPath new ]) nextPath ].
+		                explorePathWithFrame: outputFrame
+		                solver: solution solver.
+
+	"If we do not get an explored path (to see if this is still happenning)
+	This may be because there was an exception while doing the interpretation.
+	Continue by negating the going to the next path.
+	Can this loop?"
+	currentPath := exploredPath ifNil: [ currentPath nextPath ].
 
 	"Negate and solve constraints!"
-	solution := self solve: currentPath withInterpreter: aVM.
-	previousRunFrameConstraints := inputFrame frameConstraints.	
+	solution := self solve: currentPath.
+	previousInputFrameConstraints := inputFrame frameConstraints.
 	solution isEmpty ] whileFalse.
 	^ solutions
 ]
@@ -78,46 +87,6 @@ RAPathExplorer >> explorePathWithFrame: aFrame solver: solver [
 	^ explorer path
 ]
 
-{ #category : #api }
-RAPathExplorer >> explorePrimitive: aSelector on: anObject vmBuildingBlock: aBuildingBlock [
-
-	| currentPath solution currentConstraints |
-	self initializeWithSelector: aSelector onVM: anObject.
-
-	solution := RAConstraintSolution new solver: #initial.
-	currentConstraints := {
-		"Frame number of arguments. Start with 0"
-		objectBuilder newAbstractSmallIntegerWithValue: 0.
-		"Frame number of locals. Start with 0"
-		objectBuilder newAbstractSmallIntegerWithValue: 0.
-		"Receiver"
-		objectBuilder newAbstractSmallInteger.
-		"Method"
-		objectBuilder newAbstractMethod.
-	},
-	"Arguments"
-	((numberOfArguments to: 0 by: -1) collect: [ :e | 
-		                      | smallInteger |
-		                      smallInteger := objectBuilder
-			                                      newAbstractObject.
-		                      smallInteger typeTag value: 1.
-		                      smallInteger integerValue value: 0.
-		                      smallInteger ]).
-	[ 
-	currentPath := (self
-		 explorePathWithFrame: currentConstraints
-		 solver: solution solver)
-			ifNil: [ (currentPath ifNil: [ RAPath new ]) nextPath ].
-
-	"Negate and solve constraints!"
-	solution := self solve: currentPath withInterpreter: anObject.
-	currentConstraints := solution path inputs collect: [ :e | e second ].
-	self initializeWithSelector: aSelector onVM: aBuildingBlock value.
-	
-	solution isEmpty ] whileFalse.
-	^ solutions
-]
-
 { #category : #accessing }
 RAPathExplorer >> failOnError [
 
@@ -140,33 +109,6 @@ RAPathExplorer >> initialize [
 	constraintBuilder := RAConstraintBuilder new
 ]
 
-{ #category : #api }
-RAPathExplorer >> initializeWithBytecodeSelector: aSelector onVM: aVM [
-	
-	| method |
-	selector := aSelector.
-	vm := aVM.
-	method := aVM class lookupSelector: aSelector.
-	objectBuilder := RAObjectBuilder new
-		interpreter: aVM;
-		nextIndex: 100;
-		yourself
-]
-
-{ #category : #api }
-RAPathExplorer >> initializeWithSelector: aSelector onVM: aVM [
-	
-	| method |
-	selector := aSelector.
-	vm := aVM.
-	method := aVM class lookupSelector: aSelector.
-	numberOfArguments := (method ast pragmaNamed: #numberOfArguments:) arguments first value.
-	objectBuilder := RAObjectBuilder new
-		interpreter: aVM;
-		nextIndex: 100;
-		yourself
-]
-
 { #category : #solving }
 RAPathExplorer >> recordSolution: aSolution [
 
@@ -174,32 +116,23 @@ RAPathExplorer >> recordSolution: aSolution [
 ]
 
 { #category : #solving }
-RAPathExplorer >> solve: aRAPath withInterpreter: interpreter [
+RAPathExplorer >> solve: aRAPath [
 
-	^ self solveAtLeast: aRAPath pathConstraints size inPathConstraint: aRAPath withInterpreter: interpreter
-]
-
-{ #category : #solving }
-RAPathExplorer >> solveAtLeast: ktry inPathConstraint: aRAPath withInterpreter: interpreter [
-
-	| nextPath solution j |
-	j := (executionStack first: (executionStack size min: ktry)) lastIndexOf: false.
+	| nextPath solution j ktry |
+	ktry :=  aRAPath pathConstraints size.
+	j := (executionStack first: (executionStack size min: ktry)) 
+		     lastIndexOf: false.
 	(j = 0 or: [ j > aRAPath pathConstraints size ]) ifTrue: [ 
-		^ RAPath new solveWithInterpreter: interpreter ].
+		^ RAPath new solveWithInterpreter: vm ].
 
 	nextPath := (aRAPath copyWithNumberOfSegments: j) nextPath.
 
 	[ 
-	[ solution := nextPath solveWithInterpreter: interpreter ]
+	[ solution := nextPath solveWithInterpreter: vm ]
 		on: MzUnsatisfiable
-		do: [ :e |
-			^ self
-				  solveAtLeast: j - 1
-				  inPathConstraint: aRAPath
-				  withInterpreter: interpreter ] ]
+		do: [ :e | ^ self solve: (aRAPath copyWithNumberOfSegments: ktry - 1) ] ]
 		on: Error
-		do: [ :e |
-			"If there is a timeout, record that this path has shown a bug in the solver
+		do: [ :e | "If there is a timeout, record that this path has shown a bug in the solver
 			Then retry with the next one"
 			self recordSolution: (RAErrorSolution new
 					 path: nextPath;
@@ -208,10 +141,7 @@ RAPathExplorer >> solveAtLeast: ktry inPathConstraint: aRAPath withInterpreter: 
 					 error: e freeze;
 					 yourself).
 
-			^ self
-				  solveAtLeast: j - 1
-				  inPathConstraint: aRAPath
-				  withInterpreter: interpreter ].
+			^ self solve: (aRAPath copyWithNumberOfSegments: ktry - 1) ].
 
 	executionStack := executionStack first: j.
 	"Now we expect that the next iteration will go over the other branch at j"

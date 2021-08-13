@@ -159,8 +159,10 @@ RASinglePathExplorer >> initializeSpecialCases [
 	"special variables"
 	specialCases at: #trueObj put: #interpretTrueObjectWith:.
 	specialCases at: #falseObj put: #interpretFalseObjectWith:.
-	specialCases at: #splObj: put: #interpretSpecialObjectWith:.
 	specialCases at: #specialSelector: put: #interpretSpecialSelectorWith:.
+	
+	specialCases at: #splObj: put: #interpretSpecialObjectWith:.
+	specialCases at: #maybeSplObj: put: #interpretSpecialObjectWith:.
 	
 	"special simulation cases"
 	specialCases at: #cCode:inSmalltalk: put: #interpretCCodeInSmalltalkWith:.
@@ -1193,7 +1195,7 @@ RASinglePathExplorer >> interpretStackAt: indexPair [
 	(indexPair first between: 0 and: vmFrame operandStackSize first - 1)
 		ifTrue: [ 
 			self addPathConstraint: constraint taken: true.
-			self pushOperand: (vmFrame operandStackAt: indexPair first) ]
+			self pushOperand: (vmFrame operandStackAt: indexPair first + 1) ]
 		ifFalse: [ 
 			self addPathConstraint: constraint negated taken: true.
 			RAInvalidMemoryAccess signal ]
@@ -1213,7 +1215,7 @@ RASinglePathExplorer >> interpretStackTopPutWith: aRBMessageNode [
 	(0 < vmFrame operandStackSize first)
 		ifTrue: [ 
 			self addPathConstraint: constraint taken: true.
-			vmFrame operandStackAt: 0 put: value.
+			vmFrame operandStackAt: 1 put: value.
 			self pushOperand: self receiver ]
 		ifFalse: [ 
 			self addPathConstraint: constraint negated taken: true.

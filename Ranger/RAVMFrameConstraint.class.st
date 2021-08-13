@@ -81,7 +81,7 @@ RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAC
 	frame arguments: concreteArguments.
 	newConstraints arguments: abstractArguments.
 	
-	((1 to: (operandStackSize value ifNil: [ 0 ])) collect: [ :e |
+	(((operandStackSize value ifNil: [ 0 ]) to: 1 by: -1) collect: [ :e |
 		frame push: (aRAObjectBuilder instantiate: 
 			(self operandAt: e ifAbsent: [ aRAConstraintBuilder newAbstractSmallInteger ])).
 		newConstraints push: aRAObjectBuilder newAbstractObject.
@@ -154,19 +154,15 @@ RAVMFrameConstraint >> operandStack: anObject [
 
 { #category : #accessing }
 RAVMFrameConstraint >> operandStackAt: stackIndex [ 
-	"The operand stack is accessed backwards.
-	Position 0 is the last pushed (the top)
-	Position N is at | operandStack | - N"
-	^ operandStack at: (operandStack size - stackIndex).
+
+	^ operandStack at: stackIndex
 ]
 
 { #category : #accessing }
 RAVMFrameConstraint >> operandStackAt: stackIndex put: aValue [
-	"The operand stack is accessed backwards.
-	Position 0 is the last pushed (the top)
-	Position N is at | operandStack | - N"
+
 	operandStack
-		at: (operandStack size - stackIndex)
+		at: stackIndex
 		put: aValue
 ]
 

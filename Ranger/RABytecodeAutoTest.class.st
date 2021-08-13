@@ -31,8 +31,12 @@ RABytecodeAutoTest class >> exploreCasesForBytecode: aBytecode withWordSize: aWo
 		               setUp;
 		               interpreter.
 	^ RAPathExplorer new
-		  failOnError: true;
-		  exploreBytecode: aBytecode on: interpreter vmBuildingBlock: [ 
+			failOnError: true;
+			explore: (RABytecodeConcolicCase new
+				bytecode: aBytecode;
+				vm: interpreter;
+				yourself)
+			vmBuildingBlock: [ 
 			  (suite detect: [ :e | 
 					   e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
 					   e wordSize = aWordSize ])
@@ -59,7 +63,10 @@ RABytecodeAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: a
 		               interpreter.
 	^ RAPathExplorer new
 		  failOnError: false;
-		  explorePrimitive: aPrimitive on: interpreter vmBuildingBlock: [ 
+		  explore: (RAPrimitiveConcolicCase new
+				   selector: aPrimitive;
+				   yourself)
+		  vmBuildingBlock: [ 
 			  (suite detect: [ :e | 
 					   e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
 					   e wordSize = aWordSize ])
@@ -121,12 +128,13 @@ RABytecodeAutoTest class >> testParameters [
 					               interpreter.
 				solutions := RAPathExplorer new
 					             failOnError: false;
-					             explorePrimitive: p first
-					             on: interpreter
+					             explore: (RAPrimitiveConcolicCase new
+							              selector: p first;
+							              yourself)
 					             vmBuildingBlock: [ 
-						             theSetUpTest
-							             setUp;
-							             interpreter ].
+					             theSetUpTest
+						             setUp;
+						             interpreter ].
 				solutions do: [ :e | 
 					matrix addCase: { 
 							arch first.

@@ -89,7 +89,7 @@ RAVMFrame >> locals: aCollection [
 { #category : #method }
 RAVMFrame >> method [
 	
-	^ method
+	^ {method. frameConstraints method}
 ]
 
 { #category : #accessing }
@@ -124,22 +124,18 @@ RAVMFrame >> operandStack: anObject [
 
 { #category : #initialization }
 RAVMFrame >> operandStackAt: stackIndex [
-	"The operand stack is accessed backwards.
-	Position 0 is the last pushed (the top)
-	Position N is at | operandStack | - N"
+
 	^ {
-		operandStack at: (operandStack size - stackIndex).
+		operandStack at: stackIndex.
 		frameConstraints operandStackAt: stackIndex
 	}
 ]
 
 { #category : #initialization }
 RAVMFrame >> operandStackAt: stackIndex put: aValue [
-	"The operand stack is accessed backwards.
-	Position 0 is the last pushed (the top)
-	Position N is at | operandStack | - N"
+
 	operandStack
-		at: (operandStack size - stackIndex)
+		at: stackIndex
 		put: aValue first.
 	frameConstraints
 		operandStackAt: stackIndex
