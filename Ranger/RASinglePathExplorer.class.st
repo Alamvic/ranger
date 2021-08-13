@@ -99,10 +99,12 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #literal: put: #interpretLiteralWith:.
 
 	specialCases at: #stackTop put: #interpretStackTopWith:.
+	specialCases at: #internalStackTopPut: put: #interpretStackTopPutWith:.
 	specialCases at: #stackValue: put: #interpretStackValueWith:.
 	specialCases at: #internalStackTop put: #interpretStackTopWith:.
 	specialCases at: #internalStackValue: put: #interpretStackValueWith:.
 
+	specialCases at: #internalPop: put: #interpretPopWith:.
 	specialCases at: #pop:thenPush: put: #interpretPopThenPushWith:.
 	specialCases at: #internalPop:thenPush: put: #interpretPopThenPushWith:.
 	
@@ -1059,6 +1061,22 @@ RASinglePathExplorer >> interpretPopThenPushWith: aRBMessageNode [
 	self pushOperand: self receiver.
 ]
 
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretPopWith: aRBMessageNode [ 
+
+	"Pop N elements from the operand stack"
+	
+	| elementsToPop |
+	aRBMessageNode arguments first acceptVisitor: self.
+	elementsToPop := self popOperand.
+	elementsToPop first isInteger
+		ifFalse: [ self error: 'expected an integer value' ].	
+	self pop: elementsToPop first.
+
+	"pop: does not return an interesting value"
+	self pushOperand: self receiver.
+]
+
 { #category : #visiting }
 RASinglePathExplorer >> interpretPrimitive: method receiver: receiver arguments: arguments [
 
@@ -1162,9 +1180,53 @@ RASinglePathExplorer >> interpretSpecialSelectorWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretStackAt: indexPair [
+
+	| constraint |
+	constraint := RAAndConstraint operands: { 
+			              (RAGreaterOrEqualsConstraint operands: { 
+					               indexPair second.
+					               (RAConstant value: 0) }).
+			              (RALessConstraint operands: { 
+					               indexPair second.
+					               vmFrame operandStackSize second }) }.
+	(indexPair first between: 0 and: vmFrame operandStackSize first - 1)
+		ifTrue: [ 
+			self addPathConstraint: constraint taken: true.
+			self pushOperand: (vmFrame operandStackAt: indexPair first) ]
+		ifFalse: [ 
+			self addPathConstraint: constraint negated taken: true.
+			RAInvalidMemoryAccess signal ]
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretStackTopPutWith: aRBMessageNode [
+
+	| constraint value |
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	value := self popOperand.
+	
+	constraint := RALessConstraint operands: { 
+               RAConstant value: 0.
+               vmFrame operandStackSize second }.
+	(0 < vmFrame operandStackSize first)
+		ifTrue: [ 
+			self addPathConstraint: constraint taken: true.
+			vmFrame operandStackAt: 0 put: value.
+			self pushOperand: self receiver ]
+		ifFalse: [ 
+			self addPathConstraint: constraint negated taken: true.
+			RAInvalidMemoryAccess signal ]
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretStackTopWith: aRBMessageNode [ 
 
-	self pushOperand: vmFrame top
+	self interpretStackAt: { 
+		0.
+		RAConstant value: 0
+	}
 ]
 
 { #category : #'special cases' }
@@ -1172,31 +1234,12 @@ RASinglePathExplorer >> interpretStackValueWith: aRBMessageNode [
 
 	"Interpret messages of the form 
 	interpreter stackValue: xxx.
-	"	
-	| index constraint |
-	aRBMessageNode arguments first acceptVisitor: self.
-	index := self popOperand.
+	"
 
-	constraint := RAAndConstraint operands: {
-		RAGreaterOrEqualsConstraint operands: { 
-			index second.
-			RAConstant value: 0
-		}.
-		(RALessConstraint operands: { 
-			 index second.
-			 vmFrame operandStackSize second })
-	}.
-	(index first between: 0 and: vmFrame operandStackSize first - 1)
-		ifTrue: [ 
-			self
-				addPathConstraint: constraint
-				taken: true.
-			self pushOperand: (vmFrame operandAt: index first + 1) ]
-		ifFalse: [ 
-			self
-				addPathConstraint: constraint negated
-				taken: true.
-			RAInvalidMemoryAccess signal ]
+	| indexPair |
+	aRBMessageNode arguments first acceptVisitor: self.
+	indexPair := self popOperand.
+	self interpretStackAt: indexPair
 ]
 
 { #category : #'special cases' }

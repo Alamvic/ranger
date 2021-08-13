@@ -195,18 +195,20 @@ RAASTInterpreter >> visitArgumentVariableNode: aRBVariableNode [
 ]
 
 { #category : #visiting }
-RAASTInterpreter >> visitAssignmentNode: aRBAssignmentNode [ 
-	
+RAASTInterpreter >> visitAssignmentNode: aRBAssignmentNode [
+
+	| binding |
 	aRBAssignmentNode value acceptVisitor: self.
-	
-	aRBAssignmentNode variable binding isTempVariable ifTrue: [ 
+	binding := aRBAssignmentNode variable binding.
+	binding isLocalVariable ifTrue: [ 
 		^ self
-			temporaryAt: aRBAssignmentNode variable name
-			put: self operandStackTop ].
-	
-	aRBAssignmentNode variable binding isInstanceVariable ifTrue: [ 
-		^ self receiver first instVarNamed: aRBAssignmentNode variable name put: self operandStackTop first ].
-	
+			  temporaryAt: aRBAssignmentNode variable name
+			  put: self operandStackTop ].
+	binding isInstanceVariable ifTrue: [ 
+		^ self receiver first
+			  instVarNamed: aRBAssignmentNode variable name
+			  put: self operandStackTop first ].
+
 	self halt
 ]
 

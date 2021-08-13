@@ -135,12 +135,6 @@ RAVMFrameConstraint >> numberOfLocals [
 ]
 
 { #category : #accessing }
-RAVMFrameConstraint >> operandAt: anInteger [ 
-	
-	^ operandStack at: anInteger
-]
-
-{ #category : #accessing }
 RAVMFrameConstraint >> operandAt: anInteger ifAbsent: aBlock [
 	
 	^ operandStack at: anInteger ifAbsent: aBlock
@@ -159,6 +153,24 @@ RAVMFrameConstraint >> operandStack: anObject [
 ]
 
 { #category : #accessing }
+RAVMFrameConstraint >> operandStackAt: stackIndex [ 
+	"The operand stack is accessed backwards.
+	Position 0 is the last pushed (the top)
+	Position N is at | operandStack | - N"
+	^ operandStack at: (operandStack size - stackIndex).
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> operandStackAt: stackIndex put: aValue [
+	"The operand stack is accessed backwards.
+	Position 0 is the last pushed (the top)
+	Position N is at | operandStack | - N"
+	operandStack
+		at: (operandStack size - stackIndex)
+		put: aValue
+]
+
+{ #category : #accessing }
 RAVMFrameConstraint >> operandStackSize [
 	
 	^ operandStackSize
@@ -168,6 +180,14 @@ RAVMFrameConstraint >> operandStackSize [
 RAVMFrameConstraint >> operandStackSize: anObject [
 
 	operandStackSize := anObject
+]
+
+{ #category : #initialization }
+RAVMFrameConstraint >> postCopy [
+
+	locals := locals copy.
+	arguments := arguments copy.
+	operandStack := operandStack copy.
 ]
 
 { #category : #accessing }
@@ -186,4 +206,9 @@ RAVMFrameConstraint >> receiver [
 RAVMFrameConstraint >> receiver: anObject [
 
 	receiver := anObject
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> top [
+	self shouldBeImplemented.
 ]

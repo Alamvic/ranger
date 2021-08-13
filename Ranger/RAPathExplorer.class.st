@@ -21,7 +21,7 @@ Class {
 { #category : #api }
 RAPathExplorer >> exploreBytecode: aBytecode on: aVM vmBuildingBlock: aBuildingBlock [
 
-	| currentPath solution previousRunFrameConstraints exploredPath aFrame |
+	| currentPath solution previousRunFrameConstraints exploredPath inputFrame outputFrame |
 	selector := aVM class bytecodeTable at: aBytecode + 1.
 
 	solution := RAConstraintSolution new solver: #initial.
@@ -31,19 +31,21 @@ RAPathExplorer >> exploreBytecode: aBytecode on: aVM vmBuildingBlock: aBuildingB
 	previousRunFrameConstraints method: constraintBuilder newAbstractMethod.
 
 	[
+		1halt.
 	self initializeWithBytecodeSelector: selector onVM: aBuildingBlock value.
 	vm currentBytecode: aBytecode.
-	aFrame := previousRunFrameConstraints
+	inputFrame := previousRunFrameConstraints
 		instantiateWith: objectBuilder
 		constraintBuilder: constraintBuilder.
+	outputFrame := inputFrame copy.
 	exploredPath := self
-		 explorePathWithFrame: aFrame
+		 explorePathWithFrame: outputFrame
 		 solver: solution solver.
 	currentPath := exploredPath ifNil: [ (currentPath ifNil: [ RAPath new ]) nextPath ].
 
 	"Negate and solve constraints!"
 	solution := self solve: currentPath withInterpreter: aVM.
-	previousRunFrameConstraints := aFrame frameConstraints.	
+	previousRunFrameConstraints := inputFrame frameConstraints.	
 	solution isEmpty ] whileFalse.
 	^ solutions
 ]
@@ -145,7 +147,6 @@ RAPathExplorer >> initializeWithBytecodeSelector: aSelector onVM: aVM [
 	selector := aSelector.
 	vm := aVM.
 	method := aVM class lookupSelector: aSelector.
-	numberOfArguments := (method ast pragmaNamed: #pops:thenPush:) arguments first value.
 	objectBuilder := RAObjectBuilder new
 		interpreter: aVM;
 		nextIndex: 100;
