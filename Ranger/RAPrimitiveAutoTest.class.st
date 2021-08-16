@@ -32,8 +32,9 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 		               interpreter.
 	^ RAPathExplorer new
 		  failOnError: false;
-		  explore: (RAPrimitiveConcolicCase new
-				   selector: aPrimitive;
+		  explore: (RABytecodeConcolicCase new
+		vm: interpreter;
+				   bytecode: aPrimitive;
 				   yourself)
 		  vmBuildingBlock: [ 
 		  (suite detect: [ :e | 

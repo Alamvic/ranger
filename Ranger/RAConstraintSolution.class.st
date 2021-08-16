@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'solver',
 		'path',
-		'inputConstraints'
+		'inputConstraints',
+		'outputConstraints'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -52,6 +53,18 @@ RAConstraintSolution >> isInvalid [
 	^ path exitCondition isInvalid
 ]
 
+{ #category : #accessing }
+RAConstraintSolution >> outputConstraints [
+
+	^ outputConstraints
+]
+
+{ #category : #accessing }
+RAConstraintSolution >> outputConstraints: anObject [
+
+	outputConstraints := anObject
+]
+
 { #category : #testing }
 RAConstraintSolution >> parameterNames [
 	
@@ -78,6 +91,12 @@ RAConstraintSolution >> printOn: aStream [
 		nextPutAll: '(';
 		print: path exitCondition;
 		nextPutAll: ')'
+]
+
+{ #category : #accessing }
+RAConstraintSolution >> result [
+	
+	^ outputConstraints operandStack top
 ]
 
 { #category : #accessing }

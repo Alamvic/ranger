@@ -3,7 +3,8 @@ Class {
 	#superclass : #Object,
 	#instVars : [
 		'interpreter',
-		'nextIndex'
+		'nextIndex',
+		'instances'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -11,7 +12,7 @@ Class {
 { #category : #asd }
 RAObjectBuilder >> allocateClassObject: aClassObject [ 
 
-	| classIndex aClass |
+	| classIndex aConcreteClass |
 	(aClassObject isNil
 		or: [ aClassObject classIndex value isNil
 			or: [ aClassObject classIndex value = 0 ] ])
@@ -21,14 +22,16 @@ RAObjectBuilder >> allocateClassObject: aClassObject [
 	"If it is float, do not override it"
 	classIndex = 34 ifTrue: [ ^ 34 ].
 	
-	aClass := self
+	aConcreteClass := self
 		newClassInOldSpaceWithSlots: 0
 		instSpec: (aClassObject format value ifNil: [0]).
-	self memory setHashBitsOf: aClass to: classIndex.
+	instances at: aClassObject put: aConcreteClass.
+	
+	self memory setHashBitsOf: aConcreteClass to: classIndex.
 	self memory
 		storePointer: classIndex
 		ofObject: self memory classTableFirstPage
-		withValue: aClass.
+		withValue: aConcreteClass.
 	^ classIndex
 ]
 
@@ -53,9 +56,17 @@ RAObjectBuilder >> defaultFormatForClassIndex: anInteger [
 	^ 0
 ]
 
+{ #category : #accessing }
+RAObjectBuilder >> initialize [
+
+	super initialize.
+	instances := IdentityDictionary new.
+]
+
 { #category : #'object-building' }
 RAObjectBuilder >> initializeConcreteObject: anOop withConstraints: aRAObject [
 
+	| numberOfSlots |
 	aRAObject format value = interpreter objectMemory firstCompiledMethodFormat ifTrue: [ 
 		| numberOfLiterals |
 		"Instantiate the method with as many literals as numSlots.
@@ -70,13 +81,26 @@ RAObjectBuilder >> initializeConcreteObject: anOop withConstraints: aRAObject [
 			interpreter objectMemory
 				storePointer: index
 				ofObject: anOop
-				withValue: (interpreter objectMemory integerObjectOf: 0) ] ]
+				withValue: (interpreter objectMemory integerObjectOf: 0) ] ].
+
+	numberOfSlots := self numberOfSlotsOf: aRAObject.
+	0 to: (numberOfSlots max: aRAObject slots size) - 1 do: [ :index | | objectToInstantiate |
+		objectToInstantiate := aRAObject slots at: index + 1.
+		objectToInstantiate ifNotNil: [
+			interpreter objectMemory
+				storePointer: index
+				ofObject: anOop
+				withValue: (self instantiate: objectToInstantiate) ]
+	]
 ]
 
 { #category : #'value-setup' }
 RAObjectBuilder >> instantiate: aRAObject [
 
 	| typeTag |
+	
+	instances at: aRAObject ifPresent: [ :instance | ^ instance ].
+	
 	typeTag := aRAObject typeTag value ifNil: [ 0 ].
 	typeTag = 0 ifTrue: [ ^ self instantiateNonImmediateObject: aRAObject ].
 	typeTag = 1 ifTrue: [ 
@@ -110,6 +134,8 @@ RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 		format: (aRAObject format value ifNil: [ 
 			self defaultFormatForClassIndex: classIndex ])
 		classIndex: classIndex.
+	instances at: aRAObject put: newConcreteObject.
+	
 	self
 		initializeConcreteObject: newConcreteObject
 		withConstraints: aRAObject.

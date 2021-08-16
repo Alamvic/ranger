@@ -19,7 +19,7 @@ Class {
 { #category : #api }
 RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 
-	| currentPath solution previousInputFrameConstraints exploredPath inputFrame outputFrame |
+	| currentPath solution previousInputFrameConstraints exploredPath inputFrame |
 	selector := aConcolicCase selector.
 	currentPath := RAPath new.
 	solution := RAConstraintSolution new solver: #initial.
@@ -41,9 +41,8 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	inputFrame := previousInputFrameConstraints
 		              instantiateWith: objectBuilder
 		              constraintBuilder: constraintFactory.
-	outputFrame := inputFrame copy.
 	exploredPath := self
-		                explorePathWithFrame: outputFrame
+		                explorePathWithFrame: inputFrame
 		                solver: solution solver.
 
 	"If we do not get an explored path (to see if this is still happenning)
@@ -60,18 +59,20 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 ]
 
 { #category : #api }
-RAPathExplorer >> explorePathWithFrame: aFrame solver: solver [
+RAPathExplorer >> explorePathWithFrame: inputFrame solver: solver [
 
-	| explorer |
-	[
+	| explorer outputFrame |
+	[ 
+	outputFrame := inputFrame copy.
 	explorer := RASinglePathExplorer new.
 	explorer
 		explore: selector
 		on: vm
-		withFrame: aFrame
+		withFrame: outputFrame
 		explorer: self.
 	self recordSolution: (RAConstraintSolution new
-			 inputConstraints: aFrame frameConstraints;
+			 inputConstraints: inputFrame frameConstraints;
+			 outputConstraints: outputFrame frameConstraints;
 			 path: explorer path;
 			 solver: solver;
 			 yourself) ]
@@ -79,7 +80,8 @@ RAPathExplorer >> explorePathWithFrame: aFrame solver: solver [
 		do: [ :e | 
 			failOnError ifTrue: [ e pass ].
 			self recordSolution: (RAErrorSolution new
-					 inputConstraints: aFrame frameConstraints;
+					 inputConstraints: inputFrame frameConstraints;
+					 outputConstraints: outputFrame frameConstraints;
 					 vm: vm;
 					 selector: selector;
 					 error: e freeze;

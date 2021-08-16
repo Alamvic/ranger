@@ -93,7 +93,9 @@ RABytecodeAutoTest >> bytecode: anObject [
 RABytecodeAutoTest >> execute [
 
 	self runFrom: methodAddress until: callerAddress.
-	self assert: machineSimulator receiverRegisterValue equals: 17.
+	self
+		assert: machineSimulator receiverRegisterValue
+		equals: (objectBuilder instantiate: solution result)
 ]
 
 { #category : #running }
@@ -101,6 +103,7 @@ RABytecodeAutoTest >> prepareAutoCall [
 
 	self assert: (solution inputConstraints numberOfArguments value ifNil: [ 0 ]) = 0.
 	self assert: (solution inputConstraints numberOfLocals value ifNil: [ 0 ]) = 0.
+
 	self
 		prepareStackForSendReceiver: (objectBuilder instantiate: solution inputConstraints receiver)
 		arguments: (solution inputConstraints arguments collect: [:e | (objectBuilder instantiate: e) ]).
@@ -142,8 +145,8 @@ RABytecodeAutoTest >> testBytecode [
 	
 	self assert: (solution inputConstraints operandStackSize value ifNil: [ 0 ]) = 0.
 	methodAddress := self compile: [ | descriptor result |
-		cogit byte0: bytecode.
-		descriptor := cogit generatorAt: bytecode.
+		cogit byte0: bytecode - 1.
+		descriptor := cogit generatorAt: bytecode - 1.
 		result := cogit perform: descriptor generator.
 		solution exitCondition returnResultInto: cogit
 	] bytecodes: 15.

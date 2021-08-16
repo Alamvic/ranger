@@ -650,7 +650,7 @@ RASinglePathExplorer >> interpretIntegerValueOfWith: aRBMessageNode [
 { #category : #'special cases' }
 RASinglePathExplorer >> interpretInternalPushWith: aRBMessageNode [ 
 	
-	| elementsToPop elementToPush |
+	| elementToPush |
 	aRBMessageNode arguments first acceptVisitor: self.
 	elementToPush := self popOperand.
 	self push: elementToPush.
