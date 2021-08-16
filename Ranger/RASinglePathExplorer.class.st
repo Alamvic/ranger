@@ -706,6 +706,23 @@ RASinglePathExplorer >> interpretIsForwardedWith: aRBMessageNode [
 	aRBMessageNode arguments first acceptVisitor: self.
 	maybeImmediate := self popOperand.
 	
+	(receiver first isImmediate: maybeImmediate first)
+		ifTrue: [ 
+			self
+				addPathConstraint: (RAGreaterConstraint
+					operands: { 
+						maybeImmediate second typeTag.
+						RAConstant value: 0 })
+				taken: true.
+			RAInvalidMemoryAccess signal ].
+	self
+		addPathConstraint: (RAEqualsConstraint
+			operands: { 
+				maybeImmediate second typeTag.
+				RAConstant value: 0 })
+		taken: false.
+	
+	
 	concreteValue := receiver first isForwarded: maybeImmediate first.
 
 	self pushOperand: {
@@ -865,7 +882,7 @@ RASinglePathExplorer >> interpretLiteralWith: aRBMessageNode [
 
 	self pushOperand: { 
 			concreteValue.
-			vmFrame method second fetchPointer: index second }
+			vmFrame method second fetchPointer: index first }
 ]
 
 { #category : #'special cases' }

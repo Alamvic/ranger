@@ -80,7 +80,8 @@ RAObject >> fetchLong32: aConcreteAbstractPair [
 { #category : #accessing }
 RAObject >> fetchPointer: anIndex [
 
-	^ slots at: anIndex ifAbsentPut: [
+	"Indexes are 0 based"
+	^ slots at: anIndex + 1 ifAbsentPut: [
 		constraintFactory newAbstractObject
 	]
 ]

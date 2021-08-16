@@ -66,32 +66,28 @@ RAObjectBuilder >> initialize [
 { #category : #'object-building' }
 RAObjectBuilder >> initializeConcreteObject: anOop withConstraints: aRAObject [
 
-	| numberOfSlots |
-	aRAObject format value = interpreter objectMemory firstCompiledMethodFormat ifTrue: [ 
-		| numberOfLiterals |
-		"Instantiate the method with as many literals as numSlots.
-		For the moments, put some small integer as literal"
-		numberOfLiterals := self numberOfSlotsOf: aRAObject.
+	| offset |
+	offset := 0.
+	aRAObject format value = interpreter objectMemory firstCompiledMethodFormat
+		ifTrue: [
+		"Methods have an extra literal for the header"
 		interpreter objectMemory
-				storePointer: 0 "The header"
-				ofObject: anOop
-				withValue: (interpreter objectMemory integerObjectOf: numberOfLiterals - 1).
-		1 to: numberOfLiterals do: [ :index | 
-			"For now it's just a small integer"
-			interpreter objectMemory
-				storePointer: index
-				ofObject: anOop
-				withValue: (interpreter objectMemory integerObjectOf: 0) ] ].
+			storePointer: 0
+			ofObject: anOop
+			withValue: (interpreter objectMemory
+				integerObjectOf: (self numberOfSlotsOf: aRAObject) - 1).
+		offset := 1 ].
 
-	numberOfSlots := self numberOfSlotsOf: aRAObject.
-	0 to: (numberOfSlots max: aRAObject slots size) - 1 do: [ :index | | objectToInstantiate |
-		objectToInstantiate := aRAObject slots at: index + 1.
-		objectToInstantiate ifNotNil: [
+	0 to: (self numberOfSlotsOf: aRAObject) - 1 do: [ :index | 
+		| objectToInstantiate |
+		objectToInstantiate := aRAObject slots
+			                       at: index + 1
+			                       ifAbsent: [ nil ].
+		objectToInstantiate ifNotNil: [ 
 			interpreter objectMemory
-				storePointer: index
+				storePointer: index + offset
 				ofObject: anOop
-				withValue: (self instantiate: objectToInstantiate) ]
-	]
+				withValue: (self instantiate: objectToInstantiate) ] ]
 ]
 
 { #category : #'value-setup' }
@@ -219,6 +215,7 @@ RAObjectBuilder >> numberOfSlotsOf: aRAObject [
 
 	| basicNumberOfSlots |
 	basicNumberOfSlots := aRAObject numSlots value ifNil: [ 0 ].
+	basicNumberOfSlots := basicNumberOfSlots max: aRAObject slots size.
 	^ (self isCompiledMethod: aRAObject)
 		ifTrue: [ basicNumberOfSlots + 1 "Add an extra slot for the heder" ]
 		ifFalse: [ basicNumberOfSlots ]

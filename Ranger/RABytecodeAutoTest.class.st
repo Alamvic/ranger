@@ -29,7 +29,7 @@ RABytecodeAutoTest class >> testParameters [
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	(1 to: 10)
+	(32 to: 63)
 		do: [ :bytecode | 
 			| architectures solutions |
 			architectures := { 
@@ -145,8 +145,12 @@ RABytecodeAutoTest >> testBytecode [
 	
 	self assert: (solution inputConstraints operandStackSize value ifNil: [ 0 ]) = 0.
 	methodAddress := self compile: [ | descriptor result |
-		cogit byte0: bytecode - 1.
-		descriptor := cogit generatorAt: bytecode - 1.
+		cogit methodObj: (objectBuilder instantiate: solution inputConstraints method).
+		cogit byte0: bytecode.
+		cogit bytecodePC: 0.
+		cogit endPC: 0.
+
+		descriptor := cogit generatorAt: bytecode.
 		result := cogit perform: descriptor generator.
 		solution exitCondition returnResultInto: cogit
 	] bytecodes: 15.
