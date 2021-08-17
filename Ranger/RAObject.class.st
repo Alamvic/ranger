@@ -12,7 +12,8 @@ Class {
 		'long32Slots',
 		'hashBits',
 		'constraintFactory',
-		'isForwarded'
+		'isForwarded',
+		'specialObject'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -115,6 +116,16 @@ RAObject >> initializeWithVariableName: aName [
 		              yourself.
 	slots := OrderedCollection new.
 	long32Slots := OrderedCollection new.
+
+	"
+	- 0 / nil is no special object
+	- 1 is nil
+	- 2 is true
+	- 3 is false"
+	specialObject := MzVariable new
+		           name: variableName , '_specialObject';
+		           type: '0..3';
+		           yourself.
 
 	"
 	- 0 is normal object
@@ -242,6 +253,12 @@ RAObject >> slots [
 RAObject >> slots: anObject [
 
 	slots := anObject
+]
+
+{ #category : #printing }
+RAObject >> specialObject [
+
+	^ specialObject
 ]
 
 { #category : #accessing }

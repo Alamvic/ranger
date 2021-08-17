@@ -29,7 +29,7 @@ RABytecodeAutoTest class >> testParameters [
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	(64 to: 64)
+	(76 to: 83)
 		do: [ :bytecode | 
 			| architectures solutions |
 			architectures := { 
@@ -115,8 +115,11 @@ RABytecodeAutoTest >> prepareAutoCall [
 	self pushAddress: 0. "context"
 	self pushAddress: receiver.
 
-	solution inputConstraints locals do: [ :aTemporary | 
-		self pushAddress: (objectBuilder instantiate: aTemporary) ].
+	solution inputConstraints locals do: [ :aLocalValue | 
+		self pushAddress: (objectBuilder instantiate: aLocalValue) ].
+	
+	solution inputConstraints operandStack do: [ :aStackValue | 
+		self pushAddress: (objectBuilder instantiate: aStackValue) ].
 ]
 
 { #category : #running }

@@ -98,8 +98,13 @@ RAObjectBuilder >> instantiate: aRAObject [
 
 	| typeTag |
 	
+	"If it is a constant, assume this is a hardcoded small integer..."
+	aRAObject isConstant ifTrue: [ ^ aRAObject value ].
+	
+	"Otherwise, check if we already instantiated this object"
 	instances at: aRAObject ifPresent: [ :instance | ^ instance ].
 	
+	"If not, instantiate it and cache it"
 	typeTag := aRAObject typeTag value ifNil: [ 0 ].
 	typeTag = 0 ifTrue: [ ^ self instantiateNonImmediateObject: aRAObject ].
 	typeTag = 1 ifTrue: [ 
@@ -118,8 +123,13 @@ RAObjectBuilder >> instantiate: aRAObject [
 { #category : #'value-setup' }
 RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 
-	| classIndex newConcreteObject |
+	| classIndex newConcreteObject specialID |
 	self assert: aRAObject specialObjectIndex value ~= 0.
+
+	specialID := aRAObject specialObject value ifNil: [ 0 ].
+	specialID = 1 ifTrue: [ ^ interpreter objectMemory nilObject ].
+	specialID = 2 ifTrue: [ ^ interpreter objectMemory trueObject ].
+	specialID = 3 ifTrue: [ ^ interpreter objectMemory falseObject ].
 
 	"Format 0 should always have 0 slots"
 	self assert: (aRAObject format value isNil or: [ 

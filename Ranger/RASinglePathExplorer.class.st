@@ -157,6 +157,7 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #byteSwapped64IfBigEndian: put: #interpretByteSwapped64IfBigEndianWith:.
 		
 	"special variables"
+	specialCases at: #nilObj put: #interpretNilObjectWith:.
 	specialCases at: #trueObj put: #interpretTrueObjectWith:.
 	specialCases at: #falseObj put: #interpretFalseObjectWith:.
 	specialCases at: #specialSelector: put: #interpretSpecialSelectorWith:.
@@ -359,6 +360,17 @@ RASinglePathExplorer >> interpretCppIfIfTrueIfFalseWith: aRBMessageNode [
 					home: self currentFrame)
 				receiver: self receiver
 				arguments: #() ]
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretFalseObjectWith: aRBMessageNode [
+
+	| abstractFalse |
+	abstractFalse := explorer constraintFactory newAbstractObject.
+	abstractFalse specialObject value: 3.
+	self pushOperand: {
+		self receiver first falseObject.
+		abstractFalse }
 ]
 
 { #category : #'special cases' }
@@ -888,6 +900,17 @@ RASinglePathExplorer >> interpretLiteralWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretNilObjectWith: aRBMessageNode [
+
+	| abstractNil |
+	abstractNil := explorer constraintFactory newAbstractObject.
+	abstractNil specialObject value: 1.
+	self pushOperand: {
+		self receiver first nilObject.
+		abstractNil }
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretNoopWith: aRBMessageNode [ 
 
 	self pushOperand: self receiver
@@ -1259,6 +1282,17 @@ RASinglePathExplorer >> interpretStackValueWith: aRBMessageNode [
 	aRBMessageNode arguments first acceptVisitor: self.
 	indexPair := self popOperand.
 	self interpretStackAt: indexPair
+]
+
+{ #category : #'special cases' }
+RASinglePathExplorer >> interpretTrueObjectWith: aRBMessageNode [
+
+	| abstractTrue |
+	abstractTrue := explorer constraintFactory newAbstractObject.
+	abstractTrue specialObject value: 2.
+	self pushOperand: {
+		self receiver first trueObject.
+		abstractTrue }
 ]
 
 { #category : #'special cases' }

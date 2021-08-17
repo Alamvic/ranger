@@ -16,6 +16,12 @@ Class {
 	#category : #'Ranger-Exploring'
 }
 
+{ #category : #accessing }
+RAPathExplorer >> constraintFactory [
+
+	^ constraintFactory
+]
+
 { #category : #api }
 RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 
