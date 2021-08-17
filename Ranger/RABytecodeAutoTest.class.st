@@ -29,7 +29,7 @@ RABytecodeAutoTest class >> testParameters [
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	(76 to: 83)
+	(88 to: 92)
 		do: [ :bytecode | 
 			| architectures solutions |
 			architectures := { 
@@ -51,7 +51,7 @@ RABytecodeAutoTest class >> testParameters [
 					               setUp;
 					               interpreter.
 				solutions := RAPathExplorer new
-					             failOnError: false;
+					             failOnError: true;
 					             explore: (RABytecodeConcolicCase new
 	              	              	vm: interpreter;
 	              	              	bytecode: bytecode;
@@ -167,8 +167,7 @@ RABytecodeAutoTest >> solution: aSolution [
 RABytecodeAutoTest >> testBytecode [
 
 	solution isInvalid ifTrue: [ ^ self ].
-	
-	self assert: (solution inputConstraints operandStackSize value ifNil: [ 0 ]) = 0.
+
 	methodAddress := self compile: [ | descriptor result |
 		cogit needsFrame: true.
 		cogit methodObj: (objectBuilder instantiate: solution inputConstraints method).

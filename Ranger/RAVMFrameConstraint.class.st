@@ -204,7 +204,8 @@ RAVMFrameConstraint >> postCopy [
 { #category : #accessing }
 RAVMFrameConstraint >> push: anOperandConstraint [
 
-	operandStack push: anOperandConstraint
+	operandStack push: anOperandConstraint.
+	operandStackSize := operandStackSize + 1
 ]
 
 { #category : #accessing }

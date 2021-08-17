@@ -204,10 +204,10 @@ RAASTInterpreter >> visitAssignmentNode: aRBAssignmentNode [
 		^ self
 			  temporaryAt: aRBAssignmentNode variable name
 			  put: self operandStackTop ].
-	binding isInstanceVariable ifTrue: [ 
+	binding isInstanceVariable ifTrue: [
 		^ self receiver first
 			  instVarNamed: aRBAssignmentNode variable name
-			  put: self operandStackTop first ].
+			  put: self operandStackTop ].
 
 	self halt
 ]

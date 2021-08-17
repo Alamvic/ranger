@@ -327,8 +327,10 @@ RASinglePathExplorer >> interpretClassIndexOfWith: aRBMessageNode [
 
 { #category : #'special cases' }
 RASinglePathExplorer >> interpretCommonReturnWith: aRBMessageNode [ 
-	
-	RAMethodReturnExit signal
+
+	RAMethodReturnExit new
+		returnValue: (self receiver first instVarNamed: 'localReturnValue') second;
+		signal
 ]
 
 { #category : #'special cases' }

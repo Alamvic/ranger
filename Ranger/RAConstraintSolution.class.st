@@ -96,7 +96,7 @@ RAConstraintSolution >> printOn: aStream [
 { #category : #accessing }
 RAConstraintSolution >> result [
 	
-	^ outputConstraints operandStack top
+	^ self exitCondition result
 ]
 
 { #category : #accessing }
