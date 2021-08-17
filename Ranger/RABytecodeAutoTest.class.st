@@ -29,7 +29,7 @@ RABytecodeAutoTest class >> testParameters [
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	(32 to: 63)
+	(64 to: 64)
 		do: [ :bytecode | 
 			| architectures solutions |
 			architectures := { 
@@ -101,12 +101,34 @@ RABytecodeAutoTest >> execute [
 { #category : #running }
 RABytecodeAutoTest >> prepareAutoCall [
 
-	self assert: (solution inputConstraints numberOfArguments value ifNil: [ 0 ]) = 0.
-	self assert: (solution inputConstraints numberOfLocals value ifNil: [ 0 ]) = 0.
-
+	| receiver |
+	receiver := objectBuilder instantiate: solution inputConstraints receiver.
 	self
-		prepareStackForSendReceiver: (objectBuilder instantiate: solution inputConstraints receiver)
+		prepareStackForSendReceiver: receiver
 		arguments: (solution inputConstraints arguments collect: [:e | (objectBuilder instantiate: e) ]).
+	
+	"previous frame"
+	self pushAddress: self machineSimulator framePointerRegisterValue.
+	self machineSimulator framePointerRegisterValue: self machineSimulator smalltalkStackPointerRegisterValue.
+	
+	self pushAddress: (objectBuilder instantiate: solution inputConstraints method).
+	self pushAddress: 0. "context"
+	self pushAddress: receiver.
+
+	solution inputConstraints locals do: [ :aTemporary | 
+		self pushAddress: (objectBuilder instantiate: aTemporary) ].
+]
+
+{ #category : #running }
+RABytecodeAutoTest >> prepareCall [
+
+	machineSimulator hasLinkRegister 
+		ifTrue: [ 
+			"The caller IP in ARM is in the linkRegister"
+			machineSimulator linkRegisterValue: callerAddress ].
+	"I need to push the caller IP to make a correct frame"
+	self pushAddress:  callerAddress.
+
 ]
 
 { #category : #running }
@@ -145,10 +167,12 @@ RABytecodeAutoTest >> testBytecode [
 	
 	self assert: (solution inputConstraints operandStackSize value ifNil: [ 0 ]) = 0.
 	methodAddress := self compile: [ | descriptor result |
+		cogit needsFrame: true.
 		cogit methodObj: (objectBuilder instantiate: solution inputConstraints method).
 		cogit byte0: bytecode.
 		cogit bytecodePC: 0.
 		cogit endPC: 0.
+		cogit methodOrBlockNumArgs: solution inputConstraints arguments size. 
 
 		descriptor := cogit generatorAt: bytecode.
 		result := cogit perform: descriptor generator.

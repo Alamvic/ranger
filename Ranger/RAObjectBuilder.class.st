@@ -82,7 +82,10 @@ RAObjectBuilder >> initializeConcreteObject: anOop withConstraints: aRAObject [
 		| objectToInstantiate |
 		objectToInstantiate := aRAObject slots
 			                       at: index + 1
-			                       ifAbsent: [ nil ].
+			                       ifAbsent: [ 
+					RAObject new
+						initializeWithVariableName: 'temp';
+				 		classObject: RAClassObject new; yourself ].
 		objectToInstantiate ifNotNil: [ 
 			interpreter objectMemory
 				storePointer: index + offset

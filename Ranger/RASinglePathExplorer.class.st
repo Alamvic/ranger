@@ -727,7 +727,9 @@ RASinglePathExplorer >> interpretIsForwardedWith: aRBMessageNode [
 
 	self pushOperand: {
 		concreteValue.
-		RAIsForwardedObject operands: { maybeImmediate second }
+		RAEqualsConstraint operands: { 
+			maybeImmediate second isForwarded.
+			RAConstant value: 1 }
 	}
 ]
 
@@ -1330,7 +1332,7 @@ RASinglePathExplorer >> interpretiLocalForFramePointerAtOffsetWith: aRBMessageNo
 			self
 				addPathConstraint: constraint
 				taken: true.
-			self pushOperand: (vmFrame localAt: index second) ]
+			self pushOperand: (vmFrame localAt: index first + 1) ]
 		ifFalse: [ 
 			self
 				addPathConstraint: constraint negated

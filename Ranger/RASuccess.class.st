@@ -15,6 +15,5 @@ RASuccess >> returnResultInto: compiler [
 	
 	"I'm a success and my value has been pushed to the operand stack.
 	Make a return top"
-
 	compiler genReturnTopFromMethod
 ]

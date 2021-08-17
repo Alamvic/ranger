@@ -31,7 +31,7 @@ RAVMFrame class >> firstFrameForBuilder: anObjectBuilder [
 { #category : #accessing }
 RAVMFrame >> argumentAt: anIndex [
 
-	^ arguments at: anIndex
+	^ {arguments at: anIndex . frameConstraints argumentAt: anIndex }
 ]
 
 { #category : #accessing }
@@ -67,13 +67,9 @@ RAVMFrame >> initialize [
 ]
 
 { #category : #accessing }
-RAVMFrame >> localAt: aConstraint [
+RAVMFrame >> localAt: anIndex [
 	
-	| newObject |
-	1halt.
-	newObject := RAObject named: 'local_xxx'.
-	locals add: { aConstraint. newObject }.
-	^ newObject
+	^ { locals at: anIndex . frameConstraints localAt: anIndex }
 ]
 
 { #category : #accessing }

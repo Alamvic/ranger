@@ -11,7 +11,8 @@ Class {
 		'classObject',
 		'long32Slots',
 		'hashBits',
-		'constraintFactory'
+		'constraintFactory',
+		'isForwarded'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -138,6 +139,11 @@ RAObject >> initializeWithVariableName: aName [
 		              name: variableName , '_hashBits';
 		              type: '0..1000000' "A million is more than enough to test...";
 		              yourself.
+	
+	isForwarded := MzVariable new
+		              name: variableName , '_isForwarded';
+		              type: '0..1' "A boolean";
+		              yourself.
 ]
 
 { #category : #accessing }
@@ -155,6 +161,18 @@ RAObject >> integerValue: anObject [
 RAObject >> isConstant [
 	
 	^ false
+]
+
+{ #category : #printing }
+RAObject >> isForwarded [
+
+	^ isForwarded
+]
+
+{ #category : #printing }
+RAObject >> isForwarded: aValue [
+
+	isForwarded := aValue
 ]
 
 { #category : #testing }

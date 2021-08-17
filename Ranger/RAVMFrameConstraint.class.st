@@ -15,6 +15,12 @@ Class {
 }
 
 { #category : #accessing }
+RAVMFrameConstraint >> argumentAt: anIndex [
+
+	^ arguments at: anIndex
+]
+
+{ #category : #accessing }
 RAVMFrameConstraint >> argumentAt: anInteger ifAbsent: aFullBlockClosure [ 
 	
 	^ arguments at: anInteger ifAbsent: aFullBlockClosure 
@@ -56,7 +62,7 @@ RAVMFrameConstraint >> initialize [
 { #category : #instantiation }
 RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAConstraintBuilder [
 	
-	| frame newConstraints concreteLocals abstractLocals concreteArguments abstractArguments |
+	| frame newConstraints concreteLocals abstractLocals concreteArguments abstractArguments concreteObject |
 	newConstraints := RAVMFrameConstraint new.
 	frame := RAVMFrame new.
 	frame frameConstraints: newConstraints.
@@ -88,22 +94,18 @@ RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAC
 	newConstraints arguments: abstractArguments.
 	
 	(((operandStackSize value ifNil: [ 0 ]) to: 1 by: -1) collect: [ :e |
-		frame push: (aRAObjectBuilder instantiate: 
-			(self operandAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ])).
-		newConstraints push: aRAObjectBuilder newAbstractObject.
+		concreteObject := aRAObjectBuilder instantiate: 
+			(self operandAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ]).
+		frame push: {concreteObject . aRAConstraintBuilder newAbstractObject }
 	]).
 
 	^ frame
 ]
 
 { #category : #accessing }
-RAVMFrameConstraint >> localAt: aConstraint [
+RAVMFrameConstraint >> localAt: anIndex [
 	
-	| newObject |
-	1halt.
-	newObject := RAObject named: 'local_xxx'.
-	locals add: { aConstraint. newObject }.
-	^ newObject
+	^ locals at: anIndex
 ]
 
 { #category : #accessing }
