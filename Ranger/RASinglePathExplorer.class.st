@@ -76,9 +76,9 @@ RASinglePathExplorer >> explore: aSelector on: vm withFrame: aFrame explorer: an
 		path exitCondition: self exitCondition
 	]	on: Exception
 		do: [ :error | 
-			path exitCondition: error freeze.
-			(error isKindOf: RAInterpreterEndError)
-				ifFalse: [ error pass ] ].
+			(error isKindOf: RAInterpreterExitException)
+				ifFalse: [ error pass ].
+			path exitCondition: error exitCondition ].
 	^ path
 ]
 
@@ -335,19 +335,28 @@ RASinglePathExplorer >> interpretClassIndexOfWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
-RASinglePathExplorer >> interpretCommonReturnWith: aRBMessageNode [ 
+RASinglePathExplorer >> interpretCommonReturnWith: aRBMessageNode [
 
-	RAMethodReturnExit new
-		returnValue: (self receiver first instVarNamed: 'localReturnValue') second;
+	RAInterpreterExitException new
+		exitCondition: (RAMethodReturnExit new
+				 returnValue: (self receiver first instVarNamed: 'localReturnValue') second;
+				 yourself);
 		signal
 ]
 
 { #category : #'special cases' }
-RASinglePathExplorer >> interpretCommonSendOrdinaryWith: aRBMessageNode [ 
+RASinglePathExplorer >> interpretCommonSendOrdinaryWith: aRBMessageNode [
 
-	RASendExit new
-		messageReceiver: vmFrame operandStackTop second;
-		messageSelector: (self receiver first instVarNamed: 'messageSelector') second;
+	| argumentCount |
+	argumentCount := (self receiver first instVarNamed: 'argumentCount')
+		                 second value.
+	RAInterpreterExitException new
+		exitCondition: (RASendExit new
+				 messageReceiver:
+					 (vmFrame operandStackAt: argumentCount + 1) second;
+				 messageSelector:
+					 (self receiver first instVarNamed: 'messageSelector') second;
+				 yourself);
 		signal
 ]
 
@@ -504,7 +513,9 @@ RASinglePathExplorer >> interpretFetchPointerOfObjectWith: aRBMessageNode [
 						 oop second typeTag.
 						 (RAConstant value: 0) })
 			taken: true.
-		RAInvalidMemoryAccess signal ].
+		RAInterpreterExitException new
+			exitCondition: RAInvalidMemoryAccess new;
+			signal ].
 	self
 		addPathConstraint: (RAEqualsConstraint operands: { 
 					 oop second typeTag.
@@ -516,7 +527,9 @@ RASinglePathExplorer >> interpretFetchPointerOfObjectWith: aRBMessageNode [
 	numberOfPointersInObject := vm first numSlotsOfAny: oop first.
 	index first < numberOfPointersInObject ifFalse: [ 
 		self addPathConstraint: constraint negated taken: false.
-		RAInvalidMemoryAccess signal ].
+		RAInterpreterExitException new
+			exitCondition: RAInvalidMemoryAccess new;
+			signal ].
 	
 	self addPathConstraint: constraint taken: true.
 	self pushOperand: {
@@ -740,7 +753,9 @@ RASinglePathExplorer >> interpretIsForwardedWith: aRBMessageNode [
 						maybeImmediate second typeTag.
 						RAConstant value: 0 })
 				taken: true.
-			RAInvalidMemoryAccess signal ].
+			RAInterpreterExitException new
+			exitCondition: RAInvalidMemoryAccess new;
+			signal ].
 	self
 		addPathConstraint: (RAEqualsConstraint
 			operands: { 
@@ -906,7 +921,9 @@ RASinglePathExplorer >> interpretLiteralWith: aRBMessageNode [
 							                  index second.
 							                  vmFrame method second numSlots })
 				                 taken: false.
-			                 RAInvalidMemoryAccess signal ].
+			                 RAInterpreterExitException new
+			exitCondition: RAInvalidMemoryAccess new;
+			signal ].
 
 	self pushOperand: { 
 			concreteValue.
@@ -1061,7 +1078,9 @@ RASinglePathExplorer >> interpretPopThenPushFloatWith: aRBMessageNode [
 	
 	float := self popOperand.
 	concreteFloatObject := vm first objectMemory floatObjectOf: float first.
-	self push: { concreteFloatObject . RAFloatObjectOf operands: float second }.
+	self push: { 
+		concreteFloatObject . 
+		self constraintFactory newAbstractFloatWithValueVariable: float second }.
 
 	"pop:thenPush: does not return an interesting value"
 	self pushOperand: self receiver.
@@ -1253,7 +1272,9 @@ RASinglePathExplorer >> interpretStackAt: indexPair [
 			self pushOperand: (vmFrame operandStackAt: indexPair first + 1) ]
 		ifFalse: [ 
 			self addPathConstraint: constraint negated taken: true.
-			RAInvalidMemoryAccess signal ]
+			RAInterpreterExitException new
+			exitCondition: RAInvalidMemoryAccess new;
+			signal ]
 ]
 
 { #category : #'special cases' }
@@ -1274,7 +1295,9 @@ RASinglePathExplorer >> interpretStackTopPutWith: aRBMessageNode [
 			self pushOperand: self receiver ]
 		ifFalse: [ 
 			self addPathConstraint: constraint negated taken: true.
-			RAInvalidMemoryAccess signal ]
+			RAInterpreterExitException new
+			exitCondition: RAInvalidMemoryAccess new;
+			signal ]
 ]
 
 { #category : #'special cases' }
@@ -1338,7 +1361,9 @@ RASinglePathExplorer >> interpretiArgumentForFramePointerAtOffsetWith: aRBMessag
 			self
 				addPathConstraint: constraint negated
 				taken: true.
-			RAInvalidMemoryAccess signal ]
+			RAInterpreterExitException new
+			exitCondition: RAInvalidMemoryAccess new;
+			signal ]
 ]
 
 { #category : #'special cases' }
@@ -1386,7 +1411,9 @@ RASinglePathExplorer >> interpretiLocalForFramePointerAtOffsetWith: aRBMessageNo
 			self
 				addPathConstraint: constraint negated
 				taken: true.
-			RAInvalidMemoryAccess signal ]
+			RAInterpreterExitException new
+			exitCondition: RAInvalidMemoryAccess new;
+			signal ]
 ]
 
 { #category : #'special cases' }

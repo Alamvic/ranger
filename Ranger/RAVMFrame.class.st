@@ -160,7 +160,10 @@ RAVMFrame >> pop [
 { #category : #accessing }
 RAVMFrame >> postCopy [
 
-	frameConstraints := frameConstraints copy
+	arguments := arguments copy.
+	locals := locals copy.
+	operandStack := operandStack copy.
+	frameConstraints := frameConstraints copy.
 ]
 
 { #category : #initialization }

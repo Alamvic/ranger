@@ -26,6 +26,11 @@ RAConstraintFactory >> isCompiledMethod: aRAObject [
 	^ aRAObject classObject format value = interpreter objectMemory firstCompiledMethodFormat
 ]
 
+{ #category : #factory }
+RAConstraintFactory >> newAbstractFloatWithValueVariable: aRAConstant [ 
+	self shouldBeImplemented.
+]
+
 { #category : #abstract }
 RAConstraintFactory >> newAbstractMethod [
 

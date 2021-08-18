@@ -1,12 +1,18 @@
 Class {
 	#name : #RASendExit,
-	#superclass : #RAInterpreterEndError,
+	#superclass : #RAInterpreterExitCondition,
 	#instVars : [
 		'messageReceiver',
 		'messageSelector'
 	],
 	#category : #'Ranger-Interpreter'
 }
+
+{ #category : #accessing }
+RASendExit >> executeTest: aRAAutoTest [ 
+	
+	aRAAutoTest executeUntilSendTrampoline
+]
 
 { #category : #testing }
 RASendExit >> isInvalid [

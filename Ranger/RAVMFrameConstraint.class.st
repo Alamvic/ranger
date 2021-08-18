@@ -68,35 +68,36 @@ RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAC
 	frame frameConstraints: newConstraints.
 	
 	frame receiver: (aRAObjectBuilder instantiate: receiver).
-	newConstraints receiver: aRAConstraintBuilder newAbstractObject.
+	newConstraints receiver: receiver.
 	
 	frame method: (aRAObjectBuilder instantiate: method).
-	newConstraints method: aRAConstraintBuilder newAbstractMethod.
+	newConstraints method: method.
 	
 	concreteLocals := OrderedCollection new.
 	abstractLocals := OrderedCollection new.
-	((1 to: (numberOfLocals value ifNil: [ 0 ])) collect: [ :e |
-		concreteLocals add: (aRAObjectBuilder
-			instantiate: (self localAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ])).
-		abstractLocals add: aRAConstraintBuilder newAbstractObject.
+	((1 to: (numberOfLocals value ifNil: [ 0 ])) collect: [ :e | | abstractLocal |
+		abstractLocal := self localAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ].
+		concreteLocals add: (aRAObjectBuilder instantiate: abstractLocal).
+		abstractLocals add: abstractLocal.
 	]).
 	frame locals: concreteLocals.
 	newConstraints locals: abstractLocals.
 
 	concreteArguments := OrderedCollection new.
 	abstractArguments := OrderedCollection new.
-	((1 to: (numberOfArguments value ifNil: [ 0 ])) collect: [ :e |
+	((1 to: (numberOfArguments value ifNil: [ 0 ])) collect: [ :e | | abstractArgument |
+		abstractArgument := self argumentAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ].
 		concreteArguments add: (aRAObjectBuilder 
-			instantiate: (self argumentAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ])).
-		abstractArguments add: aRAConstraintBuilder newAbstractObject.
+			instantiate: abstractArgument).
+		abstractArguments add: abstractArgument.
 	]).
 	frame arguments: concreteArguments.
 	newConstraints arguments: abstractArguments.
 	
-	(((operandStackSize evaluate ifNil: [ 0 ]) to: 1 by: -1) collect: [ :e |
-		concreteObject := aRAObjectBuilder instantiate: 
-			(self operandAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ]).
-		frame push: {concreteObject . aRAConstraintBuilder newAbstractObject }
+	(((operandStackSize evaluate ifNil: [ 0 ]) to: 1 by: -1) collect: [ :e | | abstractStackValue |
+		abstractStackValue := self operandAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ].
+		concreteObject := aRAObjectBuilder instantiate: abstractStackValue.
+		frame push: {concreteObject . abstractStackValue }
 	]).
 
 	^ frame

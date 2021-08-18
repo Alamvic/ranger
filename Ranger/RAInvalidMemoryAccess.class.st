@@ -1,6 +1,6 @@
 Class {
 	#name : #RAInvalidMemoryAccess,
-	#superclass : #RAInterpreterEndError,
+	#superclass : #RAInterpreterExitCondition,
 	#category : #'Ranger-Interpreter'
 }
 

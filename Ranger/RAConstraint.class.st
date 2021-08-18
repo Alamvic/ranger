@@ -2,8 +2,7 @@ Class {
 	#name : #RAConstraint,
 	#superclass : #Object,
 	#instVars : [
-		'operands',
-		'origin'
+		'operands'
 	],
 	#category : #'Ranger-Constraints'
 }
@@ -97,7 +96,6 @@ RAConstraint >> operands: anObject [
 { #category : #accessing }
 RAConstraint >> origin: aStackTrace [
 
-	origin := aStackTrace
 ]
 
 { #category : #adding }

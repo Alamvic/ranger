@@ -1,11 +1,17 @@
 Class {
 	#name : #RAMethodReturnExit,
-	#superclass : #RAInterpreterEndError,
+	#superclass : #RAInterpreterExitCondition,
 	#instVars : [
 		'returnValue'
 	],
 	#category : #'Ranger-Interpreter'
 }
+
+{ #category : #executing }
+RAMethodReturnExit >> executeTest: aRAAutoTest [ 
+	
+	aRAAutoTest executeUntilReturn
+]
 
 { #category : #testing }
 RAMethodReturnExit >> isInvalid [

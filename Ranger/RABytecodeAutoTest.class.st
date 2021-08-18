@@ -31,7 +31,7 @@ RABytecodeAutoTest class >> testParameters [
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	(64 to: 64)
+	(96 to: 97)
 		do: [ :bytecode | 
 			| architectures solutions |
 			architectures := { 
@@ -53,7 +53,7 @@ RABytecodeAutoTest class >> testParameters [
 					               setUp;
 					               interpreter.
 				solutions := RAPathExplorer new
-					             failOnError: true;
+					             failOnError: false;
 					             explore: (RABytecodeConcolicCase new
 	              	              	vm: interpreter;
 	              	              	bytecode: bytecode;
@@ -154,7 +154,7 @@ RABytecodeAutoTest >> executeUntilReturn [
 
 { #category : #executing }
 RABytecodeAutoTest >> executeUntilSendTrampoline [
-	
+
 	self runFrom: methodAddress until: sendTrampolineStop address.
 
 	self
@@ -195,10 +195,7 @@ RABytecodeAutoTest >> prepareAutoCall [
 	self pushAddress: receiver.
 
 	solution inputConstraints locals do: [ :aLocalValue | 
-		self pushAddress: (objectBuilder instantiate: aLocalValue) ].
-	
-	solution inputConstraints operandStack do: [ :aStackValue | 
-		self pushAddress: (objectBuilder instantiate: aStackValue) ].
+		self pushAddress: (objectBuilder instantiate: aLocalValue) ]
 ]
 
 { #category : #running }
@@ -270,6 +267,9 @@ RABytecodeAutoTest >> testBytecode [
 		cogit byte0: bytecode.
 		cogit bytecodePC: 0.
 		cogit endPC: 0.
+		
+		solution inputConstraints operandStack reversed do: [ :aStackValue | 
+			cogit genPushLiteral: (objectBuilder instantiate: aStackValue) ].
 
 		descriptor := cogit generatorAt: bytecode.
 		result := cogit perform: descriptor generator.

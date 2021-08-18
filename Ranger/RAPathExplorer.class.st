@@ -47,19 +47,20 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	inputFrame := previousInputFrameConstraints
 		              instantiateWith: objectBuilder
 		              constraintBuilder: constraintFactory.
+
 	exploredPath := self
 		                explorePathWithFrame: inputFrame
 		                solver: solution solver.
 
-	"If we do not get an explored path (to see if this is still happenning)
+	"If we do not get an explored path (to see if this is still happening)
 	This may be because there was an exception while doing the interpretation.
 	Continue by negating the going to the next path.
 	Can this loop?"
-	currentPath := exploredPath ifNil: [ currentPath nextPath ].
+	currentPath := (exploredPath ifNil: [ currentPath nextPath ]) veryDeepCopy.
 
 	"Negate and solve constraints!"
 	solution := self solve: currentPath.
-	previousInputFrameConstraints := inputFrame frameConstraints.
+	previousInputFrameConstraints := currentPath inputs frameConstraints.
 	solution isEmpty ] whileFalse.
 	^ solutions
 ]

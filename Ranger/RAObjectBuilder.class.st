@@ -25,7 +25,7 @@ RAObjectBuilder >> allocateClassObject: aClassObject [
 	aConcreteClass := self
 		newClassInOldSpaceWithSlots: 0
 		instSpec: (aClassObject format value ifNil: [0]).
-	instances at: aClassObject put: aConcreteClass.
+	instances at: aClassObject variableName put: aConcreteClass.
 	
 	self memory setHashBitsOf: aConcreteClass to: classIndex.
 	self memory
@@ -102,7 +102,7 @@ RAObjectBuilder >> instantiate: aRAObject [
 	aRAObject isConstant ifTrue: [ ^ aRAObject value ].
 	
 	"Otherwise, check if we already instantiated this object"
-	instances at: aRAObject ifPresent: [ :instance | ^ instance ].
+	instances at: aRAObject variableName ifPresent: [ :instance | ^ instance ].
 	
 	"If not, instantiate it and cache it"
 	typeTag := aRAObject typeTag value ifNil: [ 0 ].
@@ -110,7 +110,7 @@ RAObjectBuilder >> instantiate: aRAObject [
 	typeTag = 1 ifTrue: [ 
 		| concreteInteger |
 		concreteInteger := interpreter objectMemory integerObjectOf:
-			                   (aRAObject integerValue value ifNil: [ 0 ]).
+			                   ((aRAObject integerValue mzConstraintOnInterpreter: interpreter) evaluate ifNil: [ 0 ]).
 		^ concreteInteger ].
 	typeTag = 2 ifTrue: [ 
 		| concreteCharacter |
@@ -147,7 +147,7 @@ RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 		format: (aRAObject format value ifNil: [ 
 			self defaultFormatForClassIndex: classIndex ])
 		classIndex: classIndex.
-	instances at: aRAObject put: newConcreteObject.
+	instances at: aRAObject variableName put: newConcreteObject.
 	
 	self
 		initializeConcreteObject: newConcreteObject
