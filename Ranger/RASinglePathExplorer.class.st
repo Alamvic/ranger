@@ -35,13 +35,22 @@ RASinglePathExplorer >> basicNewFrame [
 	^ RAStackFrame new
 ]
 
+{ #category : #accessing }
+RASinglePathExplorer >> constraintFactory [
+	
+	^ explorer constraintFactory
+]
+
 { #category : #api }
 RASinglePathExplorer >> exitCondition [
-	
-	^ interpreter primFailCode ~= 0
-		ifTrue: [ RAPrimitiveFailure new ]
-		ifFalse: [ RASuccess new "Could be a primitive or a bytecode success!" ]
-		
+
+	interpreter primFailCode ~= 0 ifTrue: [ ^ RAPrimitiveFailure new ].
+
+	"Could be a primitive or a bytecode success!
+	Either way, the result is the top of the operand stack"
+	^ RASuccess new
+		result: vmFrame frameConstraints operandStack top;
+		yourself
 ]
 
 { #category : #api }
@@ -335,8 +344,11 @@ RASinglePathExplorer >> interpretCommonReturnWith: aRBMessageNode [
 
 { #category : #'special cases' }
 RASinglePathExplorer >> interpretCommonSendOrdinaryWith: aRBMessageNode [ 
-	
-	RASendExit signal
+
+	RASendExit new
+		messageReceiver: vmFrame operandStackTop second;
+		messageSelector: (self receiver first instVarNamed: 'messageSelector') second;
+		signal
 ]
 
 { #category : #'special cases' }
@@ -1209,18 +1221,19 @@ RASinglePathExplorer >> interpretSpecialObjectWith: aRBMessageNode [
 { #category : #'special cases' }
 RASinglePathExplorer >> interpretSpecialSelectorWith: aRBMessageNode [ 
 	
-	| receiver selectorIndex |
+	| receiver selectorIndex selector abstractSpecialSelector |
 	aRBMessageNode receiver acceptVisitor: self.
 	receiver := self popOperand.
-	
+
 	aRBMessageNode arguments first acceptVisitor: self.
 	selectorIndex := self popOperand.
 
+	selector := self receiver first objectMemory integerObjectOf: 77 + selectorIndex first.
+	abstractSpecialSelector := explorer constraintFactory newAbstractObject.
+	abstractSpecialSelector specialSelectorIndex: selectorIndex first.
 	self pushOperand: {
-		"Just push a small integer that represents the index"
-		(receiver first objectMemory integerObjectOf: selectorIndex first).
-		RAConstant value: selectorIndex.
-	}
+		selector.
+		abstractSpecialSelector }
 ]
 
 { #category : #'special cases' }
@@ -1468,6 +1481,11 @@ RASinglePathExplorer >> visitInstanceVariableNode: aRBVariableNode [
 			^ self perform: mapping withArguments: { aRBVariableNode } ].
 	
 	value := self receiver first instVarNamed: aRBVariableNode name.
+	
+	"Only wrap it with an abstract value if it is not already done"
+	value isArray ifTrue: [ 
+		^ self pushOperand: value ].
+	
 	self pushOperand: {
 		value.
 		RAConstant value: value

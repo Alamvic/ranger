@@ -131,6 +131,10 @@ RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 	specialID = 2 ifTrue: [ ^ interpreter objectMemory trueObject ].
 	specialID = 3 ifTrue: [ ^ interpreter objectMemory falseObject ].
 
+	aRAObject specialSelectorIndex value ifNotNil: [ :index |
+		^ interpreter specialSelector: index
+	].
+
 	"Format 0 should always have 0 slots"
 	self assert: (aRAObject format value isNil or: [ 
 			 aRAObject format value > 0 or: [ 

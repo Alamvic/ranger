@@ -20,7 +20,7 @@ RAMethodReturnExit >> result [
 ]
 
 { #category : #compiling }
-RAMethodReturnExit >> returnResultInto: aCompiler [ 
+RAMethodReturnExit >> returnResultInto: aTest [ 
 	
 	"Do nothing, I should already be compiled with a return"
 ]

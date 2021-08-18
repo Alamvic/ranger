@@ -5,6 +5,7 @@ Class {
 		'variableName',
 		'typeTag',
 		'integerValue',
+		'specialSelectorIndex',
 		'specialObjectIndex',
 		'slots',
 		'numSlots',
@@ -145,6 +146,10 @@ RAObject >> initializeWithVariableName: aName [
 		                      name: variableName , '_specialObjectIndex';
 		                      type: 'int';
 		                      yourself.
+	specialSelectorIndex := MzVariable new
+		                      name: variableName , '_specialSelectorIndex';
+		                      type: 'int';
+		                      yourself.
 
 	hashBits := MzVariable new
 		              name: variableName , '_hashBits';
@@ -273,7 +278,19 @@ RAObject >> specialObjectIndex: anObject [
 	specialObjectIndex := anObject
 ]
 
-{ #category : #acccessing }
+{ #category : #accessing }
+RAObject >> specialSelectorIndex [
+
+	^ specialSelectorIndex
+]
+
+{ #category : #accessing }
+RAObject >> specialSelectorIndex: anIndex [
+
+	specialSelectorIndex := anIndex
+]
+
+{ #category : #accessing }
 RAObject >> typeTag [
 	
 	^ typeTag 

@@ -1,8 +1,17 @@
 Class {
 	#name : #RASuccess,
 	#superclass : #Object,
+	#instVars : [
+		'result'
+	],
 	#category : #'Ranger-Interpreter'
 }
+
+{ #category : #executing }
+RASuccess >> executeTest: aRAAutoTest [ 
+	
+	aRAAutoTest executeUntilReturn
+]
 
 { #category : #testing }
 RASuccess >> isInvalid [
@@ -10,10 +19,20 @@ RASuccess >> isInvalid [
 	^ false
 ]
 
-{ #category : #compiling }
-RASuccess >> returnResultInto: compiler [ 
+{ #category : #accessing }
+RASuccess >> result [
 	
-	"I'm a success and my value has been pushed to the operand stack.
-	Make a return top"
-	compiler genReturnTopFromMethod
+	^ result
+]
+
+{ #category : #accessing }
+RASuccess >> result: anAbstractValue [
+	
+	result := anAbstractValue
+]
+
+{ #category : #compiling }
+RASuccess >> returnResultInto: aTest [
+
+	aTest compileEndInstructionForSuccess: self
 ]

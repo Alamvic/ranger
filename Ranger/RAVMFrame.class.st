@@ -145,6 +145,12 @@ RAVMFrame >> operandStackSize [
 	^ {operandStack size . frameConstraints operandStackSize }
 ]
 
+{ #category : #accessing }
+RAVMFrame >> operandStackTop [
+	
+	^ { operandStack top . frameConstraints operandStackTop }
+]
+
 { #category : #initialization }
 RAVMFrame >> pop [
 

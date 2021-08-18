@@ -215,7 +215,6 @@ RAASTInterpreter >> visitAssignmentNode: aRBAssignmentNode [
 { #category : #visiting }
 RAASTInterpreter >> visitInstanceVariableNode: aRBVariableNode [ 
 	
-	| receiver arguments method |
 	specialCases
 		at: aRBVariableNode name
 		ifPresent: [ :mapping |

@@ -79,6 +79,7 @@ RAAbstractStackFrame >> pop [
 { #category : #accessing }
 RAAbstractStackFrame >> push: aValue [
 
+self haltIf: [ aValue isArray and: [aValue second isArray] ].
 	operandStack push: aValue
 ]
 

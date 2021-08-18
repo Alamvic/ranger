@@ -10,6 +10,7 @@ Class {
 { #category : #'instance creation' }
 RAConstant class >> value: anInteger [ 
 	
+	self haltIf: [ anInteger isArray ].
 	^ self new
 		value: anInteger;
 		yourself

@@ -4,6 +4,12 @@ Class {
 	#category : #'Ranger-Interpreter'
 }
 
+{ #category : #executing }
+RAInterpreterEndError >> executeTest: aRAAutoTest [ 
+	
+	aRAAutoTest executeUntilSendTrampoline
+]
+
 { #category : #accessing }
 RAInterpreterEndError >> result [
 	

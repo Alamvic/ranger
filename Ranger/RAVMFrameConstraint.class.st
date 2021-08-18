@@ -93,7 +93,7 @@ RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAC
 	frame arguments: concreteArguments.
 	newConstraints arguments: abstractArguments.
 	
-	(((operandStackSize value ifNil: [ 0 ]) to: 1 by: -1) collect: [ :e |
+	(((operandStackSize evaluate ifNil: [ 0 ]) to: 1 by: -1) collect: [ :e |
 		concreteObject := aRAObjectBuilder instantiate: 
 			(self operandAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ]).
 		frame push: {concreteObject . aRAConstraintBuilder newAbstractObject }
@@ -191,6 +191,12 @@ RAVMFrameConstraint >> operandStackSize [
 RAVMFrameConstraint >> operandStackSize: anObject [
 
 	operandStackSize := anObject
+]
+
+{ #category : #accessing }
+RAVMFrameConstraint >> operandStackTop [
+	
+	^ operandStack top
 ]
 
 { #category : #initialization }

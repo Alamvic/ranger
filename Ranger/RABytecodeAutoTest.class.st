@@ -7,7 +7,9 @@ Class {
 		'endInstruction',
 		'objectBuilder',
 		'compilationResult',
-		'methodAddress'
+		'methodAddress',
+		'sendTrampolineStop',
+		'jitCompilerClass'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -29,7 +31,7 @@ RABytecodeAutoTest class >> testParameters [
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	(88 to: 92)
+	(64 to: 64)
 		do: [ :bytecode | 
 			| architectures solutions |
 			architectures := { 
@@ -68,7 +70,9 @@ RABytecodeAutoTest class >> testParameters [
 							(#solution -> e) } ] ] ]
 		displayingProgress: [ :bytecode | bytecode asString ].
 
-	^ matrix
+	^ matrix * (ParametrizedTestMatrix new
+		forSelector: #jitCompilerClass addOptions: {SimpleStackBasedCogit . StackToRegisterMappingCogit};
+		yourself)
 ]
 
 { #category : #building }
@@ -89,13 +93,88 @@ RABytecodeAutoTest >> bytecode: anObject [
 	bytecode := anObject
 ]
 
+{ #category : #compiling }
+RABytecodeAutoTest >> compileEndInstructionForPrimitiveFailure: aRAPrimitiveFailure [ 
+	
+	"In bytecodes, primitive failures should be ignored"
+	self compileEndInstructionForSuccess: aRAPrimitiveFailure
+]
+
+{ #category : #compiling }
+RABytecodeAutoTest >> compileEndInstructionForSuccess: aRASuccess [
+	
+	"I'm a success and my value has been pushed to the operand stack.
+	Make a return top"
+	cogit genReturnTopFromMethod
+]
+
+{ #category : #running }
+RABytecodeAutoTest >> createSpecialSelectorArray [
+
+	| specialObjectsOop  |
+	specialObjectsOop := self newObjectWithSlots: 24.
+	obj := self newObjectWithSlots: Smalltalk specialSelectors size.
+	memory storePointer: 23 ofObject: specialObjectsOop withValue: obj.
+	memory specialObjectsOop: specialObjectsOop.
+		
+	0 to: Smalltalk specialSelectors size - 1 by: 2 do: [ :aSelectorIndex |
+		sentSelector := Smalltalk specialSelectors at: aSelectorIndex + 1.
+		"Some object to test"
+		memory
+			storePointer: aSelectorIndex
+			ofObject: obj withValue: (selectorAtIndex := memory integerObjectOf: aSelectorIndex + 77).
+		memory
+			storePointer: aSelectorIndex + 1 
+			ofObject: obj withValue: (memory integerObjectOf: (sentSelector) numArgs) ]
+]
+
 { #category : #running }
 RABytecodeAutoTest >> execute [
+
+	solution exitCondition executeTest: self
+]
+
+{ #category : #executing }
+RABytecodeAutoTest >> executePrimitiveFailure: aRAPrimitiveFailure [ 
+	
+	"If this is a primitive failure during a bytecode instruction, this means it was a success!
+	Actually, this means that the bytecode tried to execute a primitive inside, it failed, and tried something else.
+	If this were a real failure case, the exit status would be another one (like send exit)"
+	self executeUntilReturn
+]
+
+{ #category : #executing }
+RABytecodeAutoTest >> executeUntilReturn [
 
 	self runFrom: methodAddress until: callerAddress.
 	self
 		assert: machineSimulator receiverRegisterValue
 		equals: (objectBuilder instantiate: solution result)
+]
+
+{ #category : #executing }
+RABytecodeAutoTest >> executeUntilSendTrampoline [
+	
+	self runFrom: methodAddress until: sendTrampolineStop address.
+
+	self
+		assert: machineSimulator receiverRegisterValue
+		equals: (objectBuilder instantiate: solution exitCondition messageReceiver).
+	self
+		assert: machineSimulator classRegisterValue
+		equals: (objectBuilder instantiate: solution exitCondition messageSelector)
+]
+
+{ #category : #accessing }
+RABytecodeAutoTest >> jitCompilerClass [
+
+	^ jitCompilerClass
+]
+
+{ #category : #accessing }
+RABytecodeAutoTest >> jitCompilerClass: aClass [ 
+	
+	jitCompilerClass := aClass
 ]
 
 { #category : #running }
@@ -144,17 +223,34 @@ RABytecodeAutoTest >> runCaseManaged [
 RABytecodeAutoTest >> setUp [
 
 	super setUp.
+	
+	solution isInvalid ifTrue: [ ^ self ].
+	
 	self installFloatClass.
+	self createSpecialSelectorArray.
+	
 	memory classExternalAddress: (self
 			 newClassInOldSpaceWithSlots: 0
 			 instSpec: (memory byteFormatForNumBytes: 0)).
 
 
 	cogit receiverTags: (solution inputConstraints receiver typeTag value ifNil: [ 0 ]).
+	cogit methodOrBlockNumArgs: solution inputConstraints arguments size.
+	
+	self jitCompilerClass = StackToRegisterMappingCogit ifTrue:[ 
+		cogit methodOrBlockNumTemps: solution inputConstraints locals size + solution inputConstraints arguments size.
+		cogit initSimStackForFramefulMethod: 0.
+		cogit regArgsHaveBeenPushed: false ].
+	
 	objectBuilder := RAObjectBuilder new
 		                 interpreter: interpreter;
 		                 nextIndex: nextIndex;
-		                 yourself
+		                 yourself.
+	
+	"Install a send trampoline"
+	sendTrampolineAddress := self compile: [ sendTrampolineStop := cogit Stop ].
+	0 to: 3 do: [ :numberOfArguments |
+		cogit ordinarySendTrampolineAt: numberOfArguments put: sendTrampolineAddress. ]
 ]
 
 { #category : #running }
@@ -174,11 +270,10 @@ RABytecodeAutoTest >> testBytecode [
 		cogit byte0: bytecode.
 		cogit bytecodePC: 0.
 		cogit endPC: 0.
-		cogit methodOrBlockNumArgs: solution inputConstraints arguments size. 
 
 		descriptor := cogit generatorAt: bytecode.
 		result := cogit perform: descriptor generator.
-		solution exitCondition returnResultInto: cogit
+		solution exitCondition returnResultInto: self
 	] bytecodes: 15.
 
 	self prepareAutoCall.
