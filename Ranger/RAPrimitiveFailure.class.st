@@ -22,6 +22,12 @@ RAPrimitiveFailure >> isInvalid [
 	^ false
 ]
 
+{ #category : #testing }
+RAPrimitiveFailure >> isPrimitiveFailure [
+	
+	^ true
+]
+
 { #category : #compiling }
 RAPrimitiveFailure >> returnResultInto: aTest [
 

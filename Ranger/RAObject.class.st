@@ -186,6 +186,28 @@ RAObject >> integerValue: anObject [
 ]
 
 { #category : #testing }
+RAObject >> isAbstractPointersObject [
+
+	"Type tags are
+	0- normal objects
+	1- small integers
+	2- immediate characters"	
+		
+	"By default, an unknown typetag is by default interpreted as a pointers object"
+	^ #(0 nil) includes: self typeTag value
+]
+
+{ #category : #testing }
+RAObject >> isAbstractSmallInteger [
+
+	"Type tags are
+	0- normal objects
+	1- small integers
+	2- immediate characters"	
+	^ self typeTag value = 1
+]
+
+{ #category : #testing }
 RAObject >> isBooleanObjectOf [
 	
 	^ false

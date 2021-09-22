@@ -31,7 +31,9 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	currentPath := RAPath new.
 	solution := RAConstraintSolution new solver: #initial.
 
-	previousInputFrameConstraints := self newFrameConstraintForSolution: MzSolver new.
+	previousInputFrameConstraints := RAVMFrameConstraint new
+		newFrameConstraintForSolution: MzSolver new
+		constraintFactory: constraintFactory.
 
 	[ 
 	| objectBuilder |
@@ -41,6 +43,7 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 		                 nextIndex: 100;
 		                 yourself.
 	aConcolicCase initializeVM: vm.
+
 
 	inputFrame := previousInputFrameConstraints
 		              instantiateWith: objectBuilder
@@ -59,7 +62,9 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	"Negate and solve constraints!"
 	solution := self solve: currentPath.
 
-	previousInputFrameConstraints := self newFrameConstraintForSolution: solution solver.
+	previousInputFrameConstraints := previousInputFrameConstraints
+		newFrameConstraintForSolution: solution solver
+		constraintFactory: constraintFactory.
 	solution isEmpty ] whileFalse.
 	^ solutions
 ]
@@ -115,24 +120,6 @@ RAPathExplorer >> initialize [
 	executionStack := OrderedCollection new.
 	solutions := OrderedCollection new.
 	constraintFactory := RAConstraintFactory new
-]
-
-{ #category : #'abstract-frame-management' }
-RAPathExplorer >> newFrameConstraintForSolution: aMzSolver [
-
-	| newConstraints operandStackSize |
-	newConstraints := RAVMFrameConstraint new.
-	newConstraints receiver: constraintFactory newAbstractSmallInteger.
-	newConstraints method: constraintFactory newAbstractMethod.
-	
-	operandStackSize := aMzSolver
-		at: 'frame_operand_stack_size'
-		ifAbsent: [ 0 ].
-	newConstraints operandStackSize value: operandStackSize.
-	1 to: operandStackSize do: [ :e |
-		newConstraints basicPush: constraintFactory newAbstractObject
-	].
-	^ newConstraints
 ]
 
 { #category : #solving }
