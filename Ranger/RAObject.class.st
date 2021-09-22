@@ -186,6 +186,12 @@ RAObject >> integerValue: anObject [
 ]
 
 { #category : #testing }
+RAObject >> isAbstractFalseObject [
+	
+	^ self specialObject value = 3
+]
+
+{ #category : #testing }
 RAObject >> isAbstractPointersObject [
 
 	"Type tags are

@@ -120,6 +120,52 @@ RATest >> testExplorePrimitiveCheckingSmallIntegerSucceedsOnSmallInteger [
 ]
 
 { #category : #tests }
+RATest >> testExplorePrimitiveComputedBoolean [
+
+	| solutions |
+	solutions := self explorePrimitive: #primitiveComputedBoolean.
+	
+	"The first solution is invalid frame access"
+	self assert: solutions size equals: 3.
+	self assert: solutions first exitCondition isInvalid.
+	
+	"The second solution is a success, returning false because the input is not a smi"
+	self assert: solutions second exitCondition isSuccess.
+	self assert: solutions second inputConstraints operandStack size equals: 1.
+	self deny: 	 solutions second inputConstraints operandStackTop isAbstractSmallInteger.
+	self assert: solutions second outputConstraints operandStackTop isAbstractFalseObject.
+	
+	"The second solution is a success, returning true because the input is a smi"
+	self assert: solutions third exitCondition isSuccess.
+	self assert: solutions third inputConstraints operandStack size equals: 1.
+	self assert: solutions third inputConstraints operandStackTop isAbstractSmallInteger.
+	self assert: solutions third outputConstraints operandStackTop isAbstractTrueObject.
+]
+
+{ #category : #tests }
+RATest >> testExplorePrimitiveComputedBooleanWithInlinedPopPushBool [
+
+	| solutions |
+	solutions := self explorePrimitive: #primitiveComputedBoolean2.
+	
+	"The first solution is invalid frame access"
+	self assert: solutions size equals: 2.
+	self assert: solutions first exitCondition isInvalid.
+	
+	"Finally, there is a success where the return value is computed from the receiver"
+	self assert: solutions last exitCondition isSuccess.
+
+	self assert: solutions last inputConstraints operandStack size equals: 1.
+	self
+		assert: solutions last outputConstraints operandStackTop
+		equals: (RABooleanObjectOf operands: {
+			RAIsIntegerObject operands: {	
+				solutions last inputConstraints operandStackTop
+			}
+		})
+]
+
+{ #category : #tests }
 RATest >> testExplorePrimitiveReturningReceiver [
 
 	| solutions validSolution |

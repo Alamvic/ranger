@@ -37,6 +37,28 @@ RATestingInterpreter >> primitiveCheckPairOfIntegers2 [
 ]
 
 { #category : #'as yet unclassified' }
+RATestingInterpreter >> primitiveComputedBoolean [
+
+	| stackReceiver |
+	stackReceiver := self stackValue: 0.
+	
+	self
+		pop: 1
+		thenPush: (objectMemory booleanObjectOf: (objectMemory isIntegerObject: stackReceiver))
+]
+
+{ #category : #'as yet unclassified' }
+RATestingInterpreter >> primitiveComputedBoolean2 [
+
+	| stackReceiver |
+	stackReceiver := self stackValue: 0.
+	
+	self
+		pop: 1
+		thenPushBool: (objectMemory isIntegerObject: stackReceiver)
+]
+
+{ #category : #'as yet unclassified' }
 RATestingInterpreter >> primitiveReturningInteger [
 
 	"Accessing the operand stack in the frame will force to have a frame with a filled stack"

@@ -1368,11 +1368,9 @@ RASinglePathExplorer >> interpretStackValueWith: aRBMessageNode [
 { #category : #'special cases' }
 RASinglePathExplorer >> interpretTrueObjectWith: aRBMessageNode [
 
-	| abstractTrue |
-	abstractTrue := explorer constraintFactory newAbstractTrueObject.
 	self pushOperand: {
 		self receiver first trueObject.
-		abstractTrue }
+		explorer constraintFactory newAbstractTrueObject }
 ]
 
 { #category : #'special cases' }
