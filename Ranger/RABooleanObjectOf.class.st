@@ -7,7 +7,7 @@ Class {
 { #category : #evaluating }
 RABooleanObjectOf >> evaluateWith: interpreter [ 
 	
-	^ interpreter objectMemory booleanObjectOf: (operands evaluateWith: interpreter)
+	^ interpreter objectMemory booleanObjectOf: (operands first evaluateWith: interpreter)
 ]
 
 { #category : #testing }

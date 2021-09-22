@@ -1072,7 +1072,7 @@ RASinglePathExplorer >> interpretPopThenPushBoolWith: aRBMessageNode [
 	Pop: keep track of the operand stack and remove one element
 	Push: move the value to the physical register assigned to the current stack position"
 	
-	| elementsToPop vm boolean concreteBooleanObject |
+	| elementsToPop vm boolean concreteBooleanObject booleanObjectConstraint |
 	aRBMessageNode receiver acceptVisitor: self.
 	vm := self popOperand.
 	
@@ -1083,9 +1083,16 @@ RASinglePathExplorer >> interpretPopThenPushBoolWith: aRBMessageNode [
 	aRBMessageNode arguments second acceptVisitor: self.
 	self pop: elementsToPop first.
 	
-	boolean := self popOperand.
+	boolean := self popOperand. "an Array(false a RAConstant(false))"
+	
 	concreteBooleanObject := vm first objectMemory booleanObjectOf: boolean first.
-	self push: { concreteBooleanObject . RABooleanObjectOf operands: boolean second }.
+	booleanObjectConstraint := boolean second isConstant
+		ifTrue: [  boolean first
+			ifTrue: [ explorer constraintFactory newAbstractTrueObject ]
+			ifFalse: [ explorer constraintFactory newAbstractFalseObject ] ]
+		ifFalse: [ RABooleanObjectOf operands: {boolean second} ].
+	
+	self push: { concreteBooleanObject . booleanObjectConstraint }.
 
 	"pop:thenPush: does not return an interesting value"
 	self pushOperand: self receiver.
@@ -1362,8 +1369,7 @@ RASinglePathExplorer >> interpretStackValueWith: aRBMessageNode [
 RASinglePathExplorer >> interpretTrueObjectWith: aRBMessageNode [
 
 	| abstractTrue |
-	abstractTrue := explorer constraintFactory newAbstractObject.
-	abstractTrue specialObject value: 2.
+	abstractTrue := explorer constraintFactory newAbstractTrueObject.
 	self pushOperand: {
 		self receiver first trueObject.
 		abstractTrue }

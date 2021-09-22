@@ -208,6 +208,12 @@ RAObject >> isAbstractSmallInteger [
 ]
 
 { #category : #testing }
+RAObject >> isAbstractTrueObject [
+	
+	^ self specialObject value = 2
+]
+
+{ #category : #testing }
 RAObject >> isBooleanObjectOf [
 	
 	^ false

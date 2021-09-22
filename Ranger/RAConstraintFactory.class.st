@@ -26,6 +26,15 @@ RAConstraintFactory >> isCompiledMethod: aRAObject [
 	^ aRAObject classObject format value = interpreter objectMemory firstCompiledMethodFormat
 ]
 
+{ #category : #abstract }
+RAConstraintFactory >> newAbstractFalseObject [
+
+	| falseObject |
+	falseObject := self newAbstractObject.
+	falseObject specialObject value: 3.
+	^ falseObject
+]
+
 { #category : #factory }
 RAConstraintFactory >> newAbstractFloatWithValueVariable: aRAConstant [ 
 	
@@ -47,6 +56,15 @@ RAConstraintFactory >> newAbstractMethod [
 	smallInteger typeTag value: 0.
 	smallInteger classObject format value: 24"interpreter objectMemory firstCompiledMethodFormat".
 	^ smallInteger
+]
+
+{ #category : #abstract }
+RAConstraintFactory >> newAbstractNilObject [
+
+	| nilObject |
+	nilObject := self newAbstractObject.
+	nilObject specialObject value: 1.
+	^ nilObject
 ]
 
 { #category : #abstract }
@@ -85,6 +103,15 @@ RAConstraintFactory >> newAbstractSmallIntegerWithValueVariable: aValueVariable 
 	smallInteger typeTag value: 1.
 	smallInteger integerValue: aValueVariable.
 	^ smallInteger
+]
+
+{ #category : #abstract }
+RAConstraintFactory >> newAbstractTrueObject [
+
+	| trueObject |
+	trueObject := self newAbstractObject.
+	trueObject specialObject value: 2.
+	^ trueObject
 ]
 
 { #category : #accessing }

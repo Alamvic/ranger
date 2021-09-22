@@ -148,18 +148,20 @@ RAVMFrameConstraint >> newFrameConstraintForSolution: aMzSolver constraintFactor
 		at: 'frame_operand_stack_size'
 		ifAbsent: [ 0 ].
 	newConstraints operandStackSize value: theOperandStackSize.
-	1 to: theOperandStackSize do: [ :index | | constrainedObject oldConstrainedObject |
-		constrainedObject := constraintFactory newAbstractObject.
-		oldConstrainedObject := operandStack at: index ifAbsent: [ nil ].
-		oldConstrainedObject ifNotNil: [ | typeTag integerValue |
-			"If there is an object in the previous frame at that position"
-			typeTag := aMzSolver at: oldConstrainedObject typeTag name ifAbsent: [ 0 ].
-			constrainedObject typeTag value: typeTag.
-			
-			integerValue := aMzSolver at: oldConstrainedObject integerValue name ifAbsent: [ 0 ].
-			constrainedObject integerValue value: integerValue.
-		].
-		newConstraints basicPush: constrainedObject
+
+	theOperandStackSize to: 1 by: -1 "iterate the stack backwarsd"
+		do: [ :index | | constrainedObject oldConstrainedObject |
+			constrainedObject := constraintFactory newAbstractObject.
+			oldConstrainedObject := operandStack at: index ifAbsent: [ nil ].
+			oldConstrainedObject ifNotNil: [ | typeTag integerValue |
+				"If there is an object in the previous frame at that position"
+				typeTag := aMzSolver at: oldConstrainedObject typeTag name ifAbsent: [ 0 ].
+				constrainedObject typeTag value: typeTag.
+				
+				integerValue := aMzSolver at: oldConstrainedObject integerValue name ifAbsent: [ 0 ].
+				constrainedObject integerValue value: integerValue.
+			].
+			newConstraints basicPush: constrainedObject
 	].
 	^ newConstraints
 ]
