@@ -28,7 +28,15 @@ RAConstraintFactory >> isCompiledMethod: aRAObject [
 
 { #category : #factory }
 RAConstraintFactory >> newAbstractFloatWithValueVariable: aRAConstant [ 
-	self shouldBeImplemented.
+	
+	| floatObjectConstraint |
+	floatObjectConstraint := self newAbstractObject.
+	"In 32 bits, floats are boxed floats"
+	floatObjectConstraint typeTag value: 0.
+	floatObjectConstraint classObject classIndex: 33.
+	floatObjectConstraint classObject format: 10.
+	floatObjectConstraint floatValue: aRAConstant.
+	^ floatObjectConstraint
 ]
 
 { #category : #abstract }

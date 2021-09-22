@@ -38,6 +38,12 @@ RAVMFrameConstraint >> arguments: aCollection [
 	arguments := aCollection
 ]
 
+{ #category : #accessing }
+RAVMFrameConstraint >> basicPush: anOperandConstraint [
+
+	operandStack push: anOperandConstraint
+]
+
 { #category : #initialization }
 RAVMFrameConstraint >> initialize [
 
@@ -62,42 +68,33 @@ RAVMFrameConstraint >> initialize [
 { #category : #instantiation }
 RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAConstraintBuilder [
 	
-	| frame newConstraints concreteLocals abstractLocals concreteArguments abstractArguments concreteObject |
-	newConstraints := RAVMFrameConstraint new.
+	| frame concreteLocals concreteArguments concreteObject |
 	frame := RAVMFrame new.
-	frame frameConstraints: newConstraints.
+	frame frameConstraints: self.
 	
 	frame receiver: (aRAObjectBuilder instantiate: receiver).
-	newConstraints receiver: receiver.
 	
 	frame method: (aRAObjectBuilder instantiate: method).
-	newConstraints method: method.
 	
 	concreteLocals := OrderedCollection new.
-	abstractLocals := OrderedCollection new.
 	((1 to: (numberOfLocals value ifNil: [ 0 ])) collect: [ :e | | abstractLocal |
 		abstractLocal := self localAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ].
 		concreteLocals add: (aRAObjectBuilder instantiate: abstractLocal).
-		abstractLocals add: abstractLocal.
 	]).
 	frame locals: concreteLocals.
-	newConstraints locals: abstractLocals.
 
 	concreteArguments := OrderedCollection new.
-	abstractArguments := OrderedCollection new.
 	((1 to: (numberOfArguments value ifNil: [ 0 ])) collect: [ :e | | abstractArgument |
 		abstractArgument := self argumentAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ].
 		concreteArguments add: (aRAObjectBuilder 
 			instantiate: abstractArgument).
-		abstractArguments add: abstractArgument.
 	]).
 	frame arguments: concreteArguments.
-	newConstraints arguments: abstractArguments.
 	
 	(((operandStackSize evaluate ifNil: [ 0 ]) to: 1 by: -1) collect: [ :e | | abstractStackValue |
 		abstractStackValue := self operandAt: e ifAbsent: [ aRAConstraintBuilder newAbstractObject ].
 		concreteObject := aRAObjectBuilder instantiate: abstractStackValue.
-		frame push: {concreteObject . abstractStackValue }
+		frame pushConcrete: concreteObject
 	]).
 
 	^ frame
@@ -211,7 +208,7 @@ RAVMFrameConstraint >> postCopy [
 { #category : #accessing }
 RAVMFrameConstraint >> push: anOperandConstraint [
 
-	operandStack push: anOperandConstraint.
+	self basicPush: anOperandConstraint.
 	operandStackSize := operandStackSize + 1
 ]
 

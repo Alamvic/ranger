@@ -169,8 +169,14 @@ RAVMFrame >> postCopy [
 { #category : #initialization }
 RAVMFrame >> push: aValue [
 
-	operandStack push: aValue first.
+	self pushConcrete: aValue first.
 	frameConstraints push: aValue second.
+]
+
+{ #category : #'operand stack' }
+RAVMFrame >> pushConcrete: aValue [
+	
+	operandStack push: aValue
 ]
 
 { #category : #accessing }

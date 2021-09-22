@@ -13,12 +13,6 @@ RAMethodReturnExit >> executeTest: aRAAutoTest [
 	aRAAutoTest executeUntilReturn
 ]
 
-{ #category : #testing }
-RAMethodReturnExit >> isInvalid [
-	
-	^ false
-]
-
 { #category : #accessing }
 RAMethodReturnExit >> result [
 	

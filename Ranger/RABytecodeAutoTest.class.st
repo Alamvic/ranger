@@ -1,14 +1,11 @@
 Class {
 	#name : #RABytecodeAutoTest,
-	#superclass : #VMSimpleStackBasedCogitAbstractTest,
+	#superclass : #RAAbstractAutoTest,
 	#instVars : [
-		'solution',
 		'bytecode',
 		'endInstruction',
-		'objectBuilder',
 		'compilationResult',
 		'methodAddress',
-		'sendTrampolineStop',
 		'jitCompilerClass'
 	],
 	#category : #'Ranger-Exploring'
@@ -75,12 +72,6 @@ RABytecodeAutoTest class >> testParameters [
 		yourself)
 ]
 
-{ #category : #building }
-RABytecodeAutoTest >> allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 [ 
-	
-	^ memory allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 
-]
-
 { #category : #accessing }
 RABytecodeAutoTest >> bytecode [
 
@@ -106,26 +97,6 @@ RABytecodeAutoTest >> compileEndInstructionForSuccess: aRASuccess [
 	"I'm a success and my value has been pushed to the operand stack.
 	Make a return top"
 	cogit genReturnTopFromMethod
-]
-
-{ #category : #running }
-RABytecodeAutoTest >> createSpecialSelectorArray [
-
-	| specialObjectsOop  |
-	specialObjectsOop := self newObjectWithSlots: 24.
-	obj := self newObjectWithSlots: Smalltalk specialSelectors size.
-	memory storePointer: 23 ofObject: specialObjectsOop withValue: obj.
-	memory specialObjectsOop: specialObjectsOop.
-		
-	0 to: Smalltalk specialSelectors size - 1 by: 2 do: [ :aSelectorIndex |
-		sentSelector := Smalltalk specialSelectors at: aSelectorIndex + 1.
-		"Some object to test"
-		memory
-			storePointer: aSelectorIndex
-			ofObject: obj withValue: (selectorAtIndex := memory integerObjectOf: aSelectorIndex + 77).
-		memory
-			storePointer: aSelectorIndex + 1 
-			ofObject: obj withValue: (memory integerObjectOf: (sentSelector) numArgs) ]
 ]
 
 { #category : #running }
@@ -210,50 +181,10 @@ RABytecodeAutoTest >> prepareCall [
 
 ]
 
-{ #category : #running }
-RABytecodeAutoTest >> runCaseManaged [ 
+{ #category : #accessing }
+RABytecodeAutoTest >> receiverTags [
 
-	^ self runCase
-]
-
-{ #category : #running }
-RABytecodeAutoTest >> setUp [
-
-	super setUp.
-	
-	solution isInvalid ifTrue: [ ^ self ].
-	
-	self installFloatClass.
-	self createSpecialSelectorArray.
-	
-	memory classExternalAddress: (self
-			 newClassInOldSpaceWithSlots: 0
-			 instSpec: (memory byteFormatForNumBytes: 0)).
-
-
-	cogit receiverTags: (solution inputConstraints receiver typeTag value ifNil: [ 0 ]).
-	cogit methodOrBlockNumArgs: solution inputConstraints arguments size.
-	
-	self jitCompilerClass = StackToRegisterMappingCogit ifTrue:[ 
-		cogit methodOrBlockNumTemps: solution inputConstraints locals size + solution inputConstraints arguments size.
-		cogit initSimStackForFramefulMethod: 0.
-		cogit regArgsHaveBeenPushed: false ].
-	
-	objectBuilder := RAObjectBuilder new
-		                 interpreter: interpreter;
-		                 nextIndex: nextIndex;
-		                 yourself.
-	
-	"Install a send trampoline"
-	sendTrampolineAddress := self compile: [ sendTrampolineStop := cogit Stop ].
-	0 to: 3 do: [ :numberOfArguments |
-		cogit ordinarySendTrampolineAt: numberOfArguments put: sendTrampolineAddress. ]
-]
-
-{ #category : #running }
-RABytecodeAutoTest >> solution: aSolution [
-
-	solution := aSolution
+	^ solution inputConstraints receiver typeTag value ifNil: [ 0 ]
 ]
 
 { #category : #running }

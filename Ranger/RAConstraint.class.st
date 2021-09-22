@@ -43,7 +43,6 @@ RAConstraint class >> operands: operands [
 { #category : #'as yet unclassified' }
 RAConstraint class >> operation: anOperation operands: operands [
 
-	self haltIf: [ (self constraintClassFor: anOperation) == RABitAndConstraint ].
 	^ (self constraintClassFor: anOperation) new
 		operands: operands;
 		simplify

@@ -64,7 +64,7 @@ RASinglePathExplorer >> explore: aSelector on: vm withFrame: aFrame explorer: an
 	vmFrame := aFrame.
 
 	vm primFailCode: 0.
-	vm argumentCount: aFrame operandStackSize - 1 "Should not count the message receiver".
+	vm argumentCount: aFrame operandStackSize first - 1 "Should not count the message receiver".
 
 	path := RAPath new.
 	path inputFrame: aFrame.
@@ -120,6 +120,8 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #pop:thenPushBool: put: #interpretPopThenPushBoolWith:.
 	specialCases at: #pop:thenPushFloat: put: #interpretPopThenPushFloatWith:.
 	specialCases at: #pop:thenPushInteger: put: #interpretPopThenPushIntWith:.
+	
+	specialCases at: #push: put: #interpretInternalPushWith:.
 	specialCases at: #internalPush: put: #interpretInternalPushWith:.
 	
 	specialCases at: #fetchByte put: #interpretNoopWith:.
@@ -127,6 +129,7 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #internalizeIPandSP put: #interpretNoopWith:.
 	
 	"Object format"
+	specialCases at: #isPointersNonImm: put: #interpretIsPointersNonImmWith:.
 	specialCases at: #formatOf: put: #interpretFormatOfObjectWith:.
 	specialCases at: #fetchClassOfNonImm: put: #interpretFetchClassOfNonImmWith:.
 	specialCases at: #fetchClassOf: put: #interpretFetchClassOfWith:.
@@ -495,7 +498,7 @@ RASinglePathExplorer >> interpretFetchLong32OfObjectWith: aRBMessageNode [
 { #category : #'special cases' }
 RASinglePathExplorer >> interpretFetchPointerOfObjectWith: aRBMessageNode [
 
-	| oop vm concreteValue index numberOfPointersInObject constraint |
+	| oop vm index numberOfPointersInObject constraint |
 	aRBMessageNode receiver acceptVisitor: self.
 	vm := self popOperand.
 
@@ -753,9 +756,10 @@ RASinglePathExplorer >> interpretIsForwardedWith: aRBMessageNode [
 						maybeImmediate second typeTag.
 						RAConstant value: 0 })
 				taken: true.
+			1halt.
 			RAInterpreterExitException new
-			exitCondition: RAInvalidMemoryAccess new;
-			signal ].
+				exitCondition: RAInvalidMemoryAccess new;
+				signal ].
 	self
 		addPathConstraint: (RAEqualsConstraint
 			operands: { 
@@ -788,10 +792,10 @@ RASinglePathExplorer >> interpretIsImmediateWith: aRBMessageNode [
 
 	self pushOperand: {
 		concreteValue.
-		RAGreaterConstraint
-			operands: { 
-				maybeImmediate second typeTag.
-				RAConstant value: 0 }
+		RAOrConstraint operands: {
+			RAIsIntegerObject operands: { maybeImmediate second }.
+			RAIsCharacterObject operands: { maybeImmediate second }
+		}
 	}
 ]
 
@@ -870,6 +874,36 @@ RASinglePathExplorer >> interpretIsNonIntegerObjectWith: aRBMessageNode [
 ]
 
 { #category : #'special cases' }
+RASinglePathExplorer >> interpretIsPointersNonImmWith: aRBMessageNode [ 
+	
+	| oop receiver concreteValue |
+	aRBMessageNode receiver acceptVisitor: self.
+	receiver := self popOperand.
+	
+	aRBMessageNode arguments first acceptVisitor: self.
+	oop := self popOperand.
+	
+	concreteValue := receiver first isPointersNonImm: oop first.	
+	
+	"A value is pointers if:
+	 - format = 0 and #slots = 0
+	 - format = 1 and #slots > 0
+	 - format = 2
+	 - format = 3
+	 - format = 4
+	 - format = 5"
+	self pushOperand: {
+		concreteValue.
+		(oop second format = 0 and: oop second numSlots = 0)
+			or: [ (oop second format = 1 and: oop second numSlots > 0)
+				or: [ oop second format = 2
+					or: [ oop second format = 3
+					or: [ oop second format = 4
+					or: [ oop second format = 5 ] ] ] ] ]
+	}
+]
+
+{ #category : #'special cases' }
 RASinglePathExplorer >> interpretLengthOfFormatWith: aRBMessageNode [ 
 
 	| oop vm concreteValue format |
@@ -921,9 +955,10 @@ RASinglePathExplorer >> interpretLiteralWith: aRBMessageNode [
 							                  index second.
 							                  vmFrame method second numSlots })
 				                 taken: false.
-			                 RAInterpreterExitException new
-			exitCondition: RAInvalidMemoryAccess new;
-			signal ].
+				1halt.
+			RAInterpreterExitException new
+				exitCondition: RAInvalidMemoryAccess new;
+				signal ].
 
 	self pushOperand: { 
 			concreteValue.
@@ -1266,6 +1301,7 @@ RASinglePathExplorer >> interpretStackAt: indexPair [
 			              (RALessConstraint operands: { 
 					               indexPair second.
 					               vmFrame operandStackSize second }) }.
+	
 	(indexPair first between: 0 and: vmFrame operandStackSize first - 1)
 		ifTrue: [ 
 			self addPathConstraint: constraint taken: true.
@@ -1273,8 +1309,8 @@ RASinglePathExplorer >> interpretStackAt: indexPair [
 		ifFalse: [ 
 			self addPathConstraint: constraint negated taken: true.
 			RAInterpreterExitException new
-			exitCondition: RAInvalidMemoryAccess new;
-			signal ]
+				exitCondition: RAInvalidFrameAccess new;
+				signal ]
 ]
 
 { #category : #'special cases' }
@@ -1284,7 +1320,7 @@ RASinglePathExplorer >> interpretStackTopPutWith: aRBMessageNode [
 	
 	aRBMessageNode arguments first acceptVisitor: self.
 	value := self popOperand.
-	
+
 	constraint := RALessConstraint operands: { 
                RAConstant value: 0.
                vmFrame operandStackSize second }.
@@ -1296,8 +1332,8 @@ RASinglePathExplorer >> interpretStackTopPutWith: aRBMessageNode [
 		ifFalse: [ 
 			self addPathConstraint: constraint negated taken: true.
 			RAInterpreterExitException new
-			exitCondition: RAInvalidMemoryAccess new;
-			signal ]
+				exitCondition: RAInvalidFrameAccess new;
+				signal ]
 ]
 
 { #category : #'special cases' }
@@ -1362,7 +1398,7 @@ RASinglePathExplorer >> interpretiArgumentForFramePointerAtOffsetWith: aRBMessag
 				addPathConstraint: constraint negated
 				taken: true.
 			RAInterpreterExitException new
-			exitCondition: RAInvalidMemoryAccess new;
+			exitCondition: RAInvalidFrameAccess new;
 			signal ]
 ]
 
@@ -1412,7 +1448,7 @@ RASinglePathExplorer >> interpretiLocalForFramePointerAtOffsetWith: aRBMessageNo
 				addPathConstraint: constraint negated
 				taken: true.
 			RAInterpreterExitException new
-			exitCondition: RAInvalidMemoryAccess new;
+			exitCondition: RAInvalidFrameAccess new;
 			signal ]
 ]
 

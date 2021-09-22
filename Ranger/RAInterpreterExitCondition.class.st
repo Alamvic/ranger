@@ -10,6 +10,12 @@ RAInterpreterExitCondition >> executeTest: aRAAutoTest [
 	aRAAutoTest executeUntilReturn
 ]
 
+{ #category : #testing }
+RAInterpreterExitCondition >> isInvalid [
+	
+	^ false
+]
+
 { #category : #accessing }
 RAInterpreterExitCondition >> result [
 	

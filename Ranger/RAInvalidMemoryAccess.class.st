@@ -3,9 +3,3 @@ Class {
 	#superclass : #RAInterpreterExitCondition,
 	#category : #'Ranger-Interpreter'
 }
-
-{ #category : #testing }
-RAInvalidMemoryAccess >> isInvalid [
-	
-	^ true
-]

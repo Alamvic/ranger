@@ -4,6 +4,12 @@ Class {
 	#category : #'Ranger-Constraints'
 }
 
+{ #category : #evaluating }
+RAEqualsConstraint >> evaluateWith: interpreter [
+	
+	^ (operands first evaluateWith: interpreter) = (operands second evaluateWith: interpreter)
+]
+
 { #category : #converting }
 RAEqualsConstraint >> invert [
 

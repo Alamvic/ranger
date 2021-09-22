@@ -11,6 +11,12 @@ RAPrimitiveFailure >> executeTest: aRAAutoTest [
 ]
 
 { #category : #testing }
+RAPrimitiveFailure >> isFailure [
+	
+	^ true
+]
+
+{ #category : #testing }
 RAPrimitiveFailure >> isInvalid [
 	
 	^ false

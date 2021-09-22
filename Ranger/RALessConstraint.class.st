@@ -4,6 +4,12 @@ Class {
 	#category : #'Ranger-Constraints'
 }
 
+{ #category : #evaluating }
+RALessConstraint >> evaluateWith: interpreter [
+	
+	^ (operands first evaluateWith: interpreter) < (operands second evaluateWith: interpreter)
+]
+
 { #category : #transformations }
 RALessConstraint >> invert [
 
@@ -23,7 +29,5 @@ RALessConstraint >> mzConstraintOnInterpreter: interpreter [
 { #category : #negating }
 RALessConstraint >> negated [
 
-	^ (RAGreaterOrEqualsConstraint operands: self operands)
-			origin: origin;
-			yourself
+	^ RAGreaterOrEqualsConstraint operands: self operands
 ]

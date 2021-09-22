@@ -14,7 +14,8 @@ Class {
 		'hashBits',
 		'constraintFactory',
 		'isForwarded',
-		'specialObject'
+		'specialObject',
+		'floatValue'
 	],
 	#category : #'Ranger-Exploring'
 }
@@ -90,6 +91,12 @@ RAObject >> fetchPointer: anIndex [
 ]
 
 { #category : #accessing }
+RAObject >> floatValue: aValue [
+
+	floatValue := aValue
+]
+
+{ #category : #accessing }
 RAObject >> format [
 
 	^ classObject format
@@ -160,6 +167,11 @@ RAObject >> initializeWithVariableName: aName [
 		              name: variableName , '_isForwarded';
 		              type: '0..1' "A boolean";
 		              yourself.
+		
+	floatValue := MzVariable new
+		              name: variableName , '_floatValue';
+		              type: 'float';
+		              yourself.
 ]
 
 { #category : #accessing }
@@ -171,6 +183,12 @@ RAObject >> integerValue [
 RAObject >> integerValue: anObject [
 
 	integerValue := anObject
+]
+
+{ #category : #testing }
+RAObject >> isBooleanObjectOf [
+	
+	^ false
 ]
 
 { #category : #testing }

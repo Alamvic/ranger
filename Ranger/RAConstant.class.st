@@ -24,6 +24,18 @@ RAConstant >> = anotherConstant [
 	^ value = anotherConstant value
 ]
 
+{ #category : #evaluating }
+RAConstant >> evaluate [
+	
+	^ value
+]
+
+{ #category : #evaluating }
+RAConstant >> evaluateWith: aVM [
+	
+	^ self value
+]
+
 { #category : #testing }
 RAConstant >> isConstant [
 	

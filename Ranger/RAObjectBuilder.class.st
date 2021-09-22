@@ -100,6 +100,8 @@ RAObjectBuilder >> instantiate: aRAObject [
 	
 	"If it is a constant, assume this is a hardcoded small integer..."
 	aRAObject isConstant ifTrue: [ ^ aRAObject value ].
+	aRAObject isBooleanObjectOf ifTrue: [ 
+		^ aRAObject evaluateWith: interpreter ].
 	
 	"Otherwise, check if we already instantiated this object"
 	instances at: aRAObject variableName ifPresent: [ :instance | ^ instance ].
@@ -136,10 +138,10 @@ RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 	].
 
 	"Format 0 should always have 0 slots"
-	self assert: (aRAObject format value isNil or: [ 
-			 aRAObject format value > 0 or: [ 
-				 aRAObject numSlots value isNil or: [ 
-					 aRAObject numSlots value = 0 ] ] ]).
+	((aRAObject format value ifNil: [ 0 ]) = 0 and: [ (aRAObject numSlots value ifNil: [ 0 ]) > 0 ])
+		ifTrue: [ 
+			"Make it a normal pointer object with instance variables"
+			aRAObject classObject format: 1 ].
 
 	classIndex := self allocateClassObject: aRAObject classObject.
 	newConcreteObject := self

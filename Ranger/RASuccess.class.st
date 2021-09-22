@@ -14,9 +14,21 @@ RASuccess >> executeTest: aRAAutoTest [
 ]
 
 { #category : #testing }
+RASuccess >> isFailure [
+	
+	^ false
+]
+
+{ #category : #testing }
 RASuccess >> isInvalid [
 
 	^ false
+]
+
+{ #category : #testing }
+RASuccess >> isSuccess [
+	
+	^ true
 ]
 
 { #category : #accessing }

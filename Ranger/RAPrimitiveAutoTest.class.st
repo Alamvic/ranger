@@ -1,13 +1,11 @@
 Class {
 	#name : #RAPrimitiveAutoTest,
-	#superclass : #VMSimpleStackBasedCogitAbstractTest,
+	#superclass : #RAAbstractAutoTest,
 	#instVars : [
-		'solution',
 		'endInstruction',
 		'primitiveAddress',
 		'generator',
 		'primitive',
-		'objectBuilder',
 		'compilationResult'
 	],
 	#category : #'Ranger-Exploring'
@@ -55,6 +53,7 @@ RAPrimitiveAutoTest class >> testParameters [
 	interpreter := suite anyOne
 		               setUp;
 		               interpreter.
+	
 	primitives := (interpreter class primitiveTable withIndexCollect: [ 
 		               :e 
 		               :i | i -> e ])
@@ -117,25 +116,25 @@ RAPrimitiveAutoTest class >> testParameters [
 	^ matrix
 ]
 
-{ #category : #building }
-RAPrimitiveAutoTest >> allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 [ 
-	
-	^ memory allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 
-]
-
 { #category : #running }
 RAPrimitiveAutoTest >> execute [
 
-	| stopAddress |
-	stopAddress := solution isFailure
-		ifTrue: [ 
-			compilationResult = UnimplementedPrimitive ifTrue: [ 
-				"Its ok, do not execute anything. This path was a failure and was not compiled"
-				^ self ].
-			endInstruction address ]
-		ifFalse: [ callerAddress ].
-	
-	self runFrom: primitiveAddress until: stopAddress
+	solution exitCondition executeTest: self
+]
+
+{ #category : #executing }
+RAPrimitiveAutoTest >> executePrimitiveFailure: aRAPrimitiveFailure [ 
+
+	self runFrom: primitiveAddress until: endInstruction address
+]
+
+{ #category : #executing }
+RAPrimitiveAutoTest >> executeUntilReturn [
+
+	self runFrom: primitiveAddress until: callerAddress.
+	self
+		assert: machineSimulator receiverRegisterValue
+		equals: (objectBuilder instantiate: solution result)
 ]
 
 { #category : #accessing }
@@ -143,12 +142,32 @@ RAPrimitiveAutoTest >> generator: aString [
 	generator := aString
 ]
 
-{ #category : #running }
+{ #category : #accessing }
 RAPrimitiveAutoTest >> prepareAutoCall [
 
+	| receiver primitiveReceiver primitiveArguments |
+	receiver := objectBuilder instantiate: solution inputConstraints receiver.
 	self
-		prepareStackForSendReceiver: (objectBuilder instantiate: solution receiver) first
-		arguments: (solution arguments collect: [:e | (objectBuilder instantiate: e) first ]).
+		prepareStackForSendReceiver: receiver
+		arguments: (solution inputConstraints arguments collect: [:e | (objectBuilder instantiate: e) ]).
+	
+	"previous frame"
+	self pushAddress: self machineSimulator framePointerRegisterValue.
+	self machineSimulator framePointerRegisterValue: self machineSimulator smalltalkStackPointerRegisterValue.
+	
+	self pushAddress: (objectBuilder instantiate: solution inputConstraints method).
+	self pushAddress: 0. "context"
+	self pushAddress: receiver.
+
+	solution inputConstraints locals do: [ :aLocalValue | 
+		self pushAddress: (objectBuilder instantiate: aLocalValue) ].
+
+	primitiveReceiver := objectBuilder instantiate: self primitiveReceiver.
+	primitiveArguments := solution inputConstraints operandStack allButLast
+		collect: [ :e | objectBuilder instantiate: e].
+	self
+		prepareStackForSendReceiver: primitiveReceiver
+		arguments: primitiveArguments
 ]
 
 { #category : #accessing }
@@ -157,27 +176,16 @@ RAPrimitiveAutoTest >> primitive: aString [
 	primitive := aString
 ]
 
-{ #category : #running }
-RAPrimitiveAutoTest >> runCaseManaged [ 
+{ #category : #accessing }
+RAPrimitiveAutoTest >> primitiveReceiver [
 
-	^ self runCase
+	^ solution inputConstraints operandStack last
 ]
 
-{ #category : #running }
-RAPrimitiveAutoTest >> setUp [
+{ #category : #executing }
+RAPrimitiveAutoTest >> receiverTags [
 
-	super setUp.
-	self installFloatClass.
-	memory classExternalAddress: (self
-			 newClassInOldSpaceWithSlots: 0
-			 instSpec: (memory byteFormatForNumBytes: 0)).
-
-
-	cogit receiverTags: (solution receiverTags value ifNil: [ 0 ]).
-	objectBuilder := RAObjectBuilder new
-		                 interpreter: interpreter;
-		                 nextIndex: nextIndex;
-		                 yourself
+	^ self primitiveReceiver typeTag value ifNil: [ 0 ]
 ]
 
 { #category : #running }
@@ -189,12 +197,15 @@ RAPrimitiveAutoTest >> solution: aSolution [
 { #category : #running }
 RAPrimitiveAutoTest >> testPrimitive [
 
+	solution isInvalid ifTrue: [ ^ self ].
+
 	primitiveAddress := self compile: [ 
-		compilationResult := cogit objectRepresentation perform: generator "#genPrimitiveBitShift".
+		compilationResult := cogit objectRepresentation perform: generator.
 		"If the primitive fails it continues, so we need to have an instruction to detect the end"
 		endInstruction := cogit Stop ]
 		bytecodes: 15.
 
 	self prepareAutoCall.
+
 	self execute.
 ]
