@@ -1,7 +1,7 @@
 Extension { #name : #MzVariable }
 
 { #category : #'*Ranger' }
-MzVariable >> evaluateWith: aCogVMSimulatorLSB [ 
+MzVariable >> evaluateWith: anObjectBuilder [ 
 	
 	^ self value
 ]

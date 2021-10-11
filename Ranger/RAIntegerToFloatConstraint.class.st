@@ -17,9 +17,9 @@ RAIntegerToFloatConstraint >> evaluate [
 ]
 
 { #category : #evaluating }
-RAIntegerToFloatConstraint >> evaluateWith: interpreter [ 
+RAIntegerToFloatConstraint >> evaluateWith: anObjectBuilder [ 
 
-	^ (operands first evaluateWith: interpreter) asFloat
+	^ (operands first evaluateWith: anObjectBuilder) asFloat
 ]
 
 { #category : #microzinc }

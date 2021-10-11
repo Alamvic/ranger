@@ -10,3 +10,9 @@ RAValueConstraint >> initialize [
 	super initialize.
 
 ]
+
+{ #category : #testing }
+RAValueConstraint >> isIntegerObjectOf [
+	
+	^ false
+]

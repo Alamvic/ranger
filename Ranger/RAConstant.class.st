@@ -31,7 +31,7 @@ RAConstant >> evaluate [
 ]
 
 { #category : #evaluating }
-RAConstant >> evaluateWith: aVM [
+RAConstant >> evaluateWith: anObjectBuilder [
 	
 	^ self value
 ]

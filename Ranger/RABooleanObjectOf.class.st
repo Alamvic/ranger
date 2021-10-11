@@ -5,9 +5,9 @@ Class {
 }
 
 { #category : #evaluating }
-RABooleanObjectOf >> evaluateWith: interpreter [ 
+RABooleanObjectOf >> evaluateWith: anObjectBuilder [ 
 	
-	^ interpreter objectMemory booleanObjectOf: (operands first evaluateWith: interpreter)
+	^ anObjectBuilder objectMemory booleanObjectOf: (operands first evaluateWith: anObjectBuilder)
 ]
 
 { #category : #testing }

@@ -166,6 +166,35 @@ RATest >> testExplorePrimitiveComputedBooleanWithInlinedPopPushBool [
 ]
 
 { #category : #tests }
+RATest >> testExplorePrimitiveObjectFixedLength [
+
+	| solutions |
+	solutions := self explorePrimitive: #primitiveObjectFixedLength.
+
+1halt.
+	"The first two solutions are invalid frame accesses because the primitive reads two stack elements"
+	self assert: solutions first exitCondition isInvalid.
+	self assert: solutions second exitCondition isInvalid.
+	
+	"Then the next three solutions should be the pairs of two objects where at least one is not a small integer.
+	(smi, not smi), (not smi, smi), (not smi, not smi)"
+	3 to: 5 do: [ :i | | solution |
+		solution := solutions at: i.
+		self assert: solution inputConstraints operandStack size equals: 2.
+		self assert: (solution inputConstraints operandStack anySatisfy: [ :object |
+			object isAbstractSmallInteger not ]).
+		self assert: solution exitCondition isPrimitiveFailure.
+	].
+	
+	"Finally, the only success here is when the two stack elements are smi"
+	self assert: solutions last exitCondition isSuccess.
+	self assert: solutions last inputConstraints operandStack size equals: 2.
+	self assert: (solutions last inputConstraints operandStack allSatisfy: [ :object |
+			object isAbstractSmallInteger ]).
+	self assert: solutions last outputConstraints operandStackTop isAbstractTrueObject
+]
+
+{ #category : #tests }
 RATest >> testExplorePrimitiveReturningReceiver [
 
 	| solutions validSolution |

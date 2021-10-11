@@ -65,6 +65,12 @@ RAObject >> constraintFactory: aRAConstraintFactory [
 	constraintFactory := aRAConstraintFactory
 ]
 
+{ #category : #evaluating }
+RAObject >> evaluateWith: anObjectBuilder [ 
+	
+	^ anObjectBuilder instantiate: self
+]
+
 { #category : #slots }
 RAObject >> fetchLong32: aConcreteAbstractPair [
 	
@@ -241,6 +247,12 @@ RAObject >> isForwarded [
 RAObject >> isForwarded: aValue [
 
 	isForwarded := aValue
+]
+
+{ #category : #testing }
+RAObject >> isIntegerObjectOf [
+	
+	^ false
 ]
 
 { #category : #testing }

@@ -235,14 +235,8 @@ RASinglePathExplorer >> interpretAreIntegersAreWith: aRBMessageNode [
 	self pushOperand: {
 		concreteValue.
 		RAAndConstraint operands: {
-			RAEqualsConstraint operands: { 
-				smallInteger second typeTag.
-				RAConstant value: 1
-			}.
-			RAEqualsConstraint operands: { 
-				smallInteger2 second typeTag.
-				RAConstant value: 1
-			}
+			RAIsIntegerObject operands: { smallInteger second }.
+			RAIsIntegerObject operands: { smallInteger2 second }
 		}
 	}
 ]
@@ -1150,7 +1144,7 @@ RASinglePathExplorer >> interpretPopThenPushIntWith: aRBMessageNode [
 
 	float := self popOperand.
 	concreteIntegerObject := vm first objectMemory integerObjectOf: float first.
-	self push: { concreteIntegerObject . RAIntegerObjectOf operands: float second }.
+	self push: { concreteIntegerObject . RAIntegerObjectOf operands: {float second} }.
 
 	"pop:thenPush: does not return an interesting value"
 	self pushOperand: self receiver.
@@ -1208,7 +1202,7 @@ RASinglePathExplorer >> interpretPrimitive: method receiver: receiver arguments:
 
 	"Do constant folding if possible"
 	constraintOperands := { receiver second }, constraintArguments.
-	constraint :=(constraintOperands allSatisfy: [ :e | e isConstant ])
+	constraint := (constraintOperands allSatisfy: [ :e | e isConstant ])
 		ifTrue: [ RAConstant value: concreteResult ]
 		ifFalse: [ 
 			RAConstraint

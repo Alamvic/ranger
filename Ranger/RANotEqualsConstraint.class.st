@@ -4,6 +4,12 @@ Class {
 	#category : #'Ranger-Constraints'
 }
 
+{ #category : #evaluating }
+RANotEqualsConstraint >> evaluateWith: anObjectBuilder [
+	
+	^ (operands first evaluateWith: anObjectBuilder) ~= (operands second evaluateWith: anObjectBuilder)
+]
+
 { #category : #transformations }
 RANotEqualsConstraint >> invert [
 

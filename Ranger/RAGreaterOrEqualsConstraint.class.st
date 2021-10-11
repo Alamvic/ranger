@@ -5,9 +5,9 @@ Class {
 }
 
 { #category : #evaluating }
-RAGreaterOrEqualsConstraint >> evaluateWith: interpreter [
+RAGreaterOrEqualsConstraint >> evaluateWith: anObjectBuilder [
 	
-	^ (operands first evaluateWith: interpreter) >= (operands second evaluateWith: interpreter)
+	^ (operands first evaluateWith: anObjectBuilder) >= (operands second evaluateWith: anObjectBuilder)
 ]
 
 { #category : #transformations }

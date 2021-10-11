@@ -153,13 +153,25 @@ RAVMFrameConstraint >> newFrameConstraintForSolution: aMzSolver constraintFactor
 		do: [ :index | | constrainedObject oldConstrainedObject |
 			constrainedObject := constraintFactory newAbstractObject.
 			oldConstrainedObject := operandStack at: index ifAbsent: [ nil ].
-			oldConstrainedObject ifNotNil: [ | typeTag integerValue |
+			oldConstrainedObject ifNotNil: [ | typeTag integerValue numSlots oldClassObject classObject format definedFixedFields |
 				"If there is an object in the previous frame at that position"
 				typeTag := aMzSolver at: oldConstrainedObject typeTag name ifAbsent: [ 0 ].
 				constrainedObject typeTag value: typeTag.
 				
 				integerValue := aMzSolver at: oldConstrainedObject integerValue name ifAbsent: [ 0 ].
 				constrainedObject integerValue value: integerValue.
+				
+				numSlots := aMzSolver at: oldConstrainedObject numSlots name ifAbsent: [ 0 ].
+				constrainedObject numSlots value: numSlots.
+				
+				oldClassObject := oldConstrainedObject classObject.
+				classObject := constrainedObject classObject.
+				
+				format := aMzSolver at: oldClassObject format name ifAbsent: [ 0 ].
+				classObject format value: format.
+				
+				definedFixedFields := aMzSolver at: oldClassObject definedFixedFields name ifAbsent: [ 0 ].
+				classObject definedFixedFields value: definedFixedFields.
 			].
 			newConstraints basicPush: constrainedObject
 	].

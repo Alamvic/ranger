@@ -23,7 +23,7 @@ RAObjectBuilder >> allocateClassObject: aClassObject [
 	classIndex = 34 ifTrue: [ ^ 34 ].
 	
 	aConcreteClass := self
-		newClassInOldSpaceWithSlots: 0
+		newClassInOldSpaceWithSlots: (aClassObject definedFixedFields value ifNil: [ 0 ])
 		instSpec: (aClassObject format value ifNil: [0]).
 	instances at: aClassObject variableName put: aConcreteClass.
 	
@@ -99,9 +99,12 @@ RAObjectBuilder >> instantiate: aRAObject [
 	| typeTag |
 	
 	"If it is a constant, assume this is a hardcoded small integer..."
-	aRAObject isConstant ifTrue: [ ^ aRAObject value ].
+	aRAObject isConstant ifTrue: [ 
+		^ aRAObject evaluateWith: self ].
 	aRAObject isBooleanObjectOf ifTrue: [ 
-		^ aRAObject evaluateWith: interpreter ].
+		^ aRAObject evaluateWith: self ].
+	aRAObject isIntegerObjectOf ifTrue: [ 
+		^ aRAObject evaluateWith: self ].
 	
 	"Otherwise, check if we already instantiated this object"
 	instances at: aRAObject variableName ifPresent: [ :instance | ^ instance ].
@@ -141,8 +144,9 @@ RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 	((aRAObject format value ifNil: [ 0 ]) = 0 and: [ (aRAObject numSlots value ifNil: [ 0 ]) > 0 ])
 		ifTrue: [ 
 			"Make it a normal pointer object with instance variables"
-			aRAObject classObject format: 1 ].
+			aRAObject classObject format value: 1 ].
 
+	1 haltIf: [ (aRAObject classObject definedFixedFields value ifNil:[0]) > 0 ].
 	classIndex := self allocateClassObject: aRAObject classObject.
 	newConcreteObject := self
 		allocateNewSpaceSlots: (self numberOfSlotsOf: aRAObject)
@@ -232,10 +236,18 @@ RAObjectBuilder >> nextOrdinaryClassIndex [
 { #category : #'value-setup' }
 RAObjectBuilder >> numberOfSlotsOf: aRAObject [
 
-	| basicNumberOfSlots |
+	| basicNumberOfSlots fixedNumberOfSlots |
+	fixedNumberOfSlots := aRAObject classObject definedFixedFields value ifNil: [ 0 ].
 	basicNumberOfSlots := aRAObject numSlots value ifNil: [ 0 ].
-	basicNumberOfSlots := basicNumberOfSlots max: aRAObject slots size.
+	1 haltIf: [ fixedNumberOfSlots > 0  and: [ basicNumberOfSlots > 0 ] ].
+	basicNumberOfSlots := basicNumberOfSlots max: fixedNumberOfSlots.
 	^ (self isCompiledMethod: aRAObject)
 		ifTrue: [ basicNumberOfSlots + 1 "Add an extra slot for the heder" ]
 		ifFalse: [ basicNumberOfSlots ]
+]
+
+{ #category : #accessing }
+RAObjectBuilder >> objectMemory [
+	
+	^ interpreter objectMemory
 ]

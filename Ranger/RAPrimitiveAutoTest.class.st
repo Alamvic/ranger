@@ -30,9 +30,8 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 		               interpreter.
 	^ RAPathExplorer new
 		  failOnError: true;
-		  explore: (RABytecodeConcolicCase new
-		vm: interpreter;
-				   bytecode: aPrimitive;
+		  explore: (RAPrimitiveConcolicCase new
+				   selector: aPrimitive;
 				   yourself)
 		  vmBuildingBlock: [ 
 		  (suite detect: [ :e | 
@@ -68,6 +67,12 @@ RAPrimitiveAutoTest class >> testParameters [
 				              e value.
 				              (interpreter cogit class primitiveTable at:
 					               e key - 1) primitiveGenerator } ].
+
+
+
+	1halt.
+	"primitives := #( (#primitiveAt #genPrimitiveAt))."
+
 
 	"Build the entire set of tests:
 	 - for each architecture

@@ -59,6 +59,25 @@ RATestingInterpreter >> primitiveComputedBoolean2 [
 ]
 
 { #category : #'as yet unclassified' }
+RATestingInterpreter >> primitiveObjectFixedLength [
+
+
+	| array fmt totalLength fixedFields r |
+	array := self stackValue: 0.
+	(objectMemory isImmediate: array)
+		ifTrue: [ ^ self primitiveFail ].
+
+	fmt := objectMemory formatOf: array.
+	totalLength := objectMemory lengthOf: array format: fmt.
+	fixedFields := objectMemory fixedFieldsOf: array format: fmt length: totalLength.
+	fixedFields > 1
+		ifTrue: [ r := 0 ]
+		ifFalse: [ r := 1 ].
+	
+	self pop: 1 thenPush: r
+]
+
+{ #category : #'as yet unclassified' }
 RATestingInterpreter >> primitiveReturningInteger [
 
 	"Accessing the operand stack in the frame will force to have a frame with a filled stack"

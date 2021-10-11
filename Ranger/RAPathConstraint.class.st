@@ -5,7 +5,7 @@ Class {
 }
 
 { #category : #evaluating }
-RAPathConstraint >> evaluateWith: interpreter [
+RAPathConstraint >> evaluateWith: anObjectBuilder [
 	
 	self subclassResponsibility
 ]

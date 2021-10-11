@@ -42,7 +42,7 @@ RAClassObject >> format [
 
 { #category : #accessing }
 RAClassObject >> format: anObject [
-
+1halt.
 	format := anObject
 ]
 
@@ -79,6 +79,24 @@ RAClassObject >> initializeWithVariableName: aName [
 		              name: name , '_format';
 		              type: '0..31';
 		              yourself.
+]
+
+{ #category : #testing }
+RAClassObject >> isBooleanObjectOf [
+	
+	^ false
+]
+
+{ #category : #testing }
+RAClassObject >> isConstant [
+	
+	^ false
+]
+
+{ #category : #tsting }
+RAClassObject >> isIntegerObjectOf [
+
+	^ false
 ]
 
 { #category : #accessing }
