@@ -19,11 +19,11 @@ RAAbstractAutoTest >> allocateNewSpaceSlots: anInteger format: anInteger2 classI
 RAAbstractAutoTest >> createSpecialSelectorArray [
 
 	| specialObjectsOop  |
-	specialObjectsOop := self newObjectWithSlots: 24.
+	specialObjectsOop := self newObjectWithSlots: 100.
 	obj := self newObjectWithSlots: Smalltalk specialSelectors size.
 	memory storePointer: 23 ofObject: specialObjectsOop withValue: obj.
 	memory specialObjectsOop: specialObjectsOop.
-		
+	
 	0 to: Smalltalk specialSelectors size - 1 by: 2 do: [ :aSelectorIndex |
 		sentSelector := Smalltalk specialSelectors at: aSelectorIndex + 1.
 		"Some object to test"
@@ -33,6 +33,12 @@ RAAbstractAutoTest >> createSpecialSelectorArray [
 		memory
 			storePointer: aSelectorIndex + 1 
 			ofObject: obj withValue: (memory integerObjectOf: (sentSelector) numArgs) ]
+]
+
+{ #category : #testing }
+RAAbstractAutoTest >> isInvalidMemoryAccessInvalid [
+	
+	^ self subclassResponsibility
 ]
 
 { #category : #running }
@@ -52,7 +58,7 @@ RAAbstractAutoTest >> setUp [
 
 	super setUp.
 	
-	solution isInvalid ifTrue: [ ^ self ].
+	(solution isInvalidIn: self) ifTrue: [ ^ self ].
 	
 	cogit maybeGenerateCheckFeatures.
 	self installFloatClass.

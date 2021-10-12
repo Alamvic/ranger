@@ -28,10 +28,9 @@ RAObjectBuilder >> allocateClassObject: aClassObject [
 	instances at: aClassObject variableName put: aConcreteClass.
 	
 	self memory setHashBitsOf: aConcreteClass to: classIndex.
-	self memory
-		storePointer: classIndex
-		ofObject: self memory classTableFirstPage
-		withValue: aConcreteClass.
+	
+	"Check this does not fail... 0 indicates success"
+	self assert: (self memory enterIntoClassTable: aConcreteClass) = 0.
 	^ classIndex
 ]
 
@@ -96,33 +95,7 @@ RAObjectBuilder >> initializeConcreteObject: anOop withConstraints: aRAObject [
 { #category : #'value-setup' }
 RAObjectBuilder >> instantiate: aRAObject [
 
-	| typeTag |
-	
-	"If it is a constant, assume this is a hardcoded small integer..."
-	aRAObject isConstant ifTrue: [ 
-		^ aRAObject evaluateWith: self ].
-	aRAObject isBooleanObjectOf ifTrue: [ 
-		^ aRAObject evaluateWith: self ].
-	aRAObject isIntegerObjectOf ifTrue: [ 
-		^ aRAObject evaluateWith: self ].
-	
-	"Otherwise, check if we already instantiated this object"
-	instances at: aRAObject variableName ifPresent: [ :instance | ^ instance ].
-	
-	"If not, instantiate it and cache it"
-	typeTag := aRAObject typeTag value ifNil: [ 0 ].
-	typeTag = 0 ifTrue: [ ^ self instantiateNonImmediateObject: aRAObject ].
-	typeTag = 1 ifTrue: [ 
-		| concreteInteger |
-		concreteInteger := interpreter objectMemory integerObjectOf:
-			                   ((aRAObject integerValue mzConstraintOnInterpreter: interpreter) evaluate ifNil: [ 0 ]).
-		^ concreteInteger ].
-	typeTag = 2 ifTrue: [ 
-		| concreteCharacter |
-		concreteCharacter := interpreter objectMemory characterObjectOf:
-			                     (aRAObject integerValue value ifNil: [ 0 ]).
-		^ concreteCharacter ].
-	self halt
+	^ aRAObject evaluateWith: self
 ]
 
 { #category : #'value-setup' }
@@ -160,6 +133,33 @@ RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 		withConstraints: aRAObject.
 
 	^ newConcreteObject
+]
+
+{ #category : #'value-setup' }
+RAObjectBuilder >> instantiateObject: aRAObject [
+
+	| typeTag |
+	instances
+		at: aRAObject variableName
+		ifPresent: [ :instance | ^ instance ]. "Otherwise, check if we already instantiated this object"
+
+	"If not, instantiate it and cache it"
+	typeTag := aRAObject typeTag value ifNil: [ 0 ].
+	typeTag = 0 ifTrue: [ 
+		^ self instantiateNonImmediateObject: aRAObject ].
+	typeTag = 1 ifTrue: [ 
+		| concreteInteger |
+		concreteInteger := interpreter objectMemory integerObjectOf:
+			                   ((aRAObject integerValue 
+				                     mzConstraintOnInterpreter: interpreter)
+				                    evaluate ifNil: [ 0 ]).
+		^ concreteInteger ].
+	typeTag = 2 ifTrue: [ 
+		| concreteCharacter |
+		concreteCharacter := interpreter objectMemory characterObjectOf:
+			                     (aRAObject integerValue value ifNil: [ 0 ]).
+		^ concreteCharacter ].
+	self halt
 ]
 
 { #category : #accessing }
@@ -244,6 +244,12 @@ RAObjectBuilder >> numberOfSlotsOf: aRAObject [
 	^ (self isCompiledMethod: aRAObject)
 		ifTrue: [ basicNumberOfSlots + 1 "Add an extra slot for the heder" ]
 		ifFalse: [ basicNumberOfSlots ]
+]
+
+{ #category : #accessing }
+RAObjectBuilder >> objectById: aString [ 
+	
+	^ instances at: aString
 ]
 
 { #category : #accessing }

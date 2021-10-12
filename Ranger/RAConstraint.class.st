@@ -20,6 +20,7 @@ RAConstraint class >> constraintClassFor: anOperation [
 		
 		"Arithmetics"
 		#bitAnd: -> RABitAndConstraint.
+		#bitOr: -> RABitOrConstraint.
 		#bitShift: -> RABitShiftConstraint.
 		#+ -> RAAddConstraint.
 		#- -> RASubstractionConstraint.

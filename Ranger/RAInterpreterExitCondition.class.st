@@ -16,6 +16,12 @@ RAInterpreterExitCondition >> isInvalid [
 	^ false
 ]
 
+{ #category : #testing }
+RAInterpreterExitCondition >> isInvalidIn: aTest [ 
+	
+	self subclassResponsibility
+]
+
 { #category : #accessing }
 RAInterpreterExitCondition >> result [
 	

@@ -26,6 +26,13 @@ RASuccess >> isInvalid [
 ]
 
 { #category : #testing }
+RASuccess >> isInvalidIn: aTest [
+
+	"A success is never invalid"
+	^ false
+]
+
+{ #category : #testing }
 RASuccess >> isSuccess [
 	
 	^ true

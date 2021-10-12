@@ -5,7 +5,6 @@ Class {
 		'format',
 		'name',
 		'classIndex',
-		'variableName',
 		'definedFixedFields'
 	],
 	#category : #'Ranger-Exploring'
@@ -32,6 +31,12 @@ RAClassObject >> definedFixedFields [
 RAClassObject >> definedFixedFields: anObject [
 
 	definedFixedFields := anObject
+]
+
+{ #category : #evaluating }
+RAClassObject >> evaluateWith: anObjectBuilder [ 
+	
+	^ anObjectBuilder objectById: name
 ]
 
 { #category : #accessing }
@@ -100,25 +105,13 @@ RAClassObject >> isIntegerObjectOf [
 ]
 
 { #category : #accessing }
-RAClassObject >> name [
+RAClassObject >> variableName [
 
 	^ name
 ]
 
 { #category : #accessing }
-RAClassObject >> name: anObject [
-
-	name := anObject
-]
-
-{ #category : #accessing }
-RAClassObject >> variableName [
-
-	^ variableName
-]
-
-{ #category : #accessing }
 RAClassObject >> variableName: anObject [
 
-	variableName := anObject
+	name := anObject
 ]

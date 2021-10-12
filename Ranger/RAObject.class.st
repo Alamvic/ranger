@@ -68,7 +68,7 @@ RAObject >> constraintFactory: aRAConstraintFactory [
 { #category : #evaluating }
 RAObject >> evaluateWith: anObjectBuilder [ 
 	
-	^ anObjectBuilder instantiate: self
+	^ anObjectBuilder instantiateObject: self
 ]
 
 { #category : #slots }

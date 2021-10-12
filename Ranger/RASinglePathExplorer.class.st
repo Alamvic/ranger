@@ -949,7 +949,6 @@ RASinglePathExplorer >> interpretLiteralWith: aRBMessageNode [
 							                  index second.
 							                  vmFrame method second numSlots })
 				                 taken: false.
-				1halt.
 			RAInterpreterExitException new
 				exitCondition: RAInvalidMemoryAccess new;
 				signal ].
@@ -1265,7 +1264,7 @@ RASinglePathExplorer >> interpretSpecialObjectWith: aRBMessageNode [
 	self assert: operand second isConstant.
 	index := operand first.
 
-	abstractSpecialObject := (RAObject named: UUID new asString)
+	abstractSpecialObject := explorer constraintFactory newAbstractObject
 		typeTag: 0;
 		specialObjectIndex: operand second;
 		yourself.

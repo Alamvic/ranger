@@ -20,6 +20,13 @@ RASendExit >> isInvalid [
 	^ false
 ]
 
+{ #category : #testing }
+RASendExit >> isInvalidIn: aTest [
+
+	"Send exits are never invalid"
+	^ false
+]
+
 { #category : #accessing }
 RASendExit >> messageReceiver [
 

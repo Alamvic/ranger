@@ -48,9 +48,9 @@ RAConstraintSolution >> isFailure [
 ]
 
 { #category : #testing }
-RAConstraintSolution >> isInvalid [
+RAConstraintSolution >> isInvalidIn: aTest [
 	
-	^ path exitCondition isInvalid
+	^ path exitCondition isInvalidIn: aTest
 ]
 
 { #category : #accessing }

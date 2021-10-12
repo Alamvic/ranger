@@ -28,7 +28,7 @@ RABytecodeAutoTest class >> testParameters [
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	(96 to: 97)
+	(1 to: 175)
 		do: [ :bytecode | 
 			| architectures solutions |
 			architectures := { 
@@ -136,6 +136,13 @@ RABytecodeAutoTest >> executeUntilSendTrampoline [
 		equals: (objectBuilder instantiate: solution exitCondition messageSelector)
 ]
 
+{ #category : #testing }
+RABytecodeAutoTest >> isInvalidMemoryAccessInvalid [
+	
+	"Bytecode assume all objects are correct... Otherwise it's a bytecode sequence problem"
+	^ true
+]
+
 { #category : #accessing }
 RABytecodeAutoTest >> jitCompilerClass [
 
@@ -190,7 +197,7 @@ RABytecodeAutoTest >> receiverTags [
 { #category : #running }
 RABytecodeAutoTest >> testBytecode [
 
-	solution isInvalid ifTrue: [ ^ self ].
+	(solution isInvalidIn: self) ifTrue: [ ^ self ].
 
 	methodAddress := self compile: [ | descriptor result |
 		cogit needsFrame: true.
@@ -198,7 +205,6 @@ RABytecodeAutoTest >> testBytecode [
 		cogit byte0: bytecode.
 		cogit bytecodePC: 0.
 		cogit endPC: 0.
-		
 		solution inputConstraints operandStack reversed do: [ :aStackValue | 
 			cogit genPushLiteral: (objectBuilder instantiate: aStackValue) ].
 
