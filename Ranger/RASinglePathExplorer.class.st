@@ -200,7 +200,8 @@ RASinglePathExplorer >> initializeSpecialCases [
 	
 	"Stop cases"
 	specialCases at: #commonSendOrdinary put: #interpretCommonSendOrdinaryWith:.
-	specialCases at: #commonReturn put: #interpretCommonReturnWith:
+	specialCases at: #commonReturn put: #interpretCommonReturnWith:.
+	specialCases at: #commonCallerReturn put: #interpretCommonReturnWith:
 ]
 
 { #category : #'special cases' }

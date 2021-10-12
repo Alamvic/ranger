@@ -13,6 +13,13 @@ RAMethodReturnExit >> executeTest: aRAAutoTest [
 	aRAAutoTest executeUntilReturn
 ]
 
+{ #category : #testing }
+RAMethodReturnExit >> isInvalidIn: aTest [
+
+	"A method return is never invalid"
+	^ false
+]
+
 { #category : #accessing }
 RAMethodReturnExit >> result [
 	
