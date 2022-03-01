@@ -68,10 +68,8 @@ RAPrimitiveAutoTest class >> testParameters [
 				              (interpreter cogit class primitiveTable at:
 					               e key - 1) primitiveGenerator } ].
 
-
-
-	"primitives := #( (#primitiveAt #genPrimitiveAt))."
-
+	"force the progress bar"
+	(1 to: 1) do: [ :e | ] displayingProgress: [ :e | "nothing" ].
 
 	"Build the entire set of tests:
 	 - for each architecture

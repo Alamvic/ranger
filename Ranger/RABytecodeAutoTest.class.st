@@ -23,6 +23,9 @@ RABytecodeAutoTest class >> testParameters [
 		               setUp;
 		               interpreter.
 
+	"force the progress bar"
+	(1 to: 1) do: [ :e | ] displayingProgress: [ :e | "nothing" ].
+	
 	"Build the entire set of tests:
 	 - for each architecture
 	  - for each primitive to test
