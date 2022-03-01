@@ -67,7 +67,7 @@ RABytecodeAutoTest class >> testParameters [
 							(#bytecode -> bytecode).
 							(#solution -> e) } ] ] ]
 		displayingProgress: [ :bytecode | bytecode asString ].
-1halt.
+
 	^ matrix * (ParametrizedTestMatrix new
 		forSelector: #jitCompilerClass addOptions: {SimpleStackBasedCogit};
 		yourself)

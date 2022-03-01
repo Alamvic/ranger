@@ -116,7 +116,7 @@ RAPrimitiveAutoTest class >> testParameters [
 							(#generator -> p second).
 							(#solution -> e) } ] ] ]
 		displayingProgress: [ :p | (p first -> p second) asString ].
-1halt.
+
 	^ matrix
 ]
 
