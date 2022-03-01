@@ -35,8 +35,8 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 		newFrameConstraintForSolution: MzSolver new
 		constraintFactory: constraintFactory.
 
-	[ 
-	| objectBuilder |
+	[ | timeToExplore |
+	timeToExplore := [| objectBuilder |
 	vm := aBuildingBlock value.
 	objectBuilder := RAObjectBuilder new
 		                 interpreter: vm;
@@ -64,7 +64,8 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 
 	previousInputFrameConstraints := previousInputFrameConstraints
 		newFrameConstraintForSolution: solution solver
-		constraintFactory: constraintFactory.
+		constraintFactory: constraintFactory.] timeToRun.
+	solutions last timeToExplore: timeToExplore.
 	solution isEmpty ] whileFalse.
 	^ solutions
 ]

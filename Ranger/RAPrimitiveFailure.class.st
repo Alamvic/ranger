@@ -23,6 +23,13 @@ RAPrimitiveFailure >> isInvalid [
 ]
 
 { #category : #testing }
+RAPrimitiveFailure >> isInvalidIn: aRAPrimitiveAutoTest [ 
+	
+	"Not invalid!"
+	^ false
+]
+
+{ #category : #testing }
 RAPrimitiveFailure >> isPrimitiveFailure [
 	
 	^ true

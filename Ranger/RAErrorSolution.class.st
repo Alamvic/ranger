@@ -9,6 +9,12 @@ Class {
 	#category : #'Ranger-Exploring'
 }
 
+{ #category : #validating }
+RAErrorSolution >> checkSupported [
+	
+	RAUnsupportedTestFailure signal: error messageText
+]
+
 { #category : #accessing }
 RAErrorSolution >> error [
 
@@ -31,6 +37,12 @@ RAErrorSolution >> inputConstraints [
 RAErrorSolution >> inputConstraints: anObject [
 
 	inputConstraints := anObject
+]
+
+{ #category : #accessing }
+RAErrorSolution >> isErrorSolution [
+
+	^ true
 ]
 
 { #category : #accessing }

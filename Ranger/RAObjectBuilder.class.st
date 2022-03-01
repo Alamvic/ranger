@@ -25,6 +25,7 @@ RAObjectBuilder >> allocateClassObject: aClassObject [
 	aConcreteClass := self
 		newClassInOldSpaceWithSlots: (aClassObject definedFixedFields value ifNil: [ 0 ])
 		instSpec: (aClassObject format value ifNil: [0]).
+
 	instances at: aClassObject variableName put: aConcreteClass.
 	
 	self memory setHashBitsOf: aConcreteClass to: classIndex.

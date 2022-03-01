@@ -59,6 +59,7 @@ RABytecodeAutoTest class >> testParameters [
 						             theSetUpTest
 							             setUp;
 							             interpreter ].
+				
 				solutions do: [ :e | 
 					matrix addCase: { 
 							arch first.
@@ -66,9 +67,9 @@ RABytecodeAutoTest class >> testParameters [
 							(#bytecode -> bytecode).
 							(#solution -> e) } ] ] ]
 		displayingProgress: [ :bytecode | bytecode asString ].
-
+1halt.
 	^ matrix * (ParametrizedTestMatrix new
-		forSelector: #jitCompilerClass addOptions: {SimpleStackBasedCogit . StackToRegisterMappingCogit};
+		forSelector: #jitCompilerClass addOptions: {SimpleStackBasedCogit};
 		yourself)
 ]
 

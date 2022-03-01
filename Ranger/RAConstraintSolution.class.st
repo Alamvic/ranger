@@ -5,10 +5,17 @@ Class {
 		'solver',
 		'path',
 		'inputConstraints',
-		'outputConstraints'
+		'outputConstraints',
+		'timeToExplore'
 	],
 	#category : #'Ranger-Exploring'
 }
+
+{ #category : #validating }
+RAConstraintSolution >> checkSupported [
+	
+	"Do nothing. Error subclasses should redefine"
+]
 
 { #category : #accessing }
 RAConstraintSolution >> exitCondition [
@@ -39,6 +46,12 @@ RAConstraintSolution >> inspectionItems: aBuilder [
 RAConstraintSolution >> isEmpty [
 	
 	^ path isEmpty
+]
+
+{ #category : #testing }
+RAConstraintSolution >> isErrorSolution [
+
+	^ false
 ]
 
 { #category : #testing }
@@ -109,4 +122,16 @@ RAConstraintSolution >> solver [
 RAConstraintSolution >> solver: anObject [
 
 	solver := anObject
+]
+
+{ #category : #accessing }
+RAConstraintSolution >> timeToExplore [
+
+	^ timeToExplore
+]
+
+{ #category : #accessing }
+RAConstraintSolution >> timeToExplore: anObject [
+
+	timeToExplore := anObject
 ]
