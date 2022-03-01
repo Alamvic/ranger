@@ -70,7 +70,6 @@ RAPrimitiveAutoTest class >> testParameters [
 
 
 
-	1halt.
 	"primitives := #( (#primitiveAt #genPrimitiveAt))."
 
 
@@ -117,7 +116,7 @@ RAPrimitiveAutoTest class >> testParameters [
 							(#generator -> p second).
 							(#solution -> e) } ] ] ]
 		displayingProgress: [ :p | (p first -> p second) asString ].
-
+1halt.
 	^ matrix
 ]
 
@@ -145,6 +144,12 @@ RAPrimitiveAutoTest >> executeUntilReturn [
 { #category : #accessing }
 RAPrimitiveAutoTest >> generator: aString [ 
 	generator := aString
+]
+
+{ #category : #testing }
+RAPrimitiveAutoTest >> isInvalidMemoryAccessInvalid [
+	
+	^ false
 ]
 
 { #category : #accessing }
@@ -202,7 +207,7 @@ RAPrimitiveAutoTest >> solution: aSolution [
 { #category : #running }
 RAPrimitiveAutoTest >> testPrimitive [
 
-	solution isInvalid ifTrue: [ ^ self ].
+	(solution isInvalidIn: self) ifTrue: [ ^ self ].
 
 	primitiveAddress := self compile: [ 
 		compilationResult := cogit objectRepresentation perform: generator.

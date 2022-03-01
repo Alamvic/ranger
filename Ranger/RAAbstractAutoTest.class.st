@@ -36,6 +36,17 @@ RAAbstractAutoTest >> createSpecialSelectorArray [
 ]
 
 { #category : #testing }
+RAAbstractAutoTest >> instanceVariablesToKeep [
+	^ super instanceVariablesToKeep, #( solution )
+]
+
+{ #category : #executing }
+RAAbstractAutoTest >> isExpectedFailure [
+
+	^ solution isErrorSolution
+]
+
+{ #category : #testing }
 RAAbstractAutoTest >> isInvalidMemoryAccessInvalid [
 	
 	^ self subclassResponsibility
@@ -58,6 +69,7 @@ RAAbstractAutoTest >> setUp [
 
 	super setUp.
 	
+	solution checkSupported.
 	(solution isInvalidIn: self) ifTrue: [ ^ self ].
 	
 	cogit maybeGenerateCheckFeatures.
@@ -72,7 +84,9 @@ RAAbstractAutoTest >> setUp [
 	cogit receiverTags: self receiverTags.
 	cogit methodOrBlockNumArgs: solution inputConstraints arguments size.
 	
-	self jitCompilerClass = StackToRegisterMappingCogit ifTrue:[ 
+	self jitCompilerClass = SimpleStackBasedCogit ifFalse:[
+		"Assume single bytecode set for the tests"
+		cogit bytecodeSetOffset: 0. 
 		cogit methodOrBlockNumTemps: solution inputConstraints locals size + solution inputConstraints arguments size.
 		cogit initSimStackForFramefulMethod: 0.
 		cogit regArgsHaveBeenPushed: false ].
