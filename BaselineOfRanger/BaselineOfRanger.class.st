@@ -8,9 +8,9 @@ Class {
 BaselineOfRanger >> baseline: spec [
 
 	<baseline>
-	spec for: #common do: [ 
+	spec for: #common do: [
 		spec
 			baseline: 'Minizinc'
-			with: [ spec repository: 'github://tesonep/pharo-minizinc' ].
+			with: [ spec repository: 'github://tesonep/pharo-minizinc:main' ].
 		spec package: 'Ranger' with: [ spec requires: #( 'Minizinc' ) ] ]
 ]
