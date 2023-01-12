@@ -198,6 +198,16 @@ RAObject >> isAbstractFalseObject [
 ]
 
 { #category : #testing }
+RAObject >> isAbstractImmediate [
+
+	"Type tags are
+	0- normal objects
+	1- small integers
+	2- immediate characters"
+	^ #(1 2) includes: self typeTag value
+]
+
+{ #category : #testing }
 RAObject >> isAbstractPointersObject [
 
 	"Type tags are

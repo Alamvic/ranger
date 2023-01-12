@@ -171,27 +171,24 @@ RATest >> testExplorePrimitiveObjectFixedLength [
 	| solutions |
 	solutions := self explorePrimitive: #primitiveObjectFixedLength.
 
-1halt.
-	"The first two solutions are invalid frame accesses because the primitive reads two stack elements"
+	"The first solution is invalid frame access because the primitive reads one stack element"
 	self assert: solutions first exitCondition isInvalid.
-	self assert: solutions second exitCondition isInvalid.
-	
-	"Then the next three solutions should be the pairs of two objects where at least one is not a small integer.
-	(smi, not smi), (not smi, smi), (not smi, not smi)"
-	3 to: 5 do: [ :i | | solution |
+
+	"Then the next 6 solutions are successes:
+	  - stack top with format < 2 and slots <= 1
+	  - stack top with format < 2 and slots > 1
+	  - stack top with format > 2, format < 9 and slots <= 1
+	  - stack top with format > 2, format < 9 and slots > 1
+	  - stack top with format = 2 (array format, cannot have fixed slots)
+	  - stack top with format > 9 (byte format, cannot have fixed slots)"
+	2 to: 7 do: [ :i | | solution |
 		solution := solutions at: i.
-		self assert: solution inputConstraints operandStack size equals: 2.
-		self assert: (solution inputConstraints operandStack anySatisfy: [ :object |
-			object isAbstractSmallInteger not ]).
-		self assert: solution exitCondition isPrimitiveFailure.
+		self assert: solution exitCondition isSuccess.
 	].
-	
-	"Finally, the only success here is when the two stack elements are smi"
-	self assert: solutions last exitCondition isSuccess.
-	self assert: solutions last inputConstraints operandStack size equals: 2.
-	self assert: (solutions last inputConstraints operandStack allSatisfy: [ :object |
-			object isAbstractSmallInteger ]).
-	self assert: solutions last outputConstraints operandStackTop isAbstractTrueObject
+
+	"Finally, it fails if the stack top is an immediate"
+	self assert: solutions last exitCondition isFailure.
+	self assert: solutions last inputConstraints stackTop isAbstractImmediate
 ]
 
 { #category : #tests }

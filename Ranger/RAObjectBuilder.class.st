@@ -10,28 +10,26 @@ Class {
 }
 
 { #category : #asd }
-RAObjectBuilder >> allocateClassObject: aClassObject [ 
+RAObjectBuilder >> allocateClassObject: aClassObject [
 
 	| classIndex aConcreteClass |
-	(aClassObject isNil
-		or: [ aClassObject classIndex value isNil
-			or: [ aClassObject classIndex value = 0 ] ])
-				ifTrue: [ classIndex := self nextOrdinaryClassIndex ]
-				ifFalse: [ classIndex := aClassObject classIndex value ].
-
-	"If it is float, do not override it"
+	classIndex := (aClassObject isNil or: [
+		               aClassObject classIndex value isNil or: [
+			               aClassObject classIndex value = 0 ] ])
+		              ifTrue: [ self nextOrdinaryClassIndex ]
+		              ifFalse: [ aClassObject classIndex value ].
 	classIndex = 34 ifTrue: [ ^ 34 ].
-	
+
 	aConcreteClass := self
-		newClassInOldSpaceWithSlots: (aClassObject definedFixedFields value ifNil: [ 0 ])
-		instSpec: (aClassObject format value ifNil: [0]).
+		                  newClassInOldSpaceWithSlots:
+		                  (aClassObject definedFixedFields value ifNil: [ 0 ])
+		                  instSpec: (aClassObject format value ifNil: [ 0 ]).
 
 	instances at: aClassObject variableName put: aConcreteClass.
-	
+
 	self memory setHashBitsOf: aConcreteClass to: classIndex.
-	
-	"Check this does not fail... 0 indicates success"
-	self assert: (self memory enterIntoClassTable: aConcreteClass) = 0.
+	self memory classAtIndex: classIndex put: aConcreteClass.
+
 	^ classIndex
 ]
 
@@ -116,19 +114,18 @@ RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 
 	"Format 0 should always have 0 slots"
 	((aRAObject format value ifNil: [ 0 ]) = 0 and: [ (aRAObject numSlots value ifNil: [ 0 ]) > 0 ])
-		ifTrue: [ 
+		ifTrue: [
 			"Make it a normal pointer object with instance variables"
 			aRAObject classObject format value: 1 ].
 
-	1 haltIf: [ (aRAObject classObject definedFixedFields value ifNil:[0]) > 0 ].
 	classIndex := self allocateClassObject: aRAObject classObject.
 	newConcreteObject := self
 		allocateNewSpaceSlots: (self numberOfSlotsOf: aRAObject)
-		format: (aRAObject format value ifNil: [ 
+		format: (aRAObject format value ifNil: [
 			self defaultFormatForClassIndex: classIndex ])
 		classIndex: classIndex.
 	instances at: aRAObject variableName put: newConcreteObject.
-	
+
 	self
 		initializeConcreteObject: newConcreteObject
 		withConstraints: aRAObject.

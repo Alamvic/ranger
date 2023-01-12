@@ -27,7 +27,7 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 
 	| currentPath solution previousInputFrameConstraints exploredPath inputFrame |
 	selector := aConcolicCase selector.
-	
+
 	currentPath := RAPath new.
 	solution := RAConstraintSolution new solver: #initial.
 
@@ -43,7 +43,6 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 		                 nextIndex: 100;
 		                 yourself.
 	aConcolicCase initializeVM: vm.
-
 
 	inputFrame := previousInputFrameConstraints
 		              instantiateWith: objectBuilder

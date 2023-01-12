@@ -268,6 +268,12 @@ RAVMFrameConstraint >> receiver: anObject [
 ]
 
 { #category : #accessing }
+RAVMFrameConstraint >> stackTop [
+
+	^ operandStack top
+]
+
+{ #category : #accessing }
 RAVMFrameConstraint >> top [
 	self shouldBeImplemented.
 ]
