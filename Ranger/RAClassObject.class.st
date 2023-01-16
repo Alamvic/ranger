@@ -1,6 +1,6 @@
 Class {
 	#name : #RAClassObject,
-	#superclass : #Object,
+	#superclass : #RAObject,
 	#instVars : [
 		'format',
 		'name',
@@ -54,6 +54,7 @@ RAClassObject >> format: anObject [
 { #category : #initialization }
 RAClassObject >> initializeWithVariableName: aName [
 
+	super initializeWithVariableName: aName.
 	name := aName.
 	
 	definedFixedFields := MzVariable new

@@ -74,6 +74,7 @@ RAConstraintFactory >> newAbstractObject [
 		constraintFactory: self;
 		initializeWithVariableName: 't', self nextOrdinaryClassIndex asString;
 		classObject: (RAClassObject new
+			constraintFactory: self;
 			initializeWithVariableName: 't', self nextOrdinaryClassIndex asString;
 			yourself);
 		yourself
