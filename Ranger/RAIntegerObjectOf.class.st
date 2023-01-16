@@ -7,7 +7,7 @@ Class {
 { #category : #evaluating }
 RAIntegerObjectOf >> evaluateWith: anObjectBuilder [ 
 	
-	^ anObjectBuilder objectMemory integerObjectOf: (operands evaluateWith: anObjectBuilder)
+	^ anObjectBuilder objectMemory integerObjectOf: (operands first evaluateWith: anObjectBuilder)
 ]
 
 { #category : #testing }

@@ -4,6 +4,12 @@ Class {
 	#category : #'Ranger-Constraints'
 }
 
+{ #category : #evaluating }
+RAMultiplicationConstraint >> evaluateWith: aRAObjectBuilder [ 
+
+	^ (operands first evaluateWith: aRAObjectBuilder) * (operands second evaluateWith: aRAObjectBuilder)
+]
+
 { #category : #microzinc }
 RAMultiplicationConstraint >> mzConstraintOnInterpreter: interpreter [
 	
