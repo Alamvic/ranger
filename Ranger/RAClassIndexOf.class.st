@@ -1,10 +1,18 @@
 Class {
-	#name : #RAClassIndexOf,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-VMSpecificConstraints'
+	#name : 'RAClassIndexOf',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-VMSpecificConstraints',
+	#package : 'Ranger',
+	#tag : 'VMSpecificConstraints'
 }
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RAClassIndexOf >> mutate: mutator [
+
+	^ mutator mutateIsClassIndexOfConstraint: self
+]
+
+{ #category : 'microzinc' }
 RAClassIndexOf >> mzConstraintOnInterpreter: interpreter [
 	
 	^ operands first classIndex

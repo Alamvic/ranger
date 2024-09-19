@@ -1,13 +1,15 @@
 Class {
-	#name : #RAReturnNotification,
-	#superclass : #Error,
+	#name : 'RAReturnNotification',
+	#superclass : 'Error',
 	#instVars : [
 		'frameToReturnTo'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAReturnNotification class >> to: aFrame [
 
 	^ self new
@@ -15,13 +17,13 @@ RAReturnNotification class >> to: aFrame [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAReturnNotification >> frameToReturnTo [
 
 	^ frameToReturnTo
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAReturnNotification >> frameToReturnTo: anObject [
 
 	frameToReturnTo := anObject

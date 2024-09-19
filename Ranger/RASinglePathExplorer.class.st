@@ -1,6 +1,6 @@
 Class {
-	#name : #RASinglePathExplorer,
-	#superclass : #RAASTInterpreter,
+	#name : 'RASinglePathExplorer',
+	#superclass : 'RAASTInterpreter',
 	#instVars : [
 		'constraints',
 		'paths',
@@ -10,10 +10,12 @@ Class {
 		'path',
 		'interpreter'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #constraints }
+{ #category : 'constraints' }
 RASinglePathExplorer >> addPathConstraint: aPathConstraint taken: aBoolean [
 
 	"Do not add constant conditions"
@@ -29,19 +31,19 @@ RASinglePathExplorer >> addPathConstraint: aPathConstraint taken: aBoolean [
 	pathConstraints add: aPathConstraint
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RASinglePathExplorer >> basicNewFrame [
 	
 	^ RAStackFrame new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASinglePathExplorer >> constraintFactory [
 	
 	^ explorer constraintFactory
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 RASinglePathExplorer >> exitCondition [
 
 	interpreter primFailCode ~= 0 ifTrue: [ ^ RAPrimitiveFailure new ].
@@ -53,7 +55,7 @@ RASinglePathExplorer >> exitCondition [
 		yourself
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 RASinglePathExplorer >> explore: aSelector on: vm withFrame: aFrame explorer: anExplorer [
 
 	| method |
@@ -82,7 +84,7 @@ RASinglePathExplorer >> explore: aSelector on: vm withFrame: aFrame explorer: an
 	^ path
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 RASinglePathExplorer >> initialize [
 
 	super initialize.
@@ -93,7 +95,7 @@ RASinglePathExplorer >> initialize [
 	paths := OrderedCollection new
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RASinglePathExplorer >> initializeSpecialCases [
 
 	"Stack access"
@@ -204,7 +206,7 @@ RASinglePathExplorer >> initializeSpecialCases [
 	specialCases at: #commonCallerReturn put: #interpretCommonReturnWith:
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretAndWith: aRBMessageNode [ 
 	
 	| condition |
@@ -219,7 +221,7 @@ RASinglePathExplorer >> interpretAndWith: aRBMessageNode [
 			self pushOperand: { condition first. condition second copy } ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretAreIntegersAreWith: aRBMessageNode [ 
 	
 	| smallInteger receiver concreteValue smallInteger2 |
@@ -242,7 +244,7 @@ RASinglePathExplorer >> interpretAreIntegersAreWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretByteSwapped32IfBigEndianWith: aRBMessageNode [ 
 	
 	| value vm concreteValue |
@@ -261,7 +263,7 @@ RASinglePathExplorer >> interpretByteSwapped32IfBigEndianWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretByteSwapped64IfBigEndianWith: aRBMessageNode [ 
 	
 	| value vm concreteValue |
@@ -280,7 +282,7 @@ RASinglePathExplorer >> interpretByteSwapped64IfBigEndianWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretCCoerceSimpleToWith: aRBMessageNode [ 
 	
 	| object vm concreteValue type |
@@ -300,7 +302,7 @@ RASinglePathExplorer >> interpretCCoerceSimpleToWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretCharacterValueOfWith: aRBMessageNode [ 
 	
 	| smallInteger receiver |
@@ -316,7 +318,7 @@ RASinglePathExplorer >> interpretCharacterValueOfWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretClassIndexOfWith: aRBMessageNode [ 
 	
 	| object vm |
@@ -332,7 +334,7 @@ RASinglePathExplorer >> interpretClassIndexOfWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretCommonReturnWith: aRBMessageNode [
 
 	RAInterpreterExitException new
@@ -342,7 +344,7 @@ RASinglePathExplorer >> interpretCommonReturnWith: aRBMessageNode [
 		signal
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretCommonSendOrdinaryWith: aRBMessageNode [
 
 	| argumentCount |
@@ -358,7 +360,7 @@ RASinglePathExplorer >> interpretCommonSendOrdinaryWith: aRBMessageNode [
 		signal
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretCppIfIfTrueIfFalseWith: aRBMessageNode [ 
 
 	| condition |
@@ -383,7 +385,7 @@ RASinglePathExplorer >> interpretCppIfIfTrueIfFalseWith: aRBMessageNode [
 				arguments: #() ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretFalseObjectWith: aRBMessageNode [
 
 	| abstractFalse |
@@ -394,7 +396,7 @@ RASinglePathExplorer >> interpretFalseObjectWith: aRBMessageNode [
 		abstractFalse }
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretFetchClassOfNonImmWith: aRBMessageNode [ 
 	
 	| oop vm concreteValue |
@@ -412,7 +414,7 @@ RASinglePathExplorer >> interpretFetchClassOfNonImmWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretFetchClassOfWith: aRBMessageNode [ 
 	
 	| oop vm concreteValue |
@@ -430,7 +432,7 @@ RASinglePathExplorer >> interpretFetchClassOfWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretFetchClassTagOfWith: aRBMessageNode [ 
 	
 	| oop vm concreteValue |
@@ -448,7 +450,7 @@ RASinglePathExplorer >> interpretFetchClassTagOfWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretFetchFloatIntoWith: aRBMessageNode [ 
 
 	| float vm concreteValue floatoop |
@@ -469,7 +471,7 @@ RASinglePathExplorer >> interpretFetchFloatIntoWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretFetchLong32OfObjectWith: aRBMessageNode [ 
 
 	| oop vm concreteValue index |
@@ -490,7 +492,7 @@ RASinglePathExplorer >> interpretFetchLong32OfObjectWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretFetchPointerOfObjectWith: aRBMessageNode [
 
 	| oop vm index numberOfPointersInObject constraint |
@@ -538,7 +540,7 @@ RASinglePathExplorer >> interpretFetchPointerOfObjectWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretFixedFieldsOfClassWith: aRBMessageNode [ 
 
 	| oop vm concreteValue |
@@ -556,7 +558,7 @@ RASinglePathExplorer >> interpretFixedFieldsOfClassWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretFormatOfObjectWith: aRBMessageNode [ 
 	
 	| oop receiver |
@@ -572,7 +574,7 @@ RASinglePathExplorer >> interpretFormatOfObjectWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIfFalseWith: aRBMessageNode [ 
 	
 	| condition |
@@ -587,7 +589,7 @@ RASinglePathExplorer >> interpretIfFalseWith: aRBMessageNode [
 			self pushOperand: { nil . nil } ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIfNilIfNotNilWith: aRBMessageNode [ 
 	
 	| condition |
@@ -612,7 +614,7 @@ RASinglePathExplorer >> interpretIfNilIfNotNilWith: aRBMessageNode [
 				arguments: { condition } ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIfTrueWith: aRBMessageNode [ 
 	
 	| condition |
@@ -627,7 +629,7 @@ RASinglePathExplorer >> interpretIfTrueWith: aRBMessageNode [
 			self pushOperand: { nil . nil } ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIfTrueifFalseWith: aRBMessageNode [
 
 	| condition |
@@ -652,7 +654,7 @@ RASinglePathExplorer >> interpretIfTrueifFalseWith: aRBMessageNode [
 				arguments: #() ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIntegerObjectOfWith: aRBMessageNode [ 
 	
 	| smallInteger receiver |
@@ -668,7 +670,7 @@ RASinglePathExplorer >> interpretIntegerObjectOfWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIntegerValueOfWith: aRBMessageNode [ 
 	
 	| smallInteger receiver |
@@ -684,7 +686,7 @@ RASinglePathExplorer >> interpretIntegerValueOfWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretInternalPushWith: aRBMessageNode [ 
 	
 	| elementToPush |
@@ -696,7 +698,7 @@ RASinglePathExplorer >> interpretInternalPushWith: aRBMessageNode [
 	self pushOperand: self receiver.
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIsCharacterObjectWith: aRBMessageNode [ 
 	
 	| smallInteger receiver concreteValue |
@@ -713,7 +715,7 @@ RASinglePathExplorer >> interpretIsCharacterObjectWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIsContextObjectWith: aRBMessageNode [ 
 	
 	| receiver concreteValue oop |
@@ -733,7 +735,7 @@ RASinglePathExplorer >> interpretIsContextObjectWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIsForwardedWith: aRBMessageNode [ 
 	
 	| maybeImmediate receiver concreteValue |
@@ -773,7 +775,7 @@ RASinglePathExplorer >> interpretIsForwardedWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIsImmediateWith: aRBMessageNode [ 
 	
 	| maybeImmediate receiver concreteValue |
@@ -794,7 +796,7 @@ RASinglePathExplorer >> interpretIsImmediateWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIsIntegerObjectWith: aRBMessageNode [ 
 	
 	| smallInteger receiver concreteValue |
@@ -811,7 +813,7 @@ RASinglePathExplorer >> interpretIsIntegerObjectWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIsIntegerValueWith: aRBMessageNode [ 
 	
 	| smallInteger receiver concreteValue |
@@ -829,7 +831,7 @@ RASinglePathExplorer >> interpretIsIntegerValueWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIsNonImmediateWith: aRBMessageNode [ 
 	
 	| maybeImmediate receiver concreteValue |
@@ -850,7 +852,7 @@ RASinglePathExplorer >> interpretIsNonImmediateWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIsNonIntegerObjectWith: aRBMessageNode [ 
 	
 	| smallInteger receiver concreteValue |
@@ -868,7 +870,7 @@ RASinglePathExplorer >> interpretIsNonIntegerObjectWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretIsPointersNonImmWith: aRBMessageNode [ 
 	
 	| oop receiver concreteValue |
@@ -898,7 +900,7 @@ RASinglePathExplorer >> interpretIsPointersNonImmWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretLengthOfFormatWith: aRBMessageNode [ 
 
 	| oop vm concreteValue format |
@@ -919,7 +921,7 @@ RASinglePathExplorer >> interpretLengthOfFormatWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretLiteralWith: aRBMessageNode [
 
 	| vm concreteValue index numberOfLiterals |
@@ -959,7 +961,7 @@ RASinglePathExplorer >> interpretLiteralWith: aRBMessageNode [
 			vmFrame method second fetchPointer: index first }
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretNilObjectWith: aRBMessageNode [
 
 	| abstractNil |
@@ -970,13 +972,13 @@ RASinglePathExplorer >> interpretNilObjectWith: aRBMessageNode [
 		abstractNil }
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretNoopWith: aRBMessageNode [ 
 
 	self pushOperand: self receiver
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretNumBytesOfBytesWith: aRBMessageNode [ 
 
 	"Special case to avoid interpreting bit ands"
@@ -1008,7 +1010,7 @@ RASinglePathExplorer >> interpretNumBytesOfBytesWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretNumSlotsOfAnyWith: aRBMessageNode [ 
 	
 	| oop receiver |
@@ -1024,7 +1026,7 @@ RASinglePathExplorer >> interpretNumSlotsOfAnyWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretNumSlotsOfWith: aRBMessageNode [ 
 
 	| oop vm concreteValue |
@@ -1042,7 +1044,7 @@ RASinglePathExplorer >> interpretNumSlotsOfWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretOrWith: aRBMessageNode [ 
 	
 	| condition |
@@ -1057,7 +1059,7 @@ RASinglePathExplorer >> interpretOrWith: aRBMessageNode [
 			aRBMessageNode arguments first body acceptVisitor: self ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretPopThenPushBoolWith: aRBMessageNode [ 
 
 	"Pop N elements from the operand stack.
@@ -1092,7 +1094,7 @@ RASinglePathExplorer >> interpretPopThenPushBoolWith: aRBMessageNode [
 	self pushOperand: self receiver.
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretPopThenPushFloatWith: aRBMessageNode [ 
 
 	"Pop N elements from the operand stack.
@@ -1122,7 +1124,7 @@ RASinglePathExplorer >> interpretPopThenPushFloatWith: aRBMessageNode [
 	self pushOperand: self receiver.
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretPopThenPushIntWith: aRBMessageNode [ 
 
 	"Pop N elements from the operand stack.
@@ -1150,7 +1152,7 @@ RASinglePathExplorer >> interpretPopThenPushIntWith: aRBMessageNode [
 	self pushOperand: self receiver.
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretPopThenPushWith: aRBMessageNode [ 
 
 	"Pop N elements from the operand stack.
@@ -1172,7 +1174,7 @@ RASinglePathExplorer >> interpretPopThenPushWith: aRBMessageNode [
 	self pushOperand: self receiver.
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretPopWith: aRBMessageNode [ 
 
 	"Pop N elements from the operand stack"
@@ -1188,7 +1190,7 @@ RASinglePathExplorer >> interpretPopWith: aRBMessageNode [
 	self pushOperand: self receiver.
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RASinglePathExplorer >> interpretPrimitive: method receiver: receiver arguments: arguments [
 
 	| concreteReceiver concreteArguments concreteResult constraintArguments constraintOperands constraint |
@@ -1212,7 +1214,7 @@ RASinglePathExplorer >> interpretPrimitive: method receiver: receiver arguments:
 	^ self pushOperand: { concreteResult . constraint }
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretRawHashBitsOfWith: aRBMessageNode [ 
 
 	| oop vm concreteValue |
@@ -1230,13 +1232,13 @@ RASinglePathExplorer >> interpretRawHashBitsOfWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretReceiverWith: aRBMessageNode [ 
 
 	self pushOperand: vmFrame receiver
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretSizeofWith: aRBMessageNode [ 
 	
 	| object vm concreteSizeOf |
@@ -1253,7 +1255,7 @@ RASinglePathExplorer >> interpretSizeofWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretSpecialObjectWith: aRBMessageNode [ 
 	
 	| vm index operand abstractSpecialObject |
@@ -1273,7 +1275,7 @@ RASinglePathExplorer >> interpretSpecialObjectWith: aRBMessageNode [
 	self pushOperand: { vm splObj: index . abstractSpecialObject }
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretSpecialSelectorWith: aRBMessageNode [ 
 	
 	| receiver selectorIndex selector abstractSpecialSelector |
@@ -1291,7 +1293,7 @@ RASinglePathExplorer >> interpretSpecialSelectorWith: aRBMessageNode [
 		abstractSpecialSelector }
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretStackAt: indexPair [
 
 	| constraint |
@@ -1314,7 +1316,7 @@ RASinglePathExplorer >> interpretStackAt: indexPair [
 				signal ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretStackTopPutWith: aRBMessageNode [
 
 	| constraint value |
@@ -1337,7 +1339,7 @@ RASinglePathExplorer >> interpretStackTopPutWith: aRBMessageNode [
 				signal ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretStackTopWith: aRBMessageNode [ 
 
 	self interpretStackAt: { 
@@ -1346,7 +1348,7 @@ RASinglePathExplorer >> interpretStackTopWith: aRBMessageNode [
 	}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretStackValueWith: aRBMessageNode [
 
 	"Interpret messages of the form 
@@ -1359,7 +1361,7 @@ RASinglePathExplorer >> interpretStackValueWith: aRBMessageNode [
 	self interpretStackAt: indexPair
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretTrueObjectWith: aRBMessageNode [
 
 	self pushOperand: {
@@ -1367,7 +1369,7 @@ RASinglePathExplorer >> interpretTrueObjectWith: aRBMessageNode [
 		explorer constraintFactory newAbstractTrueObject }
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretiArgumentForFramePointerAtOffsetWith: aRBMessageNode [ 
 	
 	| vm index constraint |
@@ -1400,7 +1402,7 @@ RASinglePathExplorer >> interpretiArgumentForFramePointerAtOffsetWith: aRBMessag
 			signal ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretiFrameNumArgsWith: aRBMessageNode [ 
 	
 	| vm theMessageFP |
@@ -1416,7 +1418,7 @@ RASinglePathExplorer >> interpretiFrameNumArgsWith: aRBMessageNode [
 	self pushOperand: vmFrame numberOfArguments.
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> interpretiLocalForFramePointerAtOffsetWith: aRBMessageNode [
 
 	| vm index constraint |
@@ -1450,7 +1452,7 @@ RASinglePathExplorer >> interpretiLocalForFramePointerAtOffsetWith: aRBMessageNo
 			signal ]
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> isInSmallIntegerRangeConstraintFor: aConstraint inInterpreter: anInterpreter [
 
 	^ RAAndConstraint operands: {
@@ -1465,49 +1467,49 @@ RASinglePathExplorer >> isInSmallIntegerRangeConstraintFor: aConstraint inInterp
 		}
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> lookupSelector: aString inClass: aClass [
 	
 	^ aClass lookupSelector: aString
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RASinglePathExplorer >> lookupSelector: aString inReceiver: aReceiver [
 	
 	^ aReceiver first class lookupSelector: aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASinglePathExplorer >> path [
 	
 	^ path
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASinglePathExplorer >> paths [
 	
 	^ paths
 ]
 
-{ #category : #'vm stack' }
+{ #category : 'vm stack' }
 RASinglePathExplorer >> pop: anInteger [ 
 	
 	anInteger timesRepeat: [ vmFrame pop ]
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RASinglePathExplorer >> popAbstractOperand [
 
 	^ self currentFrame popAbstractOperand
 ]
 
-{ #category : #'vm stack' }
+{ #category : 'vm stack' }
 RASinglePathExplorer >> push: anInteger [ 
 	
 	vmFrame push: anInteger
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RASinglePathExplorer >> visitBlockNode: aRBBlockNode [ 
 	
 	| closure |
@@ -1515,7 +1517,7 @@ RASinglePathExplorer >> visitBlockNode: aRBBlockNode [
 	self pushOperand: {closure . closure}
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RASinglePathExplorer >> visitClassVariableNode: aRBVariableNode [ 
 	
 	| value |
@@ -1526,13 +1528,13 @@ RASinglePathExplorer >> visitClassVariableNode: aRBVariableNode [
 		}
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RASinglePathExplorer >> visitGlobalVariableNode: aRBVariableNode [ 
 
 	^ self visitClassVariableNode: aRBVariableNode
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RASinglePathExplorer >> visitInstanceVariableNode: aRBVariableNode [ 
 	
 	| value |
@@ -1553,13 +1555,13 @@ RASinglePathExplorer >> visitInstanceVariableNode: aRBVariableNode [
 		}
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RASinglePathExplorer >> visitLiteralValueNode: aRBLiteralValueNode [ 
 	
 	self pushOperand: {aRBLiteralValueNode value . RAConstant value: aRBLiteralValueNode value }
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RASinglePathExplorer >> visitSelfNode: aRBVariableNode [ 
 	
 	self pushOperand: self receiver

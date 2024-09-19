@@ -1,39 +1,41 @@
 Class {
-	#name : #RAStackFrame,
-	#superclass : #RAAbstractStackFrame,
+	#name : 'RAStackFrame',
+	#superclass : 'RAAbstractStackFrame',
 	#instVars : [
 		'abstractOperandStack',
 		'abstractTemporaryFrame'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAStackFrame >> abstractOperandStack [
 
 	^ abstractOperandStack
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAStackFrame >> abstractOperandStack: anObject [
 
 	abstractOperandStack := anObject
 ]
 
-{ #category : #temporaries }
+{ #category : 'temporaries' }
 RAStackFrame >> abstractTemporaryAt: aString [ 
 	
 	^ abstractTemporaryFrame at: aString ifAbsent: [ self temporaryAt: aString ]
 ]
 
-{ #category : #temporaries }
+{ #category : 'temporaries' }
 RAStackFrame >> abstractTemporaryAt: aString put: aValue [
 
 	self haltIf: aValue isConstraint.
 	abstractTemporaryFrame at: aString put: aValue
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RAStackFrame >> initialize [
 
 	super initialize.
@@ -41,13 +43,13 @@ RAStackFrame >> initialize [
 	abstractTemporaryFrame := Dictionary new
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAStackFrame >> popAbstractOperand [
 
 	^ abstractOperandStack pop
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAStackFrame >> pushAbstractOperand: aValue [
 
 	^ abstractOperandStack push: aValue

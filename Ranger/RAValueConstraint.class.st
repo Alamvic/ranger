@@ -1,17 +1,19 @@
 Class {
-	#name : #RAValueConstraint,
-	#superclass : #RAConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RAValueConstraint',
+	#superclass : 'RAConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAValueConstraint >> initialize [
 
 	super initialize.
 
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAValueConstraint >> isIntegerObjectOf [
 	
 	^ false

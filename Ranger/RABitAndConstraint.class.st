@@ -1,11 +1,19 @@
 Class {
-	#name : #RABitAndConstraint,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RABitAndConstraint',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RABitAndConstraint >> evaluateWith: anObjectBuilder [
 	
 	^ (operands first evaluateWith: anObjectBuilder) bitAnd: (operands second evaluateWith: anObjectBuilder)
+]
+
+{ #category : 'as yet unclassified' }
+RABitAndConstraint >> mutate: mutator [
+
+	^ mutator mutateBitAddConstraint: self
 ]

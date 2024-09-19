@@ -1,10 +1,12 @@
 Class {
-	#name : #RAIsIntegerObject,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-VMSpecificConstraints'
+	#name : 'RAIsIntegerObject',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-VMSpecificConstraints',
+	#package : 'Ranger',
+	#tag : 'VMSpecificConstraints'
 }
 
-{ #category : #microzinc }
+{ #category : 'microzinc' }
 RAIsIntegerObject >> isInSmallIntegerRangeConstraintFor: aConstraint inInterpreter: anInterpreter [
 
 	^ ((aConstraint mzConstraintOnInterpreter: anInterpreter) 
@@ -14,7 +16,13 @@ RAIsIntegerObject >> isInSmallIntegerRangeConstraintFor: aConstraint inInterpret
 				   lessOrEquals: anInterpreter objectMemory maxSmallInteger)
 ]
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RAIsIntegerObject >> mutate: mutator [
+
+	^ mutator mutateIsIntegerObjectConstraint: self
+]
+
+{ #category : 'microzinc' }
 RAIsIntegerObject >> mzConstraintOnInterpreter: anInterpreter [
 
 	^ (operands first typeTag equals: 1) and: (self
@@ -22,7 +30,7 @@ RAIsIntegerObject >> mzConstraintOnInterpreter: anInterpreter [
 			   inInterpreter: anInterpreter)
 ]
 
-{ #category : #negating }
+{ #category : 'negating' }
 RAIsIntegerObject >> negated [
 	
 	^ RAIsNonIntegerObject operands: self operands

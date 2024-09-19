@@ -1,22 +1,30 @@
 Class {
-	#name : #RALessOrEqualsConstraint,
-	#superclass : #RAPathConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RALessOrEqualsConstraint',
+	#superclass : 'RAPathConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RALessOrEqualsConstraint >> evaluateWith: anObjectBuilder [
 	
 	^ (operands first evaluateWith: anObjectBuilder) <= (operands second evaluateWith: anObjectBuilder)
 ]
 
-{ #category : #transformations }
+{ #category : 'transformations' }
 RALessOrEqualsConstraint >> invert [
 
 	^ RAGreaterConstraint operands: self operands reversed
 ]
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RALessOrEqualsConstraint >> mutate: mutator [
+
+	^ mutator mutateLessOrEqualsConstraint: self
+]
+
+{ #category : 'microzinc' }
 RALessOrEqualsConstraint >> mzConstraintOnInterpreter: interpreter [
 	
 	| leftOperand rightOperand |
@@ -26,7 +34,7 @@ RALessOrEqualsConstraint >> mzConstraintOnInterpreter: interpreter [
 	^ leftOperand lessOrEquals: rightOperand
 ]
 
-{ #category : #negating }
+{ #category : 'negating' }
 RALessOrEqualsConstraint >> negated [
 	
 	^ RAGreaterConstraint operands: self operands

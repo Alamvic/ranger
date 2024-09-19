@@ -1,14 +1,16 @@
 Class {
-	#name : #RABlockClosure,
-	#superclass : #Object,
+	#name : 'RABlockClosure',
+	#superclass : 'Object',
 	#instVars : [
 		'ast',
 		'outerContext'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RABlockClosure class >> on: aRBBlockNode home: aFrame [
 
 	^ self new
@@ -17,34 +19,34 @@ RABlockClosure class >> on: aRBBlockNode home: aFrame [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABlockClosure >> ast [
 
 	^ ast
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABlockClosure >> ast: anObject [
 
 	ast := anObject
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RABlockClosure >> cull: arg [
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABlockClosure >> home [
 
 	^ outerContext home
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABlockClosure >> outerContext: anObject [
 
 	outerContext := anObject
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RABlockClosure >> value [
 ]

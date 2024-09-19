@@ -1,44 +1,46 @@
 Class {
-	#name : #RAMethodReturnExit,
-	#superclass : #RAInterpreterExitCondition,
+	#name : 'RAMethodReturnExit',
+	#superclass : 'RAInterpreterExitCondition',
 	#instVars : [
 		'returnValue'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #executing }
+{ #category : 'executing' }
 RAMethodReturnExit >> executeTest: aRAAutoTest [ 
 	
 	aRAAutoTest executeUntilReturn
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAMethodReturnExit >> isInvalidIn: aTest [
 
 	"A method return is never invalid"
 	^ false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAMethodReturnExit >> result [
 	
 	^ returnValue 
 ]
 
-{ #category : #compiling }
+{ #category : 'compiling' }
 RAMethodReturnExit >> returnResultInto: aTest [ 
 	
 	"Do nothing, I should already be compiled with a return"
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAMethodReturnExit >> returnValue [
 
 	^ returnValue
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAMethodReturnExit >> returnValue: anObject [
 
 	returnValue := anObject

@@ -1,18 +1,18 @@
-Extension { #name : #MzVariable }
+Extension { #name : 'MzVariable' }
 
-{ #category : #'*Ranger' }
+{ #category : '*Ranger' }
 MzVariable >> evaluateWith: anObjectBuilder [ 
 	
 	^ self value
 ]
 
-{ #category : #'*Ranger' }
+{ #category : '*Ranger' }
 MzVariable >> isConstant [
 	
 	^ false
 ]
 
-{ #category : #'*Ranger' }
+{ #category : '*Ranger' }
 MzVariable >> mzConstraintOnInterpreter: aCogVMSimulatorLSB [ 
 
 	^ self

@@ -1,6 +1,6 @@
 Class {
-	#name : #RAVMFrameConstraint,
-	#superclass : #Object,
+	#name : 'RAVMFrameConstraint',
+	#superclass : 'Object',
 	#instVars : [
 		'receiver',
 		'operandStack',
@@ -11,40 +11,42 @@ Class {
 		'numberOfArguments',
 		'operandStackSize'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> argumentAt: anIndex [
 
 	^ arguments at: anIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> argumentAt: anInteger ifAbsent: aFullBlockClosure [ 
 	
 	^ arguments at: anInteger ifAbsent: aFullBlockClosure 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> arguments [
 
 	^ arguments
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> arguments: aCollection [
 
 	arguments := aCollection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> basicPush: anOperandConstraint [
 
 	operandStack push: anOperandConstraint
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RAVMFrameConstraint >> initialize [
 
 	super initialize.
@@ -65,7 +67,7 @@ RAVMFrameConstraint >> initialize [
 		yourself. 
 ]
 
-{ #category : #instantiation }
+{ #category : 'instantiation' }
 RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAConstraintBuilder [
 	
 	| frame concreteLocals concreteArguments concreteObject |
@@ -100,42 +102,42 @@ RAVMFrameConstraint >> instantiateWith: aRAObjectBuilder constraintBuilder: aRAC
 	^ frame
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> localAt: anIndex [
 	
 	^ locals at: anIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> localAt: anInteger ifAbsent: aFullBlockClosure [ 
 	
 	^ locals at: anInteger ifAbsent: aFullBlockClosure
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> locals [
 
 	^ locals
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> locals: aCollection [ 
 	locals := aCollection
 ]
 
-{ #category : #method }
+{ #category : 'method' }
 RAVMFrameConstraint >> method [
 	
 	^ method
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> method: anObject [
 
 	method := anObject
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 RAVMFrameConstraint >> newFrameConstraintForSolution: aMzSolver constraintFactory: constraintFactory [ 
 
 	| newConstraints theOperandStackSize |
@@ -178,43 +180,43 @@ RAVMFrameConstraint >> newFrameConstraintForSolution: aMzSolver constraintFactor
 	^ newConstraints
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> numberOfArguments [
 
 	^ numberOfArguments
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> numberOfLocals [
 	
 	^ numberOfLocals
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> operandAt: anInteger ifAbsent: aBlock [
 	
 	^ operandStack at: anInteger ifAbsent: aBlock
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> operandStack [
 
 	^ operandStack
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> operandStack: anObject [
 
 	operandStack := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> operandStackAt: stackIndex [ 
 
 	^ operandStack at: stackIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> operandStackAt: stackIndex put: aValue [
 
 	operandStack
@@ -222,25 +224,25 @@ RAVMFrameConstraint >> operandStackAt: stackIndex put: aValue [
 		put: aValue
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> operandStackSize [
 	
 	^ operandStackSize
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> operandStackSize: anObject [
 
 	operandStackSize := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> operandStackTop [
 	
 	^ operandStack top
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RAVMFrameConstraint >> postCopy [
 
 	locals := locals copy.
@@ -248,32 +250,32 @@ RAVMFrameConstraint >> postCopy [
 	operandStack := operandStack copy.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> push: anOperandConstraint [
 
 	self basicPush: anOperandConstraint.
 	operandStackSize := operandStackSize + 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> receiver [
 
 	^ receiver
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> receiver: anObject [
 
 	receiver := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> stackTop [
 
 	^ operandStack top
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrameConstraint >> top [
 	self shouldBeImplemented.
 ]

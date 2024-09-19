@@ -1,41 +1,43 @@
 Class {
-	#name : #RAPrimitiveFailure,
-	#superclass : #Object,
-	#category : #'Ranger-Interpreter'
+	#name : 'RAPrimitiveFailure',
+	#superclass : 'Object',
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #executing }
+{ #category : 'executing' }
 RAPrimitiveFailure >> executeTest: aRAAutoTest [ 
 	
 	aRAAutoTest executePrimitiveFailure: self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAPrimitiveFailure >> isFailure [
 	
 	^ true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAPrimitiveFailure >> isInvalid [
 	
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAPrimitiveFailure >> isInvalidIn: aRAPrimitiveAutoTest [ 
 	
 	"Not invalid!"
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAPrimitiveFailure >> isPrimitiveFailure [
 	
 	^ true
 ]
 
-{ #category : #compiling }
+{ #category : 'compiling' }
 RAPrimitiveFailure >> returnResultInto: aTest [
 
 	aTest compileEndInstructionForPrimitiveFailure: self

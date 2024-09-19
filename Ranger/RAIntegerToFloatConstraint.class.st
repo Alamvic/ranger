@@ -1,28 +1,36 @@
 Class {
-	#name : #RAIntegerToFloatConstraint,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-VMSpecificConstraints'
+	#name : 'RAIntegerToFloatConstraint',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-VMSpecificConstraints',
+	#package : 'Ranger',
+	#tag : 'VMSpecificConstraints'
 }
 
-{ #category : #converting }
+{ #category : 'converting' }
 RAIntegerToFloatConstraint >> asMzValue [
 	
 	^ self
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RAIntegerToFloatConstraint >> evaluate [
 	
 	^ operands first evaluate asFloat
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RAIntegerToFloatConstraint >> evaluateWith: anObjectBuilder [ 
 
 	^ (operands first evaluateWith: anObjectBuilder) asFloat
 ]
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RAIntegerToFloatConstraint >> mutate: mutator [
+
+	^ mutator mutateIsIntegerToFloatConstraint: self
+]
+
+{ #category : 'microzinc' }
 RAIntegerToFloatConstraint >> mzConstraintOnInterpreter: aCogVMSimulatorLSB [ 
 	
 	^ self

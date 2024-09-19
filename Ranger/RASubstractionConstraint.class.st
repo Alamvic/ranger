@@ -1,10 +1,18 @@
 Class {
-	#name : #RASubstractionConstraint,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RASubstractionConstraint',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RASubstractionConstraint >> mutate: mutator [
+
+	^ mutator mutateSubstractionConstraint: self
+]
+
+{ #category : 'microzinc' }
 RASubstractionConstraint >> mzConstraintOnInterpreter: interpreter [ 
 	
 	| leftOperand rightOperand leftValue rightValue |

@@ -1,16 +1,18 @@
 Class {
-	#name : #RAVMConcolicCase,
-	#superclass : #Object,
-	#category : #'Ranger-Exploring'
+	#name : 'RAVMConcolicCase',
+	#superclass : 'Object',
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger',
+	#tag : 'Exploring'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMConcolicCase >> initializeVM: aVM [
 
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMConcolicCase >> selector [
 
 	self subclassResponsibility

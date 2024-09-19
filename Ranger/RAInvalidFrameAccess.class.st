@@ -1,16 +1,18 @@
 Class {
-	#name : #RAInvalidFrameAccess,
-	#superclass : #RAInterpreterExitCondition,
-	#category : #'Ranger-Interpreter'
+	#name : 'RAInvalidFrameAccess',
+	#superclass : 'RAInterpreterExitCondition',
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAInvalidFrameAccess >> isInvalid [
 	
 	^ true
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAInvalidFrameAccess >> isInvalidIn: aTest [ 
 	
 	"Consider all invalid frame accesses as invalid created frames"

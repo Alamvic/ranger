@@ -1,10 +1,12 @@
 Class {
-	#name : #RAIsCharacterObject,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-VMSpecificConstraints'
+	#name : 'RAIsCharacterObject',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-VMSpecificConstraints',
+	#package : 'Ranger',
+	#tag : 'VMSpecificConstraints'
 }
 
-{ #category : #negating }
+{ #category : 'negating' }
 RAIsCharacterObject >> isInCharacterRangeConstraintFor: valueConstraint inInterpreter: anInterpreter [
 
 	"See isInRangeCharacterCode:"
@@ -15,7 +17,13 @@ RAIsCharacterObject >> isInCharacterRangeConstraintFor: valueConstraint inInterp
 				   lessOrEquals: (1 << 30) - 1)
 ]
 
-{ #category : #negating }
+{ #category : 'as yet unclassified' }
+RAIsCharacterObject >> mutate: mutator [
+
+	^ mutator mutateIsCharacterObjectConstraint: self
+]
+
+{ #category : 'negating' }
 RAIsCharacterObject >> mzConstraintOnInterpreter: anInterpreter [
 
 	^ (operands first typeTag equals: 2)
@@ -24,7 +32,7 @@ RAIsCharacterObject >> mzConstraintOnInterpreter: anInterpreter [
 			   inInterpreter: anInterpreter)
 ]
 
-{ #category : #negating }
+{ #category : 'negating' }
 RAIsCharacterObject >> negated [
 	
 	^ RAIsNonCharacterObject operands: self operands

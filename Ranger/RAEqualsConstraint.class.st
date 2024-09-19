@@ -1,22 +1,30 @@
 Class {
-	#name : #RAEqualsConstraint,
-	#superclass : #RAPathConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RAEqualsConstraint',
+	#superclass : 'RAPathConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RAEqualsConstraint >> evaluateWith: anObjectBuilder [
 	
 	^ (operands first evaluateWith: anObjectBuilder) = (operands second evaluateWith: anObjectBuilder)
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 RAEqualsConstraint >> invert [
 
 	^ RAEqualsConstraint operands: self operands reversed
 ]
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RAEqualsConstraint >> mutate: mutator [
+
+	^ mutator mutateEqualsConstraint: self
+]
+
+{ #category : 'microzinc' }
 RAEqualsConstraint >> mzConstraintOnInterpreter: interpreter [ 
 
 	| leftOperand rightOperand |
@@ -26,7 +34,7 @@ RAEqualsConstraint >> mzConstraintOnInterpreter: interpreter [
 	^ leftOperand equals: rightOperand
 ]
 
-{ #category : #converting }
+{ #category : 'converting' }
 RAEqualsConstraint >> negated [
 
 	^ RANotEqualsConstraint operands: self operands

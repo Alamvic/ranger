@@ -1,28 +1,30 @@
 Class {
-	#name : #RAInterpreterExitCondition,
-	#superclass : #Object,
-	#category : #'Ranger-Interpreter'
+	#name : 'RAInterpreterExitCondition',
+	#superclass : 'Object',
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #executing }
+{ #category : 'executing' }
 RAInterpreterExitCondition >> executeTest: aRAAutoTest [ 
 	
 	aRAAutoTest executeUntilReturn
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAInterpreterExitCondition >> isInvalid [
 	
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAInterpreterExitCondition >> isInvalidIn: aTest [ 
 	
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAInterpreterExitCondition >> result [
 	
 	self subclassResponsibility

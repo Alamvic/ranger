@@ -1,10 +1,18 @@
 Class {
-	#name : #RAQuotientConstraint,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RAQuotientConstraint',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RAQuotientConstraint >> mutate: mutator [
+
+	^ mutator mutateQuotientConstraint: self
+]
+
+{ #category : 'microzinc' }
 RAQuotientConstraint >> mzConstraintOnInterpreter: interpreter [ 
 	
 	"This should be equivalent to Pharo's //.
