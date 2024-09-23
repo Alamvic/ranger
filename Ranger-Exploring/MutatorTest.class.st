@@ -27,6 +27,12 @@ MutatorTest >> isChar: aConstraint [
 ]
 
 { #category : 'testing' }
+MutatorTest >> isGreater: aConstraint than: number [
+	
+	^ RAGreaterConstraint operands: { aConstraint . self const: number }
+]
+
+{ #category : 'testing' }
 MutatorTest >> isInt: aConstraint [
 	
 	^ RAIsIntegerObject operands: { aConstraint }

@@ -8,14 +8,14 @@ Class {
 { #category : 'as yet unclassified' }
 IntConstraintMutator >> mutateConstraints: someConstraints [ 
 	
-	| intContraints |
-	intContraints := someConstraints select: [ :constraint | constraint class = RAIsIntegerObject ].
+	| intConstraints |
+	intConstraints := someConstraints select: [ :constraint | constraint class = RAIsIntegerObject ].
 
-	^ someConstraints copy, (intContraints collect: [ :constraint | self mutateConstraint: constraint ])
+	^ someConstraints copy, (self mutationsByIntConstraints: intConstraints)
 ]
 
 { #category : 'as yet unclassified' }
-IntConstraintMutator >> mutateIsIntegerObjectConstraint: aConstraint [
-
-	^ RALessConstraint operands: { aConstraint operands first . RAConstant value: 1000 }
+IntConstraintMutator >> mutationsByIntConstraints: intConstraints [
+	
+	^ intConstraints collect: [ :constraint | self mutateConstraint: constraint ]
 ]

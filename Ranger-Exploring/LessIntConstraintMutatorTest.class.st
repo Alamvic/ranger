@@ -1,40 +1,18 @@
 Class {
-	#name : 'IntMutatorTest',
-	#superclass : 'MutatorTest',
-	#instVars : [
-		'a',
-		'b',
-		'aPlusB',
-		'c',
-		'path',
-		'isIntA',
-		'isIntB',
-		'isIntPlus',
-		'isCharA'
-	],
+	#name : 'LessIntConstraintMutatorTest',
+	#superclass : 'IntConstraintMutatorTest',
 	#category : 'Ranger-Exploring',
 	#package : 'Ranger-Exploring'
 }
 
 { #category : 'running' }
-IntMutatorTest >> setUp [
+LessIntConstraintMutatorTest >> setUp [ 
 	super setUp.
-	path := RAPath new.
-	a := self const: 500.
-	b := self const: 400.
-	c := self const: $c.
-	aPlusB := self add: a to: b.
-	
-	isIntA := self isInt: a. "int(500)"
-	isCharA := self isChar: c. "char('c')"
-	isIntB := self isInt: b. "int(400)"
-	isIntPlus := self isInt: aPlusB. "int(500 + 400)"
-	
-	self mutator: IntConstraintMutator new
+	self mutator: LessIntConstraintMutator new
 ]
 
 { #category : 'tests' }
-IntMutatorTest >> testAddLessConstraintWithAnOnlyIsInt [
+LessIntConstraintMutatorTest >> testAddLessConstraintWithAnOnlyIsInt [
 
 	| mutatedConstraints |
 	path pathConstraints: { isIntA }. "{ int(a) }"
@@ -48,7 +26,7 @@ IntMutatorTest >> testAddLessConstraintWithAnOnlyIsInt [
 ]
 
 { #category : 'tests' }
-IntMutatorTest >> testAddLessConstraintWithTwoIsInt [
+LessIntConstraintMutatorTest >> testAddLessConstraintWithTwoIsInt [
 
 	| mutatedConstraints |
 	path pathConstraints: { isIntA . isIntB }. "{ int(500), int(400) }"
@@ -62,7 +40,7 @@ IntMutatorTest >> testAddLessConstraintWithTwoIsInt [
 ]
 
 { #category : 'tests' }
-IntMutatorTest >> testAddLessConstraintsWithAddConstraint [
+LessIntConstraintMutatorTest >> testAddLessConstraintsWithAddConstraint [
 	"Given a RAPath with constraints of the form int(a), int(b), int(...),
 		per each int(x), the mutator will add a new constraint (x < 1000)"
 		
@@ -78,7 +56,7 @@ IntMutatorTest >> testAddLessConstraintsWithAddConstraint [
 ]
 
 { #category : 'tests' }
-IntMutatorTest >> testAddLessConstraintsWithAddConstraintAndOtherStuff [
+LessIntConstraintMutatorTest >> testAddLessConstraintsWithAddConstraintAndOtherStuff [
 
 	| mutatedConstraints |
 	path pathConstraints: { isIntA . isCharA . isIntB . isIntPlus }. "{ int(500), int(400), int(500 + 400) }"

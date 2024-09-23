@@ -31,6 +31,7 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 		               interpreter.
 	^ RAPathExplorer new
 		  failOnError: true;
+		  mutator: LessIntConstraintMutator new;
 		  explore: (RAPrimitiveConcolicCase new
 				   selector: aPrimitive;
 				   yourself)
@@ -100,6 +101,7 @@ RAPrimitiveAutoTest class >> testParameters [
 					               interpreter.
 				solutions := RAPathExplorer new
 					             failOnError: false;
+									 mutator: LessIntConstraintMutator new;
 					             explore: (RAPrimitiveConcolicCase new
 							              selector: p first;
 							              yourself)

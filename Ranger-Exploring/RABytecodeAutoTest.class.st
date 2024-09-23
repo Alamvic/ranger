@@ -55,6 +55,7 @@ RABytecodeAutoTest class >> testParameters [
 					               interpreter.
 				solutions := RAPathExplorer new
 					             failOnError: false;
+									 mutator: LessIntConstraintMutator new;
 					             explore: (RABytecodeConcolicCase new
 	              	              	vm: interpreter;
 	              	              	bytecode: bytecode;

@@ -21,6 +21,12 @@ RASlot >> index: anObject [
 	index := anObject
 ]
 
+{ #category : 'evaluating' }
+RASlot >> value [
+
+	^ value
+]
+
 { #category : 'accessing' }
 RASlot >> value: anObject [
 
