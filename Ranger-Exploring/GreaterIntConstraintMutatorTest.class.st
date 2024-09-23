@@ -12,7 +12,7 @@ GreaterIntConstraintMutatorTest >> setUp [
 ]
 
 { #category : 'tests' }
-GreaterIntConstraintMutatorTest >> testAddLessConstraintWithAnOnlyIsInt [
+GreaterIntConstraintMutatorTest >> testAddGreaterConstraintWithAnOnlyIsInt [
 
 	| mutatedConstraints |
 	path pathConstraints: { isIntA }. "{ int(a) }"
@@ -26,7 +26,7 @@ GreaterIntConstraintMutatorTest >> testAddLessConstraintWithAnOnlyIsInt [
 ]
 
 { #category : 'tests' }
-GreaterIntConstraintMutatorTest >> testAddLessConstraintWithTwoIsInt [
+GreaterIntConstraintMutatorTest >> testAddGreaterConstraintWithTwoIsInt [
 
 	| mutatedConstraints |
 	path pathConstraints: { isIntA . isIntB }. "{ int(500), int(400) }"
@@ -40,7 +40,7 @@ GreaterIntConstraintMutatorTest >> testAddLessConstraintWithTwoIsInt [
 ]
 
 { #category : 'tests' }
-GreaterIntConstraintMutatorTest >> testAddLessConstraintsWithAddConstraint [
+GreaterIntConstraintMutatorTest >> testAddGreaterConstraintsWithAddConstraint [
 	"Given a RAPath with constraints of the form int(a), int(b), int(...),
 		per each int(x), the mutator will add a new constraint (x > 1000)"
 		
@@ -56,7 +56,7 @@ GreaterIntConstraintMutatorTest >> testAddLessConstraintsWithAddConstraint [
 ]
 
 { #category : 'tests' }
-GreaterIntConstraintMutatorTest >> testAddLessConstraintsWithAddConstraintAndOtherStuff [
+GreaterIntConstraintMutatorTest >> testAddGreaterConstraintsWithAddConstraintAndOtherStuff [
 
 	| mutatedConstraints |
 	path pathConstraints: { isIntA . isCharA . isIntB . isIntPlus }. "{ int(500), int(400), int(500 + 400) }"
