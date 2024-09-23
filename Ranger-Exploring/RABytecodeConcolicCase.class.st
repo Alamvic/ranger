@@ -1,44 +1,45 @@
 Class {
-	#name : #RABytecodeConcolicCase,
-	#superclass : #RAVMConcolicCase,
+	#name : 'RABytecodeConcolicCase',
+	#superclass : 'RAVMConcolicCase',
 	#instVars : [
 		'bytecode',
 		'vm'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger-Exploring'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABytecodeConcolicCase >> bytecode [
 
 	^ bytecode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABytecodeConcolicCase >> bytecode: anObject [
 
 	bytecode := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RABytecodeConcolicCase >> initializeVM: aVM [
 	
 	aVM currentBytecode: bytecode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABytecodeConcolicCase >> selector [
 	
 	^ vm class bytecodeTable at: bytecode + 1
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABytecodeConcolicCase >> vm [
 
 	^ vm
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABytecodeConcolicCase >> vm: anObject [
 
 	vm := anObject

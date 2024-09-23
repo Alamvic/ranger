@@ -1,56 +1,58 @@
 Class {
-	#name : #RASuccess,
-	#superclass : #Object,
+	#name : 'RASuccess',
+	#superclass : 'Object',
 	#instVars : [
 		'result'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #executing }
+{ #category : 'executing' }
 RASuccess >> executeTest: aRAAutoTest [ 
 	
 	aRAAutoTest executeUntilReturn
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RASuccess >> isFailure [
 	
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RASuccess >> isInvalid [
 
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RASuccess >> isInvalidIn: aTest [
 
 	"A success is never invalid"
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RASuccess >> isSuccess [
 	
 	^ true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASuccess >> result [
 	
 	^ result
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASuccess >> result: anAbstractValue [
 	
 	result := anAbstractValue
 ]
 
-{ #category : #compiling }
+{ #category : 'compiling' }
 RASuccess >> returnResultInto: aTest [
 
 	aTest compileEndInstructionForSuccess: self

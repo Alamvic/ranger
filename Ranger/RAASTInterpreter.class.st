@@ -1,26 +1,28 @@
 Class {
-	#name : #RAASTInterpreter,
-	#superclass : #Object,
+	#name : 'RAASTInterpreter',
+	#superclass : 'Object',
 	#instVars : [
 		'specialCases',
 		'interpretationStack'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #API }
+{ #category : 'API' }
 RAASTInterpreter >> basicNewFrame [
 	
 	^ RAAbstractStackFrame new
 ]
 
-{ #category : #'frame-access' }
+{ #category : 'frame-access' }
 RAASTInterpreter >> currentFrame [
 	
 	^ interpretationStack last
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> doBasicMessageSend: aRBMessageNode [
 
 	| method receiver arguments lookupClass |
@@ -50,7 +52,7 @@ RAASTInterpreter >> doBasicMessageSend: aRBMessageNode [
 		arguments: arguments
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RAASTInterpreter >> initialize [
 
 	super initialize.
@@ -62,13 +64,13 @@ RAASTInterpreter >> initialize [
 	self initializeSpecialCases.
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RAASTInterpreter >> initializeSpecialCases [
 
 	"Hook to be redefined by subclasses"
 ]
 
-{ #category : #interpreting }
+{ #category : 'interpreting' }
 RAASTInterpreter >> interpretBlock: aBlock receiver: aReceiver arguments: arguments [ 
 	
 	| returnedFrame |
@@ -83,19 +85,19 @@ RAASTInterpreter >> interpretBlock: aBlock receiver: aReceiver arguments: argume
 	self pushOperand: returnedFrame pop.
 ]
 
-{ #category : #'special cases' }
+{ #category : 'special cases' }
 RAASTInterpreter >> interpretCCodeInSmalltalkWith: aRBMessageNode [ 
 	"Interpret the Smalltalk version"
 	^ aRBMessageNode arguments second body acceptVisitor: self
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RAASTInterpreter >> interpretMethod: aMethodAST receiver: aReceiver [
 
 	^ self interpretMethod: aMethodAST receiver: aReceiver arguments: #()
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RAASTInterpreter >> interpretMethod: aMethodAST receiver: aReceiver arguments: arguments [
 	| returnedFrame currentFrame |
 	currentFrame := self
@@ -113,7 +115,7 @@ RAASTInterpreter >> interpretMethod: aMethodAST receiver: aReceiver arguments: a
 	self pushOperand: returnedFrame returnValue.
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> interpretPrimitive: method receiver: receiver arguments: arguments [
 
 	^ self pushOperand:
@@ -122,31 +124,31 @@ RAASTInterpreter >> interpretPrimitive: method receiver: receiver arguments: arg
 			   withArguments: arguments asArray)
 ]
 
-{ #category : #lookup }
+{ #category : 'lookup' }
 RAASTInterpreter >> lookupSelector: aString inReceiver: aReceiver [
 	
 	^ aReceiver class lookupSelector: aString
 ]
 
-{ #category : #'frame-access' }
+{ #category : 'frame-access' }
 RAASTInterpreter >> operandStackTop [
 	
 	^ self currentFrame stackTop
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RAASTInterpreter >> popFrame [
 	
 	^ interpretationStack removeLast
 ]
 
-{ #category : #'frame-access' }
+{ #category : 'frame-access' }
 RAASTInterpreter >> popOperand [
 
 	^ self currentFrame pop
 ]
 
-{ #category : #API }
+{ #category : 'API' }
 RAASTInterpreter >> pushFrameWithReceiver: aReceiver withMethod: aMethod withArguments: arguments [
 	
 	| frame |
@@ -164,37 +166,37 @@ RAASTInterpreter >> pushFrameWithReceiver: aReceiver withMethod: aMethod withArg
 	^ frame
 ]
 
-{ #category : #'frame-access' }
+{ #category : 'frame-access' }
 RAASTInterpreter >> pushOperand: anOperand [
 
 	^ self currentFrame push: anOperand
 ]
 
-{ #category : #'frame-access' }
+{ #category : 'frame-access' }
 RAASTInterpreter >> receiver [
 	
 	^ self currentFrame receiver
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> temporaryAt: aString [ 
 	
 	^ self currentFrame temporaryAt: aString
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> temporaryAt: aString put: aValue [
 	
 	^ self currentFrame temporaryAt: aString put: aValue
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitArgumentVariableNode: aRBVariableNode [ 
 	
 	^ self visitTemporaryVariableNode: aRBVariableNode 
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitAssignmentNode: aRBAssignmentNode [
 
 	| binding |
@@ -212,7 +214,7 @@ RAASTInterpreter >> visitAssignmentNode: aRBAssignmentNode [
 	self halt
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitInstanceVariableNode: aRBVariableNode [ 
 	
 	specialCases
@@ -223,13 +225,13 @@ RAASTInterpreter >> visitInstanceVariableNode: aRBVariableNode [
 	self pushOperand: (self receiver instVarNamed: aRBVariableNode name)
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitLiteralValueNode: aRBLiteralValueNode [ 
 	
 	self pushOperand: aRBLiteralValueNode value
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitMessageNode: aRBMessageNode [
 
 	(#(flag: assert:) includes: aRBMessageNode selector) ifTrue: [ 
@@ -249,14 +251,14 @@ RAASTInterpreter >> visitMessageNode: aRBMessageNode [
 	^ self doBasicMessageSend: aRBMessageNode
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitMethodNode: aRBMethodNode [ 
 	
 	aRBMethodNode body acceptVisitor: self.
 	self popOperand.
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitReturnNode: aRBReturnNode [
 
 	| result |
@@ -266,13 +268,13 @@ RAASTInterpreter >> visitReturnNode: aRBReturnNode [
 	(RAReturnNotification to: self currentFrame home) signal
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitSelfNode: aRBVariableNode [ 
 	
 	self pushOperand: self receiver
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitSequenceNode: aRBSequenceNode [ 
 
 	aRBSequenceNode statements ifEmpty: [ 
@@ -291,13 +293,13 @@ RAASTInterpreter >> visitSequenceNode: aRBSequenceNode [
 	aRBSequenceNode statements last acceptVisitor: self
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitSuperNode: aRBVariableNode [ 
 	
 	self pushOperand: self receiver
 ]
 
-{ #category : #visiting }
+{ #category : 'visiting' }
 RAASTInterpreter >> visitTemporaryVariableNode: aRBVariableNode [ 
 	
 	^ self pushOperand: (self temporaryAt: aRBVariableNode name)

@@ -1,16 +1,24 @@
 Class {
-	#name : #RAAddConstraint,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RAAddConstraint',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RAAddConstraint >> evaluateWith: aRAObjectBuilder [ 
 	
 	^ (operands first evaluateWith: aRAObjectBuilder) + (operands second evaluateWith: aRAObjectBuilder)
 ]
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RAAddConstraint >> mutate: mutator [
+
+	^ mutator mutateAddConstraint: self
+]
+
+{ #category : 'microzinc' }
 RAAddConstraint >> mzConstraintOnInterpreter: interpreter [ 
 	
 	| leftOperand rightOperand |
@@ -20,7 +28,7 @@ RAAddConstraint >> mzConstraintOnInterpreter: interpreter [
 	^ leftOperand + rightOperand
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 RAAddConstraint >> prettyString [
 
 	^ String streamContents: [ :str |

@@ -1,32 +1,33 @@
 Class {
-	#name : #RAConstraintFactory,
-	#superclass : #Object,
+	#name : 'RAConstraintFactory',
+	#superclass : 'Object',
 	#instVars : [
 		'interpreter',
 		'nextIndex'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger-Exploring'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintFactory >> interpreter [
 
 	^ interpreter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintFactory >> interpreter: anObject [
 
 	interpreter := anObject
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAConstraintFactory >> isCompiledMethod: aRAObject [ 
 	
 	^ aRAObject classObject format value = interpreter objectMemory firstCompiledMethodFormat
 ]
 
-{ #category : #abstract }
+{ #category : 'abstract' }
 RAConstraintFactory >> newAbstractFalseObject [
 
 	| falseObject |
@@ -35,7 +36,7 @@ RAConstraintFactory >> newAbstractFalseObject [
 	^ falseObject
 ]
 
-{ #category : #factory }
+{ #category : 'factory' }
 RAConstraintFactory >> newAbstractFloatWithValueVariable: aRAConstant [ 
 	
 	| floatObjectConstraint |
@@ -48,7 +49,7 @@ RAConstraintFactory >> newAbstractFloatWithValueVariable: aRAConstant [
 	^ floatObjectConstraint
 ]
 
-{ #category : #abstract }
+{ #category : 'abstract' }
 RAConstraintFactory >> newAbstractMethod [
 
 	| smallInteger |
@@ -58,7 +59,7 @@ RAConstraintFactory >> newAbstractMethod [
 	^ smallInteger
 ]
 
-{ #category : #abstract }
+{ #category : 'abstract' }
 RAConstraintFactory >> newAbstractNilObject [
 
 	| nilObject |
@@ -67,7 +68,7 @@ RAConstraintFactory >> newAbstractNilObject [
 	^ nilObject
 ]
 
-{ #category : #abstract }
+{ #category : 'abstract' }
 RAConstraintFactory >> newAbstractObject [
 
 	^ RAObject new
@@ -80,13 +81,13 @@ RAConstraintFactory >> newAbstractObject [
 		yourself
 ]
 
-{ #category : #abstract }
+{ #category : 'abstract' }
 RAConstraintFactory >> newAbstractSmallInteger [
 
 	^ self newAbstractSmallIntegerWithValue: 0
 ]
 
-{ #category : #abstract }
+{ #category : 'abstract' }
 RAConstraintFactory >> newAbstractSmallIntegerWithValue: aValue [
 
 	| smallInteger |
@@ -96,7 +97,7 @@ RAConstraintFactory >> newAbstractSmallIntegerWithValue: aValue [
 	^ smallInteger
 ]
 
-{ #category : #abstract }
+{ #category : 'abstract' }
 RAConstraintFactory >> newAbstractSmallIntegerWithValueVariable: aValueVariable [
 
 	| smallInteger |
@@ -106,7 +107,7 @@ RAConstraintFactory >> newAbstractSmallIntegerWithValueVariable: aValueVariable 
 	^ smallInteger
 ]
 
-{ #category : #abstract }
+{ #category : 'abstract' }
 RAConstraintFactory >> newAbstractTrueObject [
 
 	| trueObject |
@@ -115,19 +116,19 @@ RAConstraintFactory >> newAbstractTrueObject [
 	^ trueObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintFactory >> nextIndex [
 
 	^ nextIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintFactory >> nextIndex: anObject [
 
 	^ nextIndex := anObject
 ]
 
-{ #category : #'value-setup' }
+{ #category : 'value-setup' }
 RAConstraintFactory >> nextOrdinaryClassIndex [
 	
 	^ nextIndex

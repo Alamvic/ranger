@@ -1,6 +1,6 @@
 Class {
-	#name : #RAPrimitiveAutoTest,
-	#superclass : #RAAbstractAutoTest,
+	#name : 'RAPrimitiveAutoTest',
+	#superclass : 'RAAbstractAutoTest',
 	#instVars : [
 		'endInstruction',
 		'primitiveAddress',
@@ -8,10 +8,11 @@ Class {
 		'primitive',
 		'compilationResult'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger-Exploring'
 }
 
-{ #category : #'building suites' }
+{ #category : 'building suites' }
 RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: aWordSize [
 
 	| suite interpreter |
@@ -30,6 +31,7 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 		               interpreter.
 	^ RAPathExplorer new
 		  failOnError: true;
+		  mutator: LessIntConstraintMutator new;
 		  explore: (RAPrimitiveConcolicCase new
 				   selector: aPrimitive;
 				   yourself)
@@ -41,7 +43,7 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 			  interpreter ]
 ]
 
-{ #category : #'building suites' }
+{ #category : 'building suites' }
 RAPrimitiveAutoTest class >> testParameters [
 
 	| suite matrix interpreter primitives |
@@ -99,6 +101,7 @@ RAPrimitiveAutoTest class >> testParameters [
 					               interpreter.
 				solutions := RAPathExplorer new
 					             failOnError: false;
+									 mutator: LessIntConstraintMutator new;
 					             explore: (RAPrimitiveConcolicCase new
 							              selector: p first;
 							              yourself)
@@ -118,19 +121,19 @@ RAPrimitiveAutoTest class >> testParameters [
 	^ matrix
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RAPrimitiveAutoTest >> execute [
 
 	solution exitCondition executeTest: self
 ]
 
-{ #category : #executing }
+{ #category : 'executing' }
 RAPrimitiveAutoTest >> executePrimitiveFailure: aRAPrimitiveFailure [ 
 
 	self runFrom: primitiveAddress until: endInstruction address
 ]
 
-{ #category : #executing }
+{ #category : 'executing' }
 RAPrimitiveAutoTest >> executeUntilReturn [
 
 	self runFrom: primitiveAddress until: callerAddress.
@@ -139,18 +142,18 @@ RAPrimitiveAutoTest >> executeUntilReturn [
 		equals: (objectBuilder instantiate: solution result)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPrimitiveAutoTest >> generator: aString [ 
 	generator := aString
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAPrimitiveAutoTest >> isInvalidMemoryAccessInvalid [
 	
 	^ false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPrimitiveAutoTest >> prepareAutoCall [
 
 	| receiver primitiveReceiver primitiveArguments |
@@ -178,31 +181,31 @@ RAPrimitiveAutoTest >> prepareAutoCall [
 		arguments: primitiveArguments
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPrimitiveAutoTest >> primitive: aString [ 
 	
 	primitive := aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPrimitiveAutoTest >> primitiveReceiver [
 
 	^ solution inputConstraints operandStack last
 ]
 
-{ #category : #executing }
+{ #category : 'executing' }
 RAPrimitiveAutoTest >> receiverTags [
 
 	^ self primitiveReceiver typeTag value ifNil: [ 0 ]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RAPrimitiveAutoTest >> solution: aSolution [
 
 	solution := aSolution
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RAPrimitiveAutoTest >> testPrimitive [
 
 	(solution isInvalidIn: self) ifTrue: [ ^ self ].

@@ -1,57 +1,58 @@
 Class {
-	#name : #RAClassObject,
-	#superclass : #RAObject,
+	#name : 'RAClassObject',
+	#superclass : 'RAObject',
 	#instVars : [
 		'format',
 		'name',
 		'classIndex',
 		'definedFixedFields'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger-Exploring'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAClassObject >> classIndex [
 	^ classIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAClassObject >> classIndex: anObject [
 
 	classIndex := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAClassObject >> definedFixedFields [
 
 	^ definedFixedFields
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAClassObject >> definedFixedFields: anObject [
 
 	definedFixedFields := anObject
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RAClassObject >> evaluateWith: anObjectBuilder [ 
 	
 	^ anObjectBuilder objectById: name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAClassObject >> format [
 
 	^ format
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAClassObject >> format: anObject [
 1halt.
 	format := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RAClassObject >> initializeWithVariableName: aName [
 
 	super initializeWithVariableName: aName.
@@ -87,31 +88,31 @@ RAClassObject >> initializeWithVariableName: aName [
 		              yourself.
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAClassObject >> isBooleanObjectOf [
 	
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAClassObject >> isConstant [
 	
 	^ false
 ]
 
-{ #category : #tsting }
+{ #category : 'tsting' }
 RAClassObject >> isIntegerObjectOf [
 
 	^ false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAClassObject >> variableName [
 
 	^ name
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAClassObject >> variableName: anObject [
 
 	name := anObject

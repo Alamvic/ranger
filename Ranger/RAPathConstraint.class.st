@@ -1,10 +1,12 @@
 Class {
-	#name : #RAPathConstraint,
-	#superclass : #RAConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RAPathConstraint',
+	#superclass : 'RAConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RAPathConstraint >> evaluateWith: anObjectBuilder [
 	
 	self subclassResponsibility

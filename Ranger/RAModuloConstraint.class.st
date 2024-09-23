@@ -1,10 +1,18 @@
 Class {
-	#name : #RAModuloConstraint,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RAModuloConstraint',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RAModuloConstraint >> mutate: mutator [
+
+	^ mutator mutateModuloConstraint: self
+]
+
+{ #category : 'microzinc' }
 RAModuloConstraint >> mzConstraintOnInterpreter: interpreter [ 
 
 	"This should be equivalent to Pharo's \\.

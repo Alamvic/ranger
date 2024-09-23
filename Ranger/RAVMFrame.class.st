@@ -1,6 +1,6 @@
 Class {
-	#name : #RAVMFrame,
-	#superclass : #Object,
+	#name : 'RAVMFrame',
+	#superclass : 'Object',
 	#instVars : [
 		'receiver',
 		'operandStack',
@@ -9,10 +9,12 @@ Class {
 		'locals',
 		'frameConstraints'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame class >> builder: anObjectBuilder [
 
 	^ self new
@@ -20,7 +22,7 @@ RAVMFrame class >> builder: anObjectBuilder [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame class >> firstFrameForBuilder: anObjectBuilder [
 
 	^ (self builder: anObjectBuilder)
@@ -28,36 +30,36 @@ RAVMFrame class >> firstFrameForBuilder: anObjectBuilder [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> argumentAt: anIndex [
 
 	^ {arguments at: anIndex . frameConstraints argumentAt: anIndex }
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> arguments [
 
 	^ arguments
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> arguments: aCollection [
 
 	arguments := aCollection
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> frameConstraints [
 	
 	^ frameConstraints
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> frameConstraints: aRAVMFrameConstraint [ 
 	frameConstraints := aRAVMFrameConstraint
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RAVMFrame >> initialize [
 
 	super initialize.
@@ -66,60 +68,60 @@ RAVMFrame >> initialize [
 	arguments := #()
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> localAt: anIndex [
 	
 	^ { locals at: anIndex . frameConstraints localAt: anIndex }
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> locals [
 
 	^ locals
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> locals: aCollection [ 
 	locals := aCollection
 ]
 
-{ #category : #method }
+{ #category : 'method' }
 RAVMFrame >> method [
 	
 	^ {method. frameConstraints method}
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> method: anObject [
 
 	method := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> numberOfArguments [
 
 	^ {arguments size. frameConstraints numberOfArguments }
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> numberOfLocals [
 	
 	^ {locals size . frameConstraints numberOfLocals}
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> operandStack [
 
 	^ operandStack
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> operandStack: anObject [
 
 	operandStack := anObject
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RAVMFrame >> operandStackAt: stackIndex [
 
 	^ {
@@ -128,7 +130,7 @@ RAVMFrame >> operandStackAt: stackIndex [
 	}
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RAVMFrame >> operandStackAt: stackIndex put: aValue [
 
 	operandStack
@@ -139,25 +141,25 @@ RAVMFrame >> operandStackAt: stackIndex put: aValue [
 		put: aValue second
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> operandStackSize [
 	
 	^ {operandStack size . frameConstraints operandStackSize }
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> operandStackTop [
 	
 	^ { operandStack top . frameConstraints operandStackTop }
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RAVMFrame >> pop [
 
 	^ operandStack pop
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> postCopy [
 
 	arguments := arguments copy.
@@ -166,32 +168,32 @@ RAVMFrame >> postCopy [
 	frameConstraints := frameConstraints copy.
 ]
 
-{ #category : #initialization }
+{ #category : 'initialization' }
 RAVMFrame >> push: aValue [
 
 	self pushConcrete: aValue first.
 	frameConstraints push: aValue second.
 ]
 
-{ #category : #'operand stack' }
+{ #category : 'operand stack' }
 RAVMFrame >> pushConcrete: aValue [
 	
 	operandStack push: aValue
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> receiver [
 
 	^ {receiver . frameConstraints receiver}
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> receiver: anObject [
 
 	receiver := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAVMFrame >> top [
 	1halt.
 	^ operandStack top

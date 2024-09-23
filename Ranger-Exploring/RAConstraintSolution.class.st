@@ -1,6 +1,6 @@
 Class {
-	#name : #RAConstraintSolution,
-	#superclass : #Object,
+	#name : 'RAConstraintSolution',
+	#superclass : 'Object',
 	#instVars : [
 		'solver',
 		'path',
@@ -8,33 +8,34 @@ Class {
 		'outputConstraints',
 		'timeToExplore'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger-Exploring'
 }
 
-{ #category : #validating }
+{ #category : 'validating' }
 RAConstraintSolution >> checkSupported [
 	
 	"Do nothing. Error subclasses should redefine"
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> exitCondition [
 	
 	^ path exitCondition
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> inputConstraints [
 	^ inputConstraints
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> inputConstraints: aCollection [ 
 	
 	inputConstraints := aCollection
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RAConstraintSolution >> inspectionItems: aBuilder [
 	<inspectorPresentationOrder: 0 title: 'Path'> 
 	
@@ -42,66 +43,66 @@ RAConstraintSolution >> inspectionItems: aBuilder [
 	^ path inspectionItems: aBuilder
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAConstraintSolution >> isEmpty [
 	
 	^ path isEmpty
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAConstraintSolution >> isErrorSolution [
 
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAConstraintSolution >> isFailure [
 	
 	^ path isFailure
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAConstraintSolution >> isInvalid [
 
 	^ path exitCondition isInvalid
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAConstraintSolution >> isInvalidIn: aTest [
 	
 	^ path exitCondition isInvalidIn: aTest
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> outputConstraints [
 
 	^ outputConstraints
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> outputConstraints: anObject [
 
 	outputConstraints := anObject
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAConstraintSolution >> parameterNames [
 	
 	^ path inputs
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> path [
 	^ path
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> path: aRAPath [ 
 	
 	path := aRAPath
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> printOn: aStream [
 
 	super printOn: aStream.
@@ -112,31 +113,31 @@ RAConstraintSolution >> printOn: aStream [
 		nextPutAll: ')'
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> result [
 	
 	^ self exitCondition result
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> solver [
 
 	^ solver
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> solver: anObject [
 
 	solver := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> timeToExplore [
 
 	^ timeToExplore
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraintSolution >> timeToExplore: anObject [
 
 	timeToExplore := anObject

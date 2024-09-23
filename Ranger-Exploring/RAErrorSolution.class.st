@@ -1,81 +1,82 @@
 Class {
-	#name : #RAErrorSolution,
-	#superclass : #RAConstraintSolution,
+	#name : 'RAErrorSolution',
+	#superclass : 'RAConstraintSolution',
 	#instVars : [
 		'selector',
 		'vm',
 		'error'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger-Exploring'
 }
 
-{ #category : #validating }
+{ #category : 'validating' }
 RAErrorSolution >> checkSupported [
 	
 	RAUnsupportedTestFailure signal: error messageText
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> error [
 
 	^ error
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> error: anObject [
 
 	error := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> inputConstraints [
 
 	^ inputConstraints
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> inputConstraints: anObject [
 
 	inputConstraints := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> isErrorSolution [
 
 	^ true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> path [
 
 	^ path
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> path: anObject [
 
 	path := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> selector [
 
 	^ selector
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> selector: anObject [
 
 	selector := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> vm [
 
 	^ vm
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAErrorSolution >> vm: anObject [
 
 	vm := anObject

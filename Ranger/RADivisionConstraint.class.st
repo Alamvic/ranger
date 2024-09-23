@@ -1,10 +1,18 @@
 Class {
-	#name : #RADivisionConstraint,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RADivisionConstraint',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RADivisionConstraint >> mutate: mutator [
+
+	^ mutator mutateDivisionConstraint: self
+]
+
+{ #category : 'microzinc' }
 RADivisionConstraint >> mzConstraintOnInterpreter: interpreter [ 
 
 	| leftOperand rightOperand |

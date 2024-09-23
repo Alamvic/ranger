@@ -1,10 +1,12 @@
 Class {
-	#name : #RATestingInterpreter,
-	#superclass : #CogVMSimulatorLSB,
-	#category : #'Ranger-Tests'
+	#name : 'RATestingInterpreter',
+	#superclass : 'CogVMSimulatorLSB',
+	#category : 'Ranger-Tests',
+	#package : 'Ranger',
+	#tag : 'Tests'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RATestingInterpreter >> primitiveCheckPairOfIntegers [
 
 	| stackArgument stackReceiver |
@@ -20,7 +22,7 @@ RATestingInterpreter >> primitiveCheckPairOfIntegers [
 	self pop: 1 thenPush: (objectMemory booleanObjectOf: self successful)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RATestingInterpreter >> primitiveCheckPairOfIntegers2 [
 
 	| stackArgument stackReceiver |
@@ -36,7 +38,7 @@ RATestingInterpreter >> primitiveCheckPairOfIntegers2 [
 	self pop: 1 thenPushBool: self successful
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RATestingInterpreter >> primitiveComputedBoolean [
 
 	| stackReceiver |
@@ -47,7 +49,7 @@ RATestingInterpreter >> primitiveComputedBoolean [
 		thenPush: (objectMemory booleanObjectOf: (objectMemory isIntegerObject: stackReceiver))
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RATestingInterpreter >> primitiveComputedBoolean2 [
 
 	| stackReceiver |
@@ -58,7 +60,7 @@ RATestingInterpreter >> primitiveComputedBoolean2 [
 		thenPushBool: (objectMemory isIntegerObject: stackReceiver)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RATestingInterpreter >> primitiveObjectFixedLength [
 
 
@@ -77,7 +79,7 @@ RATestingInterpreter >> primitiveObjectFixedLength [
 	self pop: 1 thenPush: r
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RATestingInterpreter >> primitiveReturningInteger [
 
 	"Accessing the operand stack in the frame will force to have a frame with a filled stack"
@@ -90,7 +92,7 @@ RATestingInterpreter >> primitiveReturningInteger [
 	self pop: 1 thenPush: stackTop
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RATestingInterpreter >> primitiveReturningReceiver [
 
 	"Accessing the operand stack in the frame will force to have a frame with a filled stack"
@@ -100,7 +102,7 @@ RATestingInterpreter >> primitiveReturningReceiver [
 	self pop: 1 thenPush: stackTop
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RATestingInterpreter >> primitiveReturningReceiverPlusOne [
 
 	"Accessing the operand stack in the frame will force to have a frame with a filled stack"
@@ -113,7 +115,7 @@ RATestingInterpreter >> primitiveReturningReceiverPlusOne [
 	self pop: 1 thenPush: (objectMemory integerObjectOf: (objectMemory integerValueOf: stackTop) + 1)
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RATestingInterpreter >> primitiveWithFrameAccess [
 
 	"Accessing the operand stack in the frame will force to have a frame with a filled stack"
@@ -123,7 +125,7 @@ RATestingInterpreter >> primitiveWithFrameAccess [
 	self pop: 1 thenPush: 1
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RATestingInterpreter >> primitiveWithSinglePath [
 
 	"This method should not access the frame to guarantee we have a single path"

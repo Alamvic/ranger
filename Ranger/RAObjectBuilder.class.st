@@ -1,15 +1,17 @@
 Class {
-	#name : #RAObjectBuilder,
-	#superclass : #Object,
+	#name : 'RAObjectBuilder',
+	#superclass : 'Object',
 	#instVars : [
 		'interpreter',
 		'nextIndex',
 		'instances'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger',
+	#tag : 'Exploring'
 }
 
-{ #category : #asd }
+{ #category : 'asd' }
 RAObjectBuilder >> allocateClassObject: aClassObject [
 
 	| classIndex aConcreteClass |
@@ -33,13 +35,13 @@ RAObjectBuilder >> allocateClassObject: aClassObject [
 	^ classIndex
 ]
 
-{ #category : #'value-setup' }
+{ #category : 'value-setup' }
 RAObjectBuilder >> allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 [ 
 	
 	^ self memory allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 
 ]
 
-{ #category : #'default-values' }
+{ #category : 'default-values' }
 RAObjectBuilder >> defaultFormatForClassIndex: anInteger [ 
 	
 	"If it is the boxed float class, we set first long format by default"
@@ -54,14 +56,14 @@ RAObjectBuilder >> defaultFormatForClassIndex: anInteger [
 	^ 0
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObjectBuilder >> initialize [
 
 	super initialize.
 	instances := IdentityDictionary new.
 ]
 
-{ #category : #'object-building' }
+{ #category : 'object-building' }
 RAObjectBuilder >> initializeConcreteObject: anOop withConstraints: aRAObject [
 
 	| offset |
@@ -91,13 +93,13 @@ RAObjectBuilder >> initializeConcreteObject: anOop withConstraints: aRAObject [
 				withValue: (self instantiate: objectToInstantiate) ] ]
 ]
 
-{ #category : #'value-setup' }
+{ #category : 'value-setup' }
 RAObjectBuilder >> instantiate: aRAObject [
 
 	^ aRAObject evaluateWith: self
 ]
 
-{ #category : #'value-setup' }
+{ #category : 'value-setup' }
 RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 
 	| classIndex newConcreteObject specialID |
@@ -133,7 +135,7 @@ RAObjectBuilder >> instantiateNonImmediateObject: aRAObject [
 	^ newConcreteObject
 ]
 
-{ #category : #'value-setup' }
+{ #category : 'value-setup' }
 RAObjectBuilder >> instantiateObject: aRAObject [
 
 	| typeTag |
@@ -160,31 +162,31 @@ RAObjectBuilder >> instantiateObject: aRAObject [
 	self halt
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObjectBuilder >> interpreter [
 
 	^ interpreter
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObjectBuilder >> interpreter: anObject [
 
 	interpreter := anObject
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObjectBuilder >> isCompiledMethod: aRAObject [ 
 	
 	^ aRAObject classObject format value = interpreter objectMemory firstCompiledMethodFormat
 ]
 
-{ #category : #'value-setup' }
+{ #category : 'value-setup' }
 RAObjectBuilder >> memory [
 
 	^ interpreter objectMemory
 ]
 
-{ #category : #building }
+{ #category : 'building' }
 RAObjectBuilder >> newClassInOldSpaceWithSlots: numberOfSlots instSpec: format [
 	| newClass formatWithSlots |
 
@@ -211,19 +213,19 @@ RAObjectBuilder >> newClassInOldSpaceWithSlots: numberOfSlots instSpec: format [
 	^ newClass	
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObjectBuilder >> nextIndex [
 
 	^ nextIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObjectBuilder >> nextIndex: anObject [
 
 	^ nextIndex := anObject
 ]
 
-{ #category : #'value-setup' }
+{ #category : 'value-setup' }
 RAObjectBuilder >> nextOrdinaryClassIndex [
 	
 	^ nextIndex
@@ -231,7 +233,7 @@ RAObjectBuilder >> nextOrdinaryClassIndex [
 		ifNotNil: [ nextIndex := nextIndex + 1 ]
 ]
 
-{ #category : #'value-setup' }
+{ #category : 'value-setup' }
 RAObjectBuilder >> numberOfSlotsOf: aRAObject [
 
 	| basicNumberOfSlots fixedNumberOfSlots |
@@ -244,13 +246,13 @@ RAObjectBuilder >> numberOfSlotsOf: aRAObject [
 		ifFalse: [ basicNumberOfSlots ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObjectBuilder >> objectById: aString [ 
 	
 	^ instances at: aString
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObjectBuilder >> objectMemory [
 	
 	^ interpreter objectMemory

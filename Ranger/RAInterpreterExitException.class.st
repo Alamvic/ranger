@@ -1,19 +1,21 @@
 Class {
-	#name : #RAInterpreterExitException,
-	#superclass : #Error,
+	#name : 'RAInterpreterExitException',
+	#superclass : 'Error',
 	#instVars : [
 		'exitCondition'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAInterpreterExitException >> exitCondition [
 
 	^ exitCondition
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAInterpreterExitException >> exitCondition: anObject [
 
 	exitCondition := anObject

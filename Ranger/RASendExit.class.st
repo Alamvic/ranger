@@ -1,63 +1,65 @@
 Class {
-	#name : #RASendExit,
-	#superclass : #RAInterpreterExitCondition,
+	#name : 'RASendExit',
+	#superclass : 'RAInterpreterExitCondition',
 	#instVars : [
 		'messageReceiver',
 		'messageSelector'
 	],
-	#category : #'Ranger-Interpreter'
+	#category : 'Ranger-Interpreter',
+	#package : 'Ranger',
+	#tag : 'Interpreter'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASendExit >> executeTest: aRAAutoTest [ 
 	
 	aRAAutoTest executeUntilSendTrampoline
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RASendExit >> isInvalid [
 	
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RASendExit >> isInvalidIn: aTest [
 
 	"Send exits are never invalid"
 	^ false
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASendExit >> messageReceiver [
 
 	^ messageReceiver
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASendExit >> messageReceiver: anObject [
 
 	messageReceiver := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASendExit >> messageSelector [
 	
 	^ messageSelector
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASendExit >> messageSelector: anObject [
 
 	messageSelector := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RASendExit >> receiver: anObject [
 
 	messageReceiver := anObject
 ]
 
-{ #category : #compiling }
+{ #category : 'compiling' }
 RASendExit >> returnResultInto: aTest [ 
 	
 	"This exit means that the compiler should insert a call to a send trampoline.

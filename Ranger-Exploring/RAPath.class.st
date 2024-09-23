@@ -1,16 +1,17 @@
 Class {
-	#name : #RAPath,
-	#superclass : #Object,
+	#name : 'RAPath',
+	#superclass : 'Object',
 	#instVars : [
 		'pathConstraints',
 		'parent',
 		'inputs',
 		'exitCondition'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger-Exploring'
 }
 
-{ #category : #copying }
+{ #category : 'copying' }
 RAPath >> copyWithNumberOfSegments: anInteger [ 
 	
 	^ self copy
@@ -18,18 +19,18 @@ RAPath >> copyWithNumberOfSegments: anInteger [
 		yourself
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPath >> exitCondition [
 	^ exitCondition
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPath >> exitCondition: anError [ 
 	
 	exitCondition := anError
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAPath >> initialize [
 
 	super initialize.
@@ -38,19 +39,19 @@ RAPath >> initialize [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPath >> inputFrame: anObject [
 
 	inputs := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPath >> inputs [
 
 	^ inputs
 ]
 
-{ #category : #copying }
+{ #category : 'copying' }
 RAPath >> inspectionItems: aBuilder [
 	<inspectorPresentationOrder: 0 title: 'Constraints'> 
 	
@@ -63,19 +64,19 @@ RAPath >> inspectionItems: aBuilder [
 		yourself
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAPath >> isEmpty [
 	
 	^ pathConstraints isEmpty
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPath >> isFailure [
 
 	^ exitCondition isFailure
 ]
 
-{ #category : #negating }
+{ #category : 'negating' }
 RAPath >> negateLastSegmentInCommonWith: aParent [ 
 	
 	| newPathConstraints |
@@ -88,7 +89,7 @@ RAPath >> negateLastSegmentInCommonWith: aParent [
 	pathConstraints := newPathConstraints.
 ]
 
-{ #category : #searching }
+{ #category : 'searching' }
 RAPath >> nextPath [
 	
 	| copy |
@@ -98,47 +99,49 @@ RAPath >> nextPath [
 	^ copy
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPath >> parent [
 
 	^ parent
 ]
 
-{ #category : #accessing }
-RAPath >> parent: aRAPath [ 
+{ #category : 'accessing' }
+RAPath >> parent: aRAPath [
+
 	parent := aRAPath
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPath >> pathConstraints [
 	
 	^ pathConstraints
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPath >> pathConstraints: anObject [
 
 	pathConstraints := anObject
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 RAPath >> printOn: aStream [
 
 	super printOn: aStream.
 	aStream nextPut: $(.
 	pathConstraints
-		do: [ :e | aStream print: e ]
+		do: [ :constraint | aStream print: constraint ]
 		separatedBy: [ aStream nextPutAll: ', ' ].
 	aStream nextPut: $).
 ]
 
-{ #category : #solving }
+{ #category : 'solving' }
 RAPath >> solveWithInterpreter: interpreter [
 
 	| solver |
 	solver := MzSolver new.
-	pathConstraints do: [ :e | 
-		solver addConstraint: (e mzConstraintOnInterpreter: interpreter). ].
+	pathConstraints do: [ :constraint | 
+		solver addConstraint: (constraint mzConstraintOnInterpreter: interpreter).
+	].
 
 	solver timeout: 2 seconds.
 	solver satisfy.

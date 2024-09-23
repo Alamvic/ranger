@@ -1,10 +1,12 @@
 Class {
-	#name : #RATest,
-	#superclass : #VMJittedGeneralPrimitiveTest,
-	#category : #'Ranger-Tests'
+	#name : 'RATest',
+	#superclass : 'VMJittedGeneralPrimitiveTest',
+	#category : 'Ranger-Tests',
+	#package : 'Ranger',
+	#tag : 'Tests'
 }
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest class >> testParameters [
 
 	^ ParametrizedTestMatrix new
@@ -12,12 +14,13 @@ RATest class >> testParameters [
 		yourself
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> explorePrimitive: aPrimitiveName [
 
 	| explorer |
 	explorer := RAPathExplorer new.
 	explorer failOnError: true.
+	explorer mutator: LessIntConstraintMutator new.
 
 	^ explorer
 		  explore: (RAPrimitiveConcolicCase new
@@ -26,19 +29,19 @@ RATest >> explorePrimitive: aPrimitiveName [
 		  vmBuildingBlock: [ self newVM ]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RATest >> interpreterClass [
 
 	^ RATestingInterpreter
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> newVM [
 
 	^ self setUp; interpreter
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveCheckPairOfIntegers [
 
 	| solutions |
@@ -66,7 +69,7 @@ RATest >> testExplorePrimitiveCheckPairOfIntegers [
 	self assert: solutions last outputConstraints operandStackTop isAbstractTrueObject
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveCheckPairOfIntegersWithInlinedPopPushBool [
 
 	| solutions |
@@ -94,7 +97,7 @@ RATest >> testExplorePrimitiveCheckPairOfIntegersWithInlinedPopPushBool [
 	self assert: solutions last outputConstraints operandStackTop isAbstractTrueObject
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveCheckingSmallIntegerFailsOnNonSmallInteger [
 
 	| solutions validSolution |
@@ -106,7 +109,7 @@ RATest >> testExplorePrimitiveCheckingSmallIntegerFailsOnNonSmallInteger [
 	self assert: validSolution inputConstraints operandStackTop isAbstractPointersObject.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveCheckingSmallIntegerSucceedsOnSmallInteger [
 
 	| solutions validSolution |
@@ -119,7 +122,7 @@ RATest >> testExplorePrimitiveCheckingSmallIntegerSucceedsOnSmallInteger [
 	self assert: validSolution outputConstraints operandStackTop isAbstractSmallInteger
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveComputedBoolean [
 
 	| solutions |
@@ -142,7 +145,7 @@ RATest >> testExplorePrimitiveComputedBoolean [
 	self assert: solutions third outputConstraints operandStackTop isAbstractTrueObject.
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveComputedBooleanWithInlinedPopPushBool [
 
 	| solutions |
@@ -165,7 +168,7 @@ RATest >> testExplorePrimitiveComputedBooleanWithInlinedPopPushBool [
 		})
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveObjectFixedLength [
 
 	| solutions |
@@ -191,7 +194,7 @@ RATest >> testExplorePrimitiveObjectFixedLength [
 	self assert: solutions last inputConstraints stackTop isAbstractImmediate
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveReturningReceiver [
 
 	| solutions validSolution |
@@ -202,7 +205,7 @@ RATest >> testExplorePrimitiveReturningReceiver [
 	self assert: validSolution outputConstraints operandStackTop equals: validSolution inputConstraints operandStackTop
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveReturningReceiverPlusOne [
 
 	| solutions validSolution outputStackTop inputStackTop |
@@ -222,7 +225,7 @@ RATest >> testExplorePrimitiveReturningReceiverPlusOne [
 			RAConstant value: 1 })
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveWithFrameAccessHasASecondValidSolution [
 
 	| solutions validSolution |
@@ -234,7 +237,7 @@ RATest >> testExplorePrimitiveWithFrameAccessHasASecondValidSolution [
 	self assert: validSolution inputConstraints operandStackSize value > 0
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveWithFrameAccessHasFirstAnInvalidSolution [
 
 	| solutions |
@@ -243,7 +246,7 @@ RATest >> testExplorePrimitiveWithFrameAccessHasFirstAnInvalidSolution [
 	self assert: solutions first isInvalid
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExplorePrimitiveWithFrameAccessValidSolutionModifiesOutputStack [
 
 	| solutions validSolution |
@@ -254,7 +257,7 @@ RATest >> testExplorePrimitiveWithFrameAccessValidSolutionModifiesOutputStack [
 	self assert: validSolution outputConstraints operandStackTop equals: (RAConstant value: 1)
 ]
 
-{ #category : #tests }
+{ #category : 'tests' }
 RATest >> testExploreSinglePathPrimitive [
 
 	| solutions |

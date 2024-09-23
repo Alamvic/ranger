@@ -1,6 +1,6 @@
 Class {
-	#name : #RABytecodeAutoTest,
-	#superclass : #RAAbstractAutoTest,
+	#name : 'RABytecodeAutoTest',
+	#superclass : 'RAAbstractAutoTest',
 	#instVars : [
 		'bytecode',
 		'endInstruction',
@@ -8,94 +8,141 @@ Class {
 		'methodAddress',
 		'jitCompilerClass'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger-Exploring'
 }
 
-{ #category : #'building suites' }
-RABytecodeAutoTest class >> testParameters [
+{ #category : 'building suites' }
+RABytecodeAutoTest class >> exploreSolutions: bytecode fromSetUp: theSetUpTest [
 
-	| suite matrix interpreter |
+	^ RAPathExplorer new
+		  failOnError: false;
+		  mutator: GreaterIntConstraintMutator new;
+		  explore: (RABytecodeConcolicCase new
+				   vm: (self interpreterFrom: theSetUpTest);
+				   bytecode: bytecode;
+				   yourself)
+		  vmBuildingBlock: [
+			  theSetUpTest
+				  setUp;
+				  interpreter
+			  ]
+]
+
+{ #category : 'building suites' }
+RABytecodeAutoTest class >> interpreterFrom: theSetUpTest [
+
+	^ theSetUpTest setUp; interpreter
+]
+
+{ #category : 'building suites' }
+RABytecodeAutoTest class >> solutionsFor: bytecode [
+	
+	^ self solutionsFor: bytecode forArch: 4 "bytes" 
+]
+
+{ #category : 'building suites' }
+RABytecodeAutoTest class >> solutionsFor: bytecode forArch: arch [
+
+	| suite matrix theSetUpTest |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
 	matrix := ParametrizedTestMatrix new.
 
-	"Find the list of primitives to test"
-	interpreter := suite anyOne
-		               setUp;
-		               interpreter.
+	"force the progress bar"
+	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].
+
+	"Build the entire set of tests:
+	 - for each architecture
+	  - for each primitive to test
+	    - for each explored path
+	      => build a test case"
+	theSetUpTest := suite detect: [ :e |
+		                e parametersToUse do: [ :aParameter |
+			                aParameter applyTo: e ].
+		                e wordSize = arch value
+		                ].
+
+	^ self exploreSolutions: bytecode fromSetUp: theSetUpTest
+]
+
+{ #category : 'building suites' }
+RABytecodeAutoTest class >> testParameters [
+
+	| suite matrix architectures |
+	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
+	matrix := ParametrizedTestMatrix new.
+
+	architectures := {
+		                 {
+			                 (#ISA -> #IA32).
+			                 (#wordSize -> 4) }.
+		                 "{ #ISA -> #'X64'. #wordSize -> 8}."
+		                 {
+			                 (#ISA -> #ARMv5).
+			                 (#wordSize -> 4) }
+						}.
 
 	"force the progress bar"
-	(1 to: 1) do: [ :e | ] displayingProgress: [ :e | "nothing" ].
-	
+	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].
+
 	"Build the entire set of tests:
 	 - for each architecture
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
 	(1 to: 175)
-		do: [ :bytecode | 
-			| architectures solutions |
-			architectures := { 
-				                 { 
-					                 (#ISA -> #IA32).
-					                 (#wordSize -> 4) }.
-				                 "{ #ISA -> #'X64'. #wordSize -> 8}."
-				                 { 
-					                 (#ISA -> #ARMv5).
-					                 (#wordSize -> 4) } }.
+		do: [ :bytecode |
+			| solutions |
 			"{ #ISA -> #'aarch64'. #wordSize -> 8}."
-			architectures do: [ :arch | 
+			architectures do: [ :arch |
 				| theSetUpTest |
-				theSetUpTest := suite detect: [ :e | 
-					                e parametersToUse do: [ :aParameter | 
+				theSetUpTest := suite detect: [ :e |
+					                e parametersToUse do: [ :aParameter |
 						                aParameter applyTo: e ].
-					                e wordSize = arch second value ].
-				interpreter := theSetUpTest
-					               setUp;
-					               interpreter.
-				solutions := RAPathExplorer new
-					             failOnError: false;
-					             explore: (RABytecodeConcolicCase new
-	              	              	vm: interpreter;
-	              	              	bytecode: bytecode;
-											yourself)
-					             vmBuildingBlock: [ 
-						             theSetUpTest
-							             setUp;
-							             interpreter ].
-				
-				solutions do: [ :e | 
-					matrix addCase: { 
+					                e wordSize = arch second value
+					                ].
+
+				solutions := self
+					             exploreSolutions: bytecode
+					             fromSetUp: theSetUpTest.
+
+				solutions do: [ :e |
+					matrix addCase: {
 							arch first.
 							arch second.
 							(#bytecode -> bytecode).
-							(#solution -> e) } ] ] ]
+							(#solution -> e) }
+					]
+				]
+			]
 		displayingProgress: [ :bytecode | bytecode asString ].
 
 	^ matrix * (ParametrizedTestMatrix new
-		forSelector: #jitCompilerClass addOptions: {SimpleStackBasedCogit};
-		yourself)
+		   forSelector: #jitCompilerClass
+		   addOptions: { SimpleStackBasedCogit };
+		   yourself)
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABytecodeAutoTest >> bytecode [
 
 	^ bytecode
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABytecodeAutoTest >> bytecode: anObject [
 
 	bytecode := anObject
 ]
 
-{ #category : #compiling }
+{ #category : 'compiling' }
 RABytecodeAutoTest >> compileEndInstructionForPrimitiveFailure: aRAPrimitiveFailure [ 
 	
 	"In bytecodes, primitive failures should be ignored"
 	self compileEndInstructionForSuccess: aRAPrimitiveFailure
 ]
 
-{ #category : #compiling }
+{ #category : 'compiling' }
 RABytecodeAutoTest >> compileEndInstructionForSuccess: aRASuccess [
 	
 	"I'm a success and my value has been pushed to the operand stack.
@@ -103,13 +150,13 @@ RABytecodeAutoTest >> compileEndInstructionForSuccess: aRASuccess [
 	cogit genReturnTopFromMethod
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RABytecodeAutoTest >> execute [
 
 	solution exitCondition executeTest: self
 ]
 
-{ #category : #executing }
+{ #category : 'executing' }
 RABytecodeAutoTest >> executePrimitiveFailure: aRAPrimitiveFailure [ 
 	
 	"If this is a primitive failure during a bytecode instruction, this means it was a success!
@@ -118,7 +165,7 @@ RABytecodeAutoTest >> executePrimitiveFailure: aRAPrimitiveFailure [
 	self executeUntilReturn
 ]
 
-{ #category : #executing }
+{ #category : 'executing' }
 RABytecodeAutoTest >> executeUntilReturn [
 
 	self runFrom: methodAddress until: callerAddress.
@@ -127,7 +174,7 @@ RABytecodeAutoTest >> executeUntilReturn [
 		equals: (objectBuilder instantiate: solution result)
 ]
 
-{ #category : #executing }
+{ #category : 'executing' }
 RABytecodeAutoTest >> executeUntilSendTrampoline [
 
 	self runFrom: methodAddress until: sendTrampolineStop address.
@@ -140,26 +187,26 @@ RABytecodeAutoTest >> executeUntilSendTrampoline [
 		equals: (objectBuilder instantiate: solution exitCondition messageSelector)
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RABytecodeAutoTest >> isInvalidMemoryAccessInvalid [
 	
 	"Bytecode assume all objects are correct... Otherwise it's a bytecode sequence problem"
 	^ true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABytecodeAutoTest >> jitCompilerClass [
 
 	^ jitCompilerClass
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABytecodeAutoTest >> jitCompilerClass: aClass [ 
 	
 	jitCompilerClass := aClass
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RABytecodeAutoTest >> prepareAutoCall [
 
 	| receiver |
@@ -180,7 +227,7 @@ RABytecodeAutoTest >> prepareAutoCall [
 		self pushAddress: (objectBuilder instantiate: aLocalValue) ]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RABytecodeAutoTest >> prepareCall [
 
 	machineSimulator hasLinkRegister 
@@ -192,13 +239,13 @@ RABytecodeAutoTest >> prepareCall [
 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RABytecodeAutoTest >> receiverTags [
 
 	^ solution inputConstraints receiver typeTag value ifNil: [ 0 ]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RABytecodeAutoTest >> testBytecode [
 
 	(solution isInvalidIn: self) ifTrue: [ ^ self ].

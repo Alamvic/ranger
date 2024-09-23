@@ -1,21 +1,22 @@
 Class {
-	#name : #RAAbstractAutoTest,
-	#superclass : #VMSimpleStackBasedCogitAbstractTest,
+	#name : 'RAAbstractAutoTest',
+	#superclass : 'VMSimpleStackBasedCogitAbstractTest',
 	#instVars : [
 		'solution',
 		'objectBuilder',
 		'sendTrampolineStop'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger-Exploring'
 }
 
-{ #category : #building }
+{ #category : 'building' }
 RAAbstractAutoTest >> allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 [ 
 	
 	^ memory allocateNewSpaceSlots: anInteger format: anInteger2 classIndex: anInteger3 
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RAAbstractAutoTest >> createSpecialSelectorArray [
 
 	| specialObjectsOop  |
@@ -35,36 +36,36 @@ RAAbstractAutoTest >> createSpecialSelectorArray [
 			ofObject: obj withValue: (memory integerObjectOf: (sentSelector) numArgs) ]
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAAbstractAutoTest >> instanceVariablesToKeep [
 	^ super instanceVariablesToKeep, #( solution )
 ]
 
-{ #category : #executing }
+{ #category : 'executing' }
 RAAbstractAutoTest >> isExpectedFailure [
 
 	^ solution isErrorSolution
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAAbstractAutoTest >> isInvalidMemoryAccessInvalid [
 	
 	^ self subclassResponsibility
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RAAbstractAutoTest >> receiverTags [
 
 	self subclassResponsibility
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RAAbstractAutoTest >> runCaseManaged [ 
 
 	^ self runCase
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RAAbstractAutoTest >> setUp [
 
 	super setUp.
@@ -102,7 +103,7 @@ RAAbstractAutoTest >> setUp [
 		cogit ordinarySendTrampolineAt: numberOfArguments put: sendTrampolineAddress. ]
 ]
 
-{ #category : #running }
+{ #category : 'running' }
 RAAbstractAutoTest >> solution: aSolution [
 
 	solution := aSolution

@@ -1,10 +1,18 @@
 Class {
-	#name : #RABitShiftConstraint,
-	#superclass : #RAValueConstraint,
-	#category : #'Ranger-Constraints'
+	#name : 'RABitShiftConstraint',
+	#superclass : 'RAValueConstraint',
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
+RABitShiftConstraint >> mutate: mutator [
+
+	^ mutator mutateBitShiftConstraint: self
+]
+
+{ #category : 'as yet unclassified' }
 RABitShiftConstraint >> simplify [
 
 	"If possible, replace shift by multiplication"

@@ -1,13 +1,15 @@
 Class {
-	#name : #RAConstraint,
-	#superclass : #Object,
+	#name : 'RAConstraint',
+	#superclass : 'Object',
 	#instVars : [
 		'operands'
 	],
-	#category : #'Ranger-Constraints'
+	#category : 'Ranger-Constraints',
+	#package : 'Ranger',
+	#tag : 'Constraints'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RAConstraint class >> constraintClassFor: anOperation [
 
 	^ { 
@@ -32,7 +34,7 @@ RAConstraint class >> constraintClassFor: anOperation [
 	 } asDictionary at: anOperation
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RAConstraint class >> operands: operands [
 
 	^ self new
@@ -41,7 +43,7 @@ RAConstraint class >> operands: operands [
 		yourself
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RAConstraint class >> operation: anOperation operands: operands [
 
 	^ (self constraintClassFor: anOperation) new
@@ -49,7 +51,7 @@ RAConstraint class >> operation: anOperation operands: operands [
 		simplify
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 RAConstraint >> = anotherConstraint [
 
 	(anotherConstraint isKindOf: self class)
@@ -57,54 +59,60 @@ RAConstraint >> = anotherConstraint [
 	^ self operands = anotherConstraint operands
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAConstraint >> isConstant [
 	
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAConstraint >> isVariable [
 	
 	^ false
 ]
 
-{ #category : #microzinc }
+{ #category : 'as yet unclassified' }
+RAConstraint >> mutate: mutator [
+
+	^ self subclassResponsibility 
+]
+
+{ #category : 'microzinc' }
 RAConstraint >> mzConstraintOnInterpreter: anInterpreter [
 	
 	self subclassResponsibility
 ]
 
-{ #category : #negating }
+{ #category : 'negating' }
 RAConstraint >> negated [
 	
 	self subclassResponsibility
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraint >> operands [
 
 	^ operands
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraint >> operands: anObject [
 
 	operands := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAConstraint >> origin: aStackTrace [
 
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 RAConstraint >> prettyIdentifier [
 
 	^ self class name
 ]
 
-{ #category : #adding }
+{ #category : 'adding' }
 RAConstraint >> prettyString [
 
 	^ String streamContents: [ :str |
@@ -117,7 +125,7 @@ RAConstraint >> prettyString [
 	]
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 RAConstraint >> printOn: aStream [
 
 	super printOn: aStream.
@@ -129,13 +137,13 @@ RAConstraint >> printOn: aStream [
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : 'as yet unclassified' }
 RAConstraint >> simplify [
 
 	^ self
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAConstraint >> variables [
 	
 	^ operands flatCollect: [ :e | e variables ] as: Set

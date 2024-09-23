@@ -1,6 +1,6 @@
 Class {
-	#name : #RAObject,
-	#superclass : #Object,
+	#name : 'RAObject',
+	#superclass : 'Object',
 	#instVars : [
 		'variableName',
 		'typeTag',
@@ -17,10 +17,12 @@ Class {
 		'specialObject',
 		'floatValue'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger',
+	#tag : 'Exploring'
 }
 
-{ #category : #'instance creation' }
+{ #category : 'instance creation' }
 RAObject class >> named: aName [
 
 	^ self basicNew
@@ -28,7 +30,7 @@ RAObject class >> named: aName [
 		yourself
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObject >> = anotherVariable [
 
 	(anotherVariable isKindOf: self class)
@@ -36,42 +38,42 @@ RAObject >> = anotherVariable [
 	^ variableName = anotherVariable variableName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> classIndex [
 
 	^ classObject classIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> classObject [
 
 	^ classObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> classObject: anObject [
 
 	classObject := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> classTag [
 
 	^ self classObject classIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> constraintFactory: aRAConstraintFactory [ 
 	constraintFactory := aRAConstraintFactory
 ]
 
-{ #category : #evaluating }
+{ #category : 'evaluating' }
 RAObject >> evaluateWith: anObjectBuilder [ 
 	
 	^ anObjectBuilder instantiateObject: self
 ]
 
-{ #category : #slots }
+{ #category : 'slots' }
 RAObject >> fetchLong32: aConcreteAbstractPair [
 	
 	| long32 |
@@ -87,7 +89,7 @@ RAObject >> fetchLong32: aConcreteAbstractPair [
 	^ long32
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> fetchPointer: anIndex [
 
 	"Indexes are 0 based"
@@ -96,31 +98,31 @@ RAObject >> fetchPointer: anIndex [
 	]
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> floatValue: aValue [
 
 	floatValue := aValue
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> format [
 
 	^ classObject format
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> hashBits [
 
 	^ hashBits
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> hashBits: anObject [
 
 	hashBits := anObject
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 RAObject >> initializeWithVariableName: aName [
 
 	variableName := aName.
@@ -180,24 +182,24 @@ RAObject >> initializeWithVariableName: aName [
 		              yourself.
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> integerValue [
 	^ integerValue
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> integerValue: anObject [
 
 	integerValue := anObject
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObject >> isAbstractFalseObject [
 	
 	^ self specialObject value = 3
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObject >> isAbstractImmediate [
 
 	"Type tags are
@@ -207,7 +209,7 @@ RAObject >> isAbstractImmediate [
 	^ #(1 2) includes: self typeTag value
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObject >> isAbstractPointersObject [
 
 	"Type tags are
@@ -219,7 +221,7 @@ RAObject >> isAbstractPointersObject [
 	^ #(0 nil) includes: self typeTag value
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObject >> isAbstractSmallInteger [
 
 	"Type tags are
@@ -229,91 +231,91 @@ RAObject >> isAbstractSmallInteger [
 	^ self typeTag value = 1
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObject >> isAbstractTrueObject [
 	
 	^ self specialObject value = 2
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObject >> isBooleanObjectOf [
 	
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObject >> isConstant [
 	
 	^ false
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 RAObject >> isForwarded [
 
 	^ isForwarded
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 RAObject >> isForwarded: aValue [
 
 	isForwarded := aValue
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObject >> isIntegerObjectOf [
 	
 	^ false
 ]
 
-{ #category : #testing }
+{ #category : 'testing' }
 RAObject >> isVariable [
 	
 	^ true
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> long32Slots [
 
 	^ long32Slots
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> long32Slots: anObject [
 
 	long32Slots := anObject
 ]
 
-{ #category : #microzinc }
+{ #category : 'microzinc' }
 RAObject >> mzConstraintOnInterpreter: interpreter [
 	
 	^ self
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> name [
 	
 	^ variableName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> numSlots [
 	
 	^ numSlots
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> numSlots: aNumberOfSlots [
 	
 	^ numSlots := aNumberOfSlots
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 RAObject >> prettyString [
 
 	^ variableName
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 RAObject >> printOn: aStream [
 
 	super printOn: aStream.
@@ -322,73 +324,73 @@ RAObject >> printOn: aStream [
 	aStream nextPut: $).
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> slots [
 
 	^ slots
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> slots: anObject [
 
 	slots := anObject
 ]
 
-{ #category : #printing }
+{ #category : 'printing' }
 RAObject >> specialObject [
 
 	^ specialObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> specialObjectIndex [
 
 	^ specialObjectIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> specialObjectIndex: anObject [
 
 	specialObjectIndex := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> specialSelectorIndex [
 
 	^ specialSelectorIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> specialSelectorIndex: anIndex [
 
 	specialSelectorIndex := anIndex
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> typeTag [
 	
 	^ typeTag 
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> typeTag: anObject [
 
 	typeTag := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> variableName [
 
 	^ variableName
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> variableName: anObject [
 
 	variableName := anObject
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAObject >> variables [
 	
 	^ { typeTag . integerValue }

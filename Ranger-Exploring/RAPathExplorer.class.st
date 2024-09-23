@@ -1,6 +1,6 @@
 Class {
-	#name : #RAPathExplorer,
-	#superclass : #Object,
+	#name : 'RAPathExplorer',
+	#superclass : 'Object',
 	#instVars : [
 		'vmStack',
 		'constraints',
@@ -11,18 +11,20 @@ Class {
 		'selector',
 		'vm',
 		'failOnError',
-		'constraintFactory'
+		'constraintFactory',
+		'mutator'
 	],
-	#category : #'Ranger-Exploring'
+	#category : 'Ranger-Exploring',
+	#package : 'Ranger-Exploring'
 }
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPathExplorer >> constraintFactory [
 
 	^ constraintFactory
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 
 	| currentPath solution previousInputFrameConstraints exploredPath inputFrame |
@@ -47,7 +49,7 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	inputFrame := previousInputFrameConstraints
 		              instantiateWith: objectBuilder
 		              constraintBuilder: constraintFactory.
-
+		
 	exploredPath := self
 		                explorePathWithFrame: inputFrame
 		                solver: solution solver.
@@ -57,6 +59,9 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	Continue by negating the going to the next path.
 	Can this loop?"
 	currentPath := (exploredPath ifNil: [ currentPath nextPath ]) veryDeepCopy.
+	
+	"We mutate the current path to avoid deterministic exploration"
+	currentPath := self mutate: currentPath.
 
 	"Negate and solve constraints!"
 	solution := self solve: currentPath.
@@ -69,7 +74,7 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	^ solutions
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 RAPathExplorer >> explorePathWithFrame: inputFrame solver: solver [
 
 	| explorer outputFrame |
@@ -100,35 +105,48 @@ RAPathExplorer >> explorePathWithFrame: inputFrame solver: solver [
 	^ explorer path
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPathExplorer >> failOnError [
 
 	^ failOnError
 ]
 
-{ #category : #accessing }
+{ #category : 'accessing' }
 RAPathExplorer >> failOnError: anObject [
 
 	failOnError := anObject
 ]
 
-{ #category : #api }
+{ #category : 'api' }
 RAPathExplorer >> initialize [
 
 	super initialize.
 	failOnError := true.
 	executionStack := OrderedCollection new.
 	solutions := OrderedCollection new.
-	constraintFactory := RAConstraintFactory new
+	constraintFactory := RAConstraintFactory new.
+	mutator := IdleMutator new
 ]
 
-{ #category : #solving }
+{ #category : 'as yet unclassified' }
+RAPathExplorer >> mutate: aPath [
+
+	^ mutator mutate: aPath 
+]
+
+{ #category : 'accessing' }
+RAPathExplorer >> mutator: aMutator [
+
+	mutator := aMutator
+]
+
+{ #category : 'solving' }
 RAPathExplorer >> recordSolution: aSolution [
 
 	solutions add: aSolution
 ]
 
-{ #category : #solving }
+{ #category : 'solving' }
 RAPathExplorer >> solve: aRAPath [
 
 	| nextPath solution j ktry |
@@ -162,7 +180,7 @@ RAPathExplorer >> solve: aRAPath [
 	^ solution
 ]
 
-{ #category : #'execution stack' }
+{ #category : 'execution stack' }
 RAPathExplorer >> updateExecutionStackWithConditional: taken position: stackPosition [
 
 	stackPosition "k" < executionStack size ifFalse: [ 
