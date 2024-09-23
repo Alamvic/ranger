@@ -13,69 +13,114 @@ Class {
 }
 
 { #category : 'building suites' }
-RABytecodeAutoTest class >> testParameters [
+RABytecodeAutoTest class >> exploreSolutions: bytecode fromSetUp: theSetUpTest [
 
-	| suite matrix interpreter |
+	^ RAPathExplorer new
+		  failOnError: false;
+		  mutator: GreaterIntConstraintMutator new;
+		  explore: (RABytecodeConcolicCase new
+				   vm: (self interpreterFrom: theSetUpTest);
+				   bytecode: bytecode;
+				   yourself)
+		  vmBuildingBlock: [
+			  theSetUpTest
+				  setUp;
+				  interpreter
+			  ]
+]
+
+{ #category : 'building suites' }
+RABytecodeAutoTest class >> interpreterFrom: theSetUpTest [
+
+	^ theSetUpTest setUp; interpreter
+]
+
+{ #category : 'building suites' }
+RABytecodeAutoTest class >> solutionsFor: bytecode [
+	
+	^ self solutionsFor: bytecode forArch: 4 "bytes" 
+]
+
+{ #category : 'building suites' }
+RABytecodeAutoTest class >> solutionsFor: bytecode forArch: arch [
+
+	| suite matrix theSetUpTest |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
 	matrix := ParametrizedTestMatrix new.
 
-	"Find the list of primitives to test"
-	interpreter := suite anyOne
-		               setUp;
-		               interpreter.
+	"force the progress bar"
+	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].
+
+	"Build the entire set of tests:
+	 - for each architecture
+	  - for each primitive to test
+	    - for each explored path
+	      => build a test case"
+	theSetUpTest := suite detect: [ :e |
+		                e parametersToUse do: [ :aParameter |
+			                aParameter applyTo: e ].
+		                e wordSize = arch value
+		                ].
+
+	^ self exploreSolutions: bytecode fromSetUp: theSetUpTest
+]
+
+{ #category : 'building suites' }
+RABytecodeAutoTest class >> testParameters [
+
+	| suite matrix architectures |
+	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
+	matrix := ParametrizedTestMatrix new.
+
+	architectures := {
+		                 {
+			                 (#ISA -> #IA32).
+			                 (#wordSize -> 4) }.
+		                 "{ #ISA -> #'X64'. #wordSize -> 8}."
+		                 {
+			                 (#ISA -> #ARMv5).
+			                 (#wordSize -> 4) }
+						}.
 
 	"force the progress bar"
-	(1 to: 1) do: [ :e | ] displayingProgress: [ :e | "nothing" ].
-	
+	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].
+
 	"Build the entire set of tests:
 	 - for each architecture
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
 	(1 to: 175)
-		do: [ :bytecode | 
-			| architectures solutions |
-			architectures := { 
-				                 { 
-					                 (#ISA -> #IA32).
-					                 (#wordSize -> 4) }.
-				                 "{ #ISA -> #'X64'. #wordSize -> 8}."
-				                 { 
-					                 (#ISA -> #ARMv5).
-					                 (#wordSize -> 4) } }.
+		do: [ :bytecode |
+			| solutions |
 			"{ #ISA -> #'aarch64'. #wordSize -> 8}."
-			architectures do: [ :arch | 
+			architectures do: [ :arch |
 				| theSetUpTest |
-				theSetUpTest := suite detect: [ :e | 
-					                e parametersToUse do: [ :aParameter | 
+				theSetUpTest := suite detect: [ :e |
+					                e parametersToUse do: [ :aParameter |
 						                aParameter applyTo: e ].
-					                e wordSize = arch second value ].
-				interpreter := theSetUpTest
-					               setUp;
-					               interpreter.
-				solutions := RAPathExplorer new
-					             failOnError: false;
-									 mutator: LessIntConstraintMutator new;
-					             explore: (RABytecodeConcolicCase new
-	              	              	vm: interpreter;
-	              	              	bytecode: bytecode;
-											yourself)
-					             vmBuildingBlock: [ 
-						             theSetUpTest
-							             setUp;
-							             interpreter ].
-				
-				solutions do: [ :e | 
-					matrix addCase: { 
+					                e wordSize = arch second value
+					                ].
+
+				solutions := self
+					             exploreSolutions: bytecode
+					             fromSetUp: theSetUpTest.
+
+				solutions do: [ :e |
+					matrix addCase: {
 							arch first.
 							arch second.
 							(#bytecode -> bytecode).
-							(#solution -> e) } ] ] ]
+							(#solution -> e) }
+					]
+				]
+			]
 		displayingProgress: [ :bytecode | bytecode asString ].
 
 	^ matrix * (ParametrizedTestMatrix new
-		forSelector: #jitCompilerClass addOptions: {SimpleStackBasedCogit};
-		yourself)
+		   forSelector: #jitCompilerClass
+		   addOptions: { SimpleStackBasedCogit };
+		   yourself)
 ]
 
 { #category : 'accessing' }
