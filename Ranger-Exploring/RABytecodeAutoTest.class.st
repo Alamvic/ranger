@@ -17,7 +17,6 @@ RABytecodeAutoTest class >> exploreSolutions: bytecode fromSetUp: theSetUpTest [
 
 	^ RAPathExplorer new
 		  failOnError: false;
-		  mutator: GreaterIntConstraintMutator new;
 		  explore: (RABytecodeConcolicCase new
 				   vm: (self interpreterFrom: theSetUpTest);
 				   bytecode: bytecode;
@@ -102,16 +101,14 @@ RABytecodeAutoTest class >> testParameters [
 					                e wordSize = arch second value
 					                ].
 
-				solutions := self
-					             exploreSolutions: bytecode
-					             fromSetUp: theSetUpTest.
+				solutions := self exploreSolutions: bytecode fromSetUp: theSetUpTest.
 
-				solutions do: [ :e |
+				solutions do: [ :solution |
 					matrix addCase: {
 							arch first.
 							arch second.
 							(#bytecode -> bytecode).
-							(#solution -> e) }
+							(#solution -> solution) }
 					]
 				]
 			]

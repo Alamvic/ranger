@@ -1,6 +1,6 @@
 Class {
 	#name : 'IdleMutator',
-	#superclass : 'Mutator',
+	#superclass : 'ConstraintsMutator',
 	#category : 'Ranger-Exploring',
 	#package : 'Ranger-Exploring'
 }

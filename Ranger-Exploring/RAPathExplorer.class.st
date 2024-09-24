@@ -59,9 +59,6 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	Continue by negating the going to the next path.
 	Can this loop?"
 	currentPath := (exploredPath ifNil: [ currentPath nextPath ]) veryDeepCopy.
-	
-	"We mutate the current path to avoid deterministic exploration"
-	currentPath := self mutate: currentPath.
 
 	"Negate and solve constraints!"
 	solution := self solve: currentPath.
@@ -72,6 +69,20 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	solutions last timeToExplore: timeToExplore.
 	solution isEmpty ] whileFalse.
 	^ solutions
+]
+
+{ #category : 'api' }
+RAPathExplorer >> exploreAndMutate: aConcolicCase vmBuildingBlock: aBuildingBlock [
+	
+	| interpreter |
+	
+	interpreter := aBuildingBlock value.
+
+	^(self explore: aConcolicCase vmBuildingBlock: aBuildingBlock) inject: {} into: [
+		:currentSolutions :solution |
+			currentSolutions, { solution }, (self solutionMutations: solution withInterpreter: interpreter)
+	]
+
 ]
 
 { #category : 'api' }
@@ -129,21 +140,35 @@ RAPathExplorer >> initialize [
 ]
 
 { #category : 'as yet unclassified' }
-RAPathExplorer >> mutate: aPath [
+RAPathExplorer >> mutator [
 
-	^ mutator mutate: aPath 
+	^ mutator 
 ]
 
-{ #category : 'accessing' }
+{ #category : 'as yet unclassified' }
 RAPathExplorer >> mutator: aMutator [
 
-	mutator := aMutator
+	mutator := aMutator 
+]
+
+{ #category : 'as yet unclassified' }
+RAPathExplorer >> pathMutations: pathToMutate [ "{ constraints, inputs, expected }"
+	"Given a path, we use our mutator to generate all possible different mutations"
+
+	^ mutator mutatePath: pathToMutate
 ]
 
 { #category : 'solving' }
 RAPathExplorer >> recordSolution: aSolution [
 
 	solutions add: aSolution
+]
+
+{ #category : 'as yet unclassified' }
+RAPathExplorer >> solutionMutations: solution withInterpreter: interpreter [ 
+
+	^ (self pathMutations: solution path) collect: [ :path | path solveWithInterpreter: interpreter ]
+
 ]
 
 { #category : 'solving' }

@@ -1,12 +1,12 @@
 Class {
-	#name : 'Mutator',
+	#name : 'ConstraintsMutator',
 	#superclass : 'Object',
 	#category : 'Ranger-Exploring',
 	#package : 'Ranger-Exploring'
 }
 
 { #category : 'as yet unclassified' }
-Mutator >> mutate: aPath [
+ConstraintsMutator >> mutate: aPath [
 
 	| path | 
 	path := RAPath new.
@@ -26,174 +26,174 @@ Mutator >> mutate: aPath [
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateAddConstraint: aConstraint [
+ConstraintsMutator >> mutateAddConstraint: aConstraint [
 
 	^ self subclassResponsibility
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateAndConstraint: aConstraint [
+ConstraintsMutator >> mutateAndConstraint: aConstraint [
 
 	^ self subclassResponsibility
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateBitAddConstraint: aConstraint [
+ConstraintsMutator >> mutateBitAddConstraint: aConstraint [
 
 	^ self subclassResponsibility
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateBitOrConstraint: aConstraint [
+ConstraintsMutator >> mutateBitOrConstraint: aConstraint [
 
 	^ self subclassResponsibility
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateBitShiftConstraint: aConstraint [
+ConstraintsMutator >> mutateBitShiftConstraint: aConstraint [
 
 	^ self subclassResponsibility
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateConstraint: aConstraint [
+ConstraintsMutator >> mutateConstraint: aConstraint [
 
 	^ aConstraint mutate: self
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateConstraints: someConstraints [ 
+ConstraintsMutator >> mutateConstraints: someConstraints [ 
 	^  someConstraints collect: [ :constraint | self mutateConstraint: constraint ].
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateDivisionConstraint: aConstraint [
+ConstraintsMutator >> mutateDivisionConstraint: aConstraint [
 
 	^ self subclassResponsibility
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateEqualsConstraint: aConstraint [
+ConstraintsMutator >> mutateEqualsConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateGreaterConstraint: aConstraint [
+ConstraintsMutator >> mutateGreaterConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateGreaterOrEqualsConstraint: aConstraint [
+ConstraintsMutator >> mutateGreaterOrEqualsConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateIsBooleanObjectOfConstraint: aConstraint [
+ConstraintsMutator >> mutateIsBooleanObjectOfConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateIsCharacterObjectConstraint: aConstraint [
+ConstraintsMutator >> mutateIsCharacterObjectConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateIsClassIndexOfConstraint: aConstraint [
+ConstraintsMutator >> mutateIsClassIndexOfConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateIsContextObjectConstraint: aConstraint [
+ConstraintsMutator >> mutateIsContextObjectConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateIsFloatObjectOfConstraint: aConstraint [
+ConstraintsMutator >> mutateIsFloatObjectOfConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateIsIntegerObjectConstraint: aConstraint [
+ConstraintsMutator >> mutateIsIntegerObjectConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateIsIntegerObjectOfConstraint: aConstraint [
+ConstraintsMutator >> mutateIsIntegerObjectOfConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateIsIntegerToFloatConstraint: aConstraint [
+ConstraintsMutator >> mutateIsIntegerToFloatConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateIsNonCharacterConstraint: aConstraint [
+ConstraintsMutator >> mutateIsNonCharacterConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateIsNonIntegerConstraint: aConstraint [
+ConstraintsMutator >> mutateIsNonIntegerConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateLessConstraint: aConstraint [
+ConstraintsMutator >> mutateLessConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateLessOrEqualsConstraint: aConstraint [
+ConstraintsMutator >> mutateLessOrEqualsConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateModuloConstraint: aConstraint [
+ConstraintsMutator >> mutateModuloConstraint: aConstraint [
 
 	^ self subclassResponsibility
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateMultiplicationConstraint: aConstraint [
+ConstraintsMutator >> mutateMultiplicationConstraint: aConstraint [
 
 	^ self subclassResponsibility
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateNotEqualsConstraint: aConstraint [
+ConstraintsMutator >> mutateNotEqualsConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateOrConstraint: aConstraint [
+ConstraintsMutator >> mutateOrConstraint: aConstraint [
 
 	^ self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateQuotientConstraint: aConstraint [
+ConstraintsMutator >> mutateQuotientConstraint: aConstraint [
 
 	^ self subclassResponsibility
 ]
 
 { #category : 'as yet unclassified' }
-Mutator >> mutateSubstractionConstraint: aConstraint [
+ConstraintsMutator >> mutateSubstractionConstraint: aConstraint [
 
 	^ self subclassResponsibility
 ]

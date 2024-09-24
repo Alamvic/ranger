@@ -31,7 +31,6 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 		               interpreter.
 	^ RAPathExplorer new
 		  failOnError: true;
-		  mutator: LessIntConstraintMutator new;
 		  explore: (RAPrimitiveConcolicCase new
 				   selector: aPrimitive;
 				   yourself)
@@ -79,7 +78,7 @@ RAPrimitiveAutoTest class >> testParameters [
 	    - for each explored path
 	      => build a test case"
 	primitives
-		do: [ :p | 
+		do: [ :primitive | 
 			| architectures solutions |
 			architectures := { 
 				                 { 
@@ -101,21 +100,20 @@ RAPrimitiveAutoTest class >> testParameters [
 					               interpreter.
 				solutions := RAPathExplorer new
 					             failOnError: false;
-									 mutator: LessIntConstraintMutator new;
 					             explore: (RAPrimitiveConcolicCase new
-							              selector: p first;
+							              selector: primitive first;
 							              yourself)
 					             vmBuildingBlock: [ 
 						             theSetUpTest
 							             setUp;
 							             interpreter ].
-				solutions do: [ :e | 
+				solutions do: [ :solution | 
 					matrix addCase: { 
 							arch first.
 							arch second.
-							(#primitive -> p first).
-							(#generator -> p second).
-							(#solution -> e) } ] ] ]
+							(#primitive -> primitive first).
+							(#generator -> primitive second).
+							(#solution -> solution) } ] ] ]
 		displayingProgress: [ :p | (p first -> p second) asString ].
 
 	^ matrix
