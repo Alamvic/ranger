@@ -20,13 +20,11 @@ RASyntacticPathMutator >> isMutable: aPath [
 { #category : 'as yet unclassified' }
 RASyntacticPathMutator >> mutatePath: path [
 
-	(self isMutable: path) ifFalse: [ ^{} ].
-	
-	^ self variationsOf: path
+	^ (self isMutable: path) ifTrue: [ self variationsOf: path ] ifFalse: [ {} ].
 ]
 
 { #category : 'as yet unclassified' }
-RASyntacticPathMutator >> variationsOf: aPath [ "should return an array of paths"
+RASyntacticPathMutator >> variationsOf: aPath [ "return an array of paths"
 
 	^ ( self constraintsVariationsFrom: aPath pathConstraints ) collect: [ :constraints |
 		RAPath new pathConstraints: constraints;

@@ -11,9 +11,9 @@ Class {
 { #category : 'as yet unclassified' }
 RAPathMutator >> mutatePath: path [
 
-	^ syntacticMutators inject: {} into: [ :currentMutations :syntacticMutator |
-		currentMutations, (syntacticMutator mutatePath: path)
-	]
+	^ syntacticMutators inject: OrderedCollection new writeStream into: [ :stream :syntacticMutator |
+		stream nextPutAll: (syntacticMutator mutatePath: path); yourself
+	] contents
 ]
 
 { #category : 'accessing' }

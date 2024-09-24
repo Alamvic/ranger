@@ -78,10 +78,12 @@ RAPathExplorer >> exploreAndMutate: aConcolicCase vmBuildingBlock: aBuildingBloc
 	
 	interpreter := aBuildingBlock value.
 
-	^(self explore: aConcolicCase vmBuildingBlock: aBuildingBlock) inject: {} into: [
-		:currentSolutions :solution |
-			currentSolutions, { solution }, (self solutionMutations: solution withInterpreter: interpreter)
-	]
+	^(self explore: aConcolicCase vmBuildingBlock: aBuildingBlock) inject: OrderedCollection new writeStream into: [
+		:stream :solution |
+			stream nextPutAll: { solution };
+			nextPutAll: (self solutionMutations: solution withInterpreter: interpreter);
+			yourself
+	] contents
 
 ]
 
