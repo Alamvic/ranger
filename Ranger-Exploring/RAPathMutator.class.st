@@ -8,6 +8,21 @@ Class {
 	#package : 'Ranger-Exploring'
 }
 
+{ #category : 'as yet unclassified' }
+RAPathMutator class >> lastestPathMutator [
+	
+	^self new
+		"This returns the most updated mutator"
+		addSyntacticMutator: RASyntacticArrayPathMutator new;
+	yourself
+]
+
+{ #category : 'adding' }
+RAPathMutator >> addSyntacticMutator: mutator [
+	
+	self syntacticMutators add: mutator
+]
+
 { #category : 'initialization' }
 RAPathMutator >> initialize [ 
 

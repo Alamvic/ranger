@@ -75,14 +75,20 @@ RAPathMutatorTest >> setUp [
 ]
 
 { #category : 'tests' }
-RAPathMutatorTest >> testMutatePathNewPathsAreAdded [
+RAPathMutatorTest >> testMutatePathGivenTwoPossibleMutationsShouldReturnAnArrayWithBothMutations [
+	"TODO: implement me"
 
+]
+
+{ #category : 'tests' }
+RAPathMutatorTest >> testMutatePathShouldReturnAnArrayWithAPathMutation [
+	"TODO: implement me"
 
 ]
 
 { #category : 'tests' }
 RAPathMutatorTest >> testMutatePathTheOriginalPathsDoesNotChange [
-
+	"TODO: implement me"
 
 ]
 
