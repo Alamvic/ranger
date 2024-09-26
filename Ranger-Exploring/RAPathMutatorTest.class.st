@@ -77,18 +77,20 @@ RAPathMutatorTest >> setUp [
 { #category : 'tests' }
 RAPathMutatorTest >> testMutatePathGivenTwoPossibleMutationsShouldReturnAnArrayWithBothMutations [
 	"TODO: implement me"
-
+	self assert: false equals: true
 ]
 
 { #category : 'tests' }
 RAPathMutatorTest >> testMutatePathShouldReturnAnArrayWithAPathMutation [
 	"TODO: implement me"
+	self assert: false equals: true
 
 ]
 
 { #category : 'tests' }
 RAPathMutatorTest >> testMutatePathTheOriginalPathsDoesNotChange [
 	"TODO: implement me"
+	self assert: false equals: true
 
 ]
 
