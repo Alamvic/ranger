@@ -53,24 +53,28 @@ RAPrimitiveAutoTest class >> testParameters [
 	interpreter := suite anyOne
 		               setUp;
 		               interpreter.
-	
-	primitives := (interpreter class primitiveTable withIndexCollect: [ 
-		               :e 
+
+	primitives := (interpreter class primitiveTable withIndexCollect: [
+		               :e
 		               :i | i -> e ])
-		              select: [ :e | 
-			              e value isSymbol and: [ 
-				              ((interpreter class lookupSelector: e value) 
-					               hasPragmaNamed: #numberOfArguments:) and: [ 
-					              (interpreter cogit class primitiveTable at:
-						               e key - 1) primitiveGenerator notNil ] ] ]
-		              thenCollect: [ :e | 
-			              { 
+		              select: [ :e |
+			              interpreter cogit class primitiveTable size > e key
+				              and: [
+					              e value isSymbol and: [
+						              (interpreter cogit class primitiveTable at: e key)
+							              primitiveGenerator notNil
+						              ]
+					              ]
+			              ]
+		              thenCollect: [ :e |
+			              {
 				              e value.
-				              (interpreter cogit class primitiveTable at:
-					               e key - 1) primitiveGenerator } ].
+				              (interpreter cogit class primitiveTable at: e key)
+					              primitiveGenerator }
+			              ].
 
 	"force the progress bar"
-	(1 to: 1) do: [ :e | ] displayingProgress: [ :e | "nothing" ].
+	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].
 
 	"Build the entire set of tests:
 	 - for each architecture
@@ -78,23 +82,24 @@ RAPrimitiveAutoTest class >> testParameters [
 	    - for each explored path
 	      => build a test case"
 	primitives
-		do: [ :primitive | 
+		do: [ :primitive |
 			| architectures solutions |
-			architectures := { 
-				                 { 
+			architectures := {
+				                 {
 					                 (#ISA -> #IA32).
 					                 (#wordSize -> 4) }.
 				                 "{ #ISA -> #'X64'. #wordSize -> 8}."
-				                 { 
+				                 {
 					                 (#ISA -> #ARMv5).
 					                 (#wordSize -> 4) } }.
 			"{ #ISA -> #'aarch64'. #wordSize -> 8}."
-			architectures do: [ :arch | 
+			architectures do: [ :arch |
 				| theSetUpTest |
-				theSetUpTest := suite detect: [ :e | 
-					                e parametersToUse do: [ :aParameter | 
+				theSetUpTest := suite detect: [ :e |
+					                e parametersToUse do: [ :aParameter |
 						                aParameter applyTo: e ].
-					                e wordSize = arch second value ].
+					                e wordSize = arch second value
+					                ].
 				interpreter := theSetUpTest
 					               setUp;
 					               interpreter.
@@ -103,19 +108,22 @@ RAPrimitiveAutoTest class >> testParameters [
 					             explore: (RAPrimitiveConcolicCase new
 							              selector: primitive first;
 							              yourself)
-					             vmBuildingBlock: [ 
+					             vmBuildingBlock: [
 						             theSetUpTest
 							             setUp;
-							             interpreter ].
-				solutions do: [ :solution | 
-					matrix addCase: { 
+							             interpreter
+						             ].
+				solutions do: [ :solution |
+					matrix addCase: {
 							arch first.
 							arch second.
 							(#primitive -> primitive first).
 							(#generator -> primitive second).
-							(#solution -> solution) } ] ] ]
+							(#solution -> solution) }
+					]
+				]
+			]
 		displayingProgress: [ :p | (p first -> p second) asString ].
-
 	^ matrix
 ]
 

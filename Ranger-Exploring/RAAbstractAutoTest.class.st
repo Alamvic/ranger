@@ -38,6 +38,7 @@ RAAbstractAutoTest >> createSpecialSelectorArray [
 
 { #category : 'testing' }
 RAAbstractAutoTest >> instanceVariablesToKeep [
+
 	^ super instanceVariablesToKeep, #( solution )
 ]
 
