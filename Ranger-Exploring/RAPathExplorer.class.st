@@ -26,13 +26,14 @@ RAPathExplorer >> constraintFactory [
 
 { #category : 'api' }
 RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
-
+	
 	| currentPath solution previousInputFrameConstraints exploredPath inputFrame |
+	
 	selector := aConcolicCase selector.
-
+	
 	currentPath := RAPath new.
 	solution := RAConstraintSolution new solver: #initial.
-
+	
 	previousInputFrameConstraints := RAVMFrameConstraint new
 		newFrameConstraintForSolution: MzSolver new
 		constraintFactory: constraintFactory.
@@ -40,16 +41,17 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	[ | timeToExplore |
 	timeToExplore := [| objectBuilder |
 	vm := aBuildingBlock value.
+
 	objectBuilder := RAObjectBuilder new
 		                 interpreter: vm;
 		                 nextIndex: 100;
 		                 yourself.
+
 	aConcolicCase initializeVM: vm.
 
 	inputFrame := previousInputFrameConstraints
 		              instantiateWith: objectBuilder
 		              constraintBuilder: constraintFactory.
-		
 	exploredPath := self
 		                explorePathWithFrame: inputFrame
 		                solver: solution solver.

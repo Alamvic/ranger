@@ -48,7 +48,6 @@ RAClassObject >> format [
 
 { #category : 'accessing' }
 RAClassObject >> format: anObject [
-1halt.
 	format := anObject
 ]
 

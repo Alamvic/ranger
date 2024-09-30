@@ -43,9 +43,8 @@ RABytecodeAutoTest class >> solutionsFor: bytecode [
 { #category : 'building suites' }
 RABytecodeAutoTest class >> solutionsFor: bytecode forArch: arch [
 
-	| suite matrix theSetUpTest |
+	| suite theSetUpTest |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-	matrix := ParametrizedTestMatrix new.
 
 	"force the progress bar"
 	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].

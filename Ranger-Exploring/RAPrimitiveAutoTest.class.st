@@ -15,6 +15,8 @@ Class {
 { #category : 'building suites' }
 RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: aWordSize [
 
+	"TODO: Delete me"
+
 	| suite interpreter |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
 
@@ -40,6 +42,41 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 				   e wordSize = aWordSize ])
 			  setUp;
 			  interpreter ]
+]
+
+{ #category : 'building suites' }
+RAPrimitiveAutoTest class >> exploreSolutions: primitiveCode fromSetUp: theSetUpTest [
+
+	^ RAPathExplorer new
+		  failOnError: true;
+		  explore: (RAPrimitiveConcolicCase new
+				   selector: primitiveCode;
+				   yourself)
+		  vmBuildingBlock: [ 
+		  	  theSetUpTest
+			  setUp;
+			  interpreter ]
+]
+
+{ #category : 'building suites' }
+RAPrimitiveAutoTest class >> solutionsFor: primitiveCode [
+	
+	^ self solutionsFor: primitiveCode forArch: 4 "bytes" 
+]
+
+{ #category : 'building suites' }
+RAPrimitiveAutoTest class >> solutionsFor: primitiveCode forArch: arch [
+
+	| theSetUpTest suite |
+
+	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
+	
+	theSetUpTest := suite detect: [ :e | 
+				   e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
+					e wordSize = arch value
+				].
+
+	^ self exploreSolutions: primitiveCode fromSetUp: theSetUpTest
 ]
 
 { #category : 'building suites' }
