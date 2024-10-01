@@ -155,6 +155,8 @@ RAPath >> solveWithInterpreter: interpreter [
 { #category : 'printing' }
 RAPath >> toString [
 	
+	| separator |
 	"To improve, this is the first iteration to see easily path patterns"
-	^ (pathConstraints collect: [ :constraint | constraint toString ]) joinUsing: '; '
+	separator := ';', Character lf asString, Character tab asString.
+	^ (pathConstraints collect: [ :constraint | constraint toString ]) joinUsing: separator
 ]

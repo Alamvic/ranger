@@ -152,7 +152,7 @@ RAConstraintSolution >> timeToExplore: anObject [
 { #category : 'printing' }
 RAConstraintSolution >> toString [
 	
-	^ self solutionLabel, '(',
-		path toString,
-	')'
+	^ self solutionLabel, ': ',
+		Character lf asString, Character tab asString ,
+		path toString
 ]
