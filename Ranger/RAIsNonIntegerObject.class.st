@@ -1,6 +1,6 @@
 Class {
 	#name : 'RAIsNonIntegerObject',
-	#superclass : 'RAValueConstraint',
+	#superclass : 'VMConstraint',
 	#category : 'Ranger-VMSpecificConstraints',
 	#package : 'Ranger',
 	#tag : 'VMSpecificConstraints'
@@ -22,4 +22,10 @@ RAIsNonIntegerObject >> mzConstraintOnInterpreter: anInterpreter [
 RAIsNonIntegerObject >> negated [
 	
 	^ RAIsIntegerObject operands: self operands
+]
+
+{ #category : 'printing' }
+RAIsNonIntegerObject >> operator [ 
+
+	^ 'IsNotInt'
 ]

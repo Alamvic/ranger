@@ -70,6 +70,12 @@ RAErrorSolution >> selector: anObject [
 	selector := anObject
 ]
 
+{ #category : 'printing' }
+RAErrorSolution >> solutionLabel [
+
+	^ 'Error'
+]
+
 { #category : 'accessing' }
 RAErrorSolution >> vm [
 

@@ -1,6 +1,6 @@
 Class {
 	#name : 'RAIsNonCharacterObject',
-	#superclass : 'RAValueConstraint',
+	#superclass : 'VMConstraint',
 	#category : 'Ranger-VMSpecificConstraints',
 	#package : 'Ranger',
 	#tag : 'VMSpecificConstraints'
@@ -22,4 +22,10 @@ RAIsNonCharacterObject >> mzConstraintOnInterpreter: anInterpreter [
 RAIsNonCharacterObject >> negated [
 	
 	^ RAIsCharacterObject operands: self operands
+]
+
+{ #category : 'printing' }
+RAIsNonCharacterObject >> operator [ 
+
+	^ 'IsNotCharObj'
 ]

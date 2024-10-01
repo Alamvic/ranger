@@ -151,3 +151,10 @@ RAPath >> solveWithInterpreter: interpreter [
 		  solver: solver;
 		  yourself
 ]
+
+{ #category : 'printing' }
+RAPath >> toString [
+	
+	"To improve, this is the first iteration to see easily path patterns"
+	^ (pathConstraints collect: [ :constraint | constraint toString ]) joinUsing: '; '
+]

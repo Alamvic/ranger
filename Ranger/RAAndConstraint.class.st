@@ -24,3 +24,9 @@ RAAndConstraint >> negated [
 	
 	^ RAOrConstraint operands: (operands collect: [ :e | e negated ])
 ]
+
+{ #category : 'accessing' }
+RAAndConstraint >> operator [
+
+	^ 'AND'
+]

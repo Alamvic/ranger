@@ -102,6 +102,12 @@ RAConstraint >> operands: anObject [
 ]
 
 { #category : 'accessing' }
+RAConstraint >> operator [
+	
+	self subclassResponsibility 
+]
+
+{ #category : 'accessing' }
 RAConstraint >> origin: aStackTrace [
 
 ]
@@ -141,6 +147,12 @@ RAConstraint >> printOn: aStream [
 RAConstraint >> simplify [
 
 	^ self
+]
+
+{ #category : 'printing' }
+RAConstraint >> toString [
+	
+	^ '(' , operands first toString , ' ' , self operator , ' ' , operands second toString , ')' 
 ]
 
 { #category : 'testing' }

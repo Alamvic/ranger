@@ -17,3 +17,9 @@ RABitOrConstraint >> mutate: mutator [
 
 	^ mutator mutateBitOrConstraint: self
 ]
+
+{ #category : 'printing' }
+RABitOrConstraint >> operator [
+
+	^ 'BIT_OR'
+]

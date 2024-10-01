@@ -119,6 +119,12 @@ RAConstraintSolution >> result [
 	^ self exitCondition result
 ]
 
+{ #category : 'as yet unclassified' }
+RAConstraintSolution >> solutionLabel [
+
+	^ 'Solution'
+]
+
 { #category : 'accessing' }
 RAConstraintSolution >> solver [
 
@@ -141,4 +147,12 @@ RAConstraintSolution >> timeToExplore [
 RAConstraintSolution >> timeToExplore: anObject [
 
 	timeToExplore := anObject
+]
+
+{ #category : 'printing' }
+RAConstraintSolution >> toString [
+	
+	^ self solutionLabel, '(',
+		path toString,
+	')'
 ]

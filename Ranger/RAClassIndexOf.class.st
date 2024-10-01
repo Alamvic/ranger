@@ -1,6 +1,6 @@
 Class {
 	#name : 'RAClassIndexOf',
-	#superclass : 'RAValueConstraint',
+	#superclass : 'VMConstraint',
 	#category : 'Ranger-VMSpecificConstraints',
 	#package : 'Ranger',
 	#tag : 'VMSpecificConstraints'
@@ -16,4 +16,10 @@ RAClassIndexOf >> mutate: mutator [
 RAClassIndexOf >> mzConstraintOnInterpreter: interpreter [
 	
 	^ operands first classIndex
+]
+
+{ #category : 'printing' }
+RAClassIndexOf >> operator [ 
+
+	^ 'ClassIndexOf'
 ]

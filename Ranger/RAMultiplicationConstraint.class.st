@@ -27,3 +27,9 @@ RAMultiplicationConstraint >> mzConstraintOnInterpreter: interpreter [
 
 	^ leftOperand * rightOperand
 ]
+
+{ #category : 'printing' }
+RAMultiplicationConstraint >> operator [
+
+	^ '*'
+]

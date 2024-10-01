@@ -23,3 +23,9 @@ RASubstractionConstraint >> mzConstraintOnInterpreter: interpreter [
 	rightValue := rightOperand.
 	^ leftValue - rightValue
 ]
+
+{ #category : 'printing' }
+RASubstractionConstraint >> operator [
+
+	^ '-'
+]

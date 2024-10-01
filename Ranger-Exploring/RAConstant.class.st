@@ -84,6 +84,12 @@ RAConstant >> printOn: aStream [
 ]
 
 { #category : 'accessing' }
+RAConstant >> toString [
+	
+	^ value asString 
+]
+
+{ #category : 'accessing' }
 RAConstant >> value [
 
 	^ value

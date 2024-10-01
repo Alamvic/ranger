@@ -18,3 +18,15 @@ RAValueConstraint >> isIntegerObjectOf [
 	
 	^ false
 ]
+
+{ #category : 'printing' }
+RAValueConstraint >> operator [
+
+	self subclassResponsibility 
+]
+
+{ #category : 'printing' }
+RAValueConstraint >> toString [ 
+
+	^ self operator , ' ' , operands first toString
+]

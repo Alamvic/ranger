@@ -26,3 +26,9 @@ RAModuloConstraint >> mzConstraintOnInterpreter: interpreter [
 
 	^ leftOperand mod: rightOperand
 ]
+
+{ #category : 'printing' }
+RAModuloConstraint >> operator [
+
+	^ '%'
+]

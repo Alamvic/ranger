@@ -366,6 +366,12 @@ RAObject >> specialSelectorIndex: anIndex [
 	specialSelectorIndex := anIndex
 ]
 
+{ #category : 'printing' }
+RAObject >> toString [
+
+	^ 'Object(' , variableName , ')'
+]
+
 { #category : 'accessing' }
 RAObject >> typeTag [
 	

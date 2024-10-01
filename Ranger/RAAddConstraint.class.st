@@ -28,6 +28,12 @@ RAAddConstraint >> mzConstraintOnInterpreter: interpreter [
 	^ leftOperand + rightOperand
 ]
 
+{ #category : 'printing' }
+RAAddConstraint >> operator [
+
+	^ '+'
+]
+
 { #category : 'adding' }
 RAAddConstraint >> prettyString [
 
