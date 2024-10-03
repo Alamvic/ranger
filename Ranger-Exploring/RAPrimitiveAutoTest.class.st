@@ -47,36 +47,26 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 { #category : 'building suites' }
 RAPrimitiveAutoTest class >> exploreSolutions: primitiveCode fromSetUp: theSetUpTest [
 
+	
+
 	^ RAPathExplorer new
 		  failOnError: true;
 		  explore: (RAPrimitiveConcolicCase new
 				   selector: primitiveCode;
 				   yourself)
-		  vmBuildingBlock: [ 
-		  	  theSetUpTest
-			  setUp;
-			  interpreter ]
+		  vmBuildingBlock: [ RATest new newVM"theSetUpTest setUp; interpreter" ]
 ]
 
 { #category : 'building suites' }
-RAPrimitiveAutoTest class >> solutionsFor: primitiveCode [
+RAPrimitiveAutoTest class >> solutionsFor: aPrimitiveName [
 	
-	^ self solutionsFor: primitiveCode forArch: 4 "bytes" 
+	^ self solutionsFor: aPrimitiveName forArch: 4 "bytes"
 ]
 
 { #category : 'building suites' }
 RAPrimitiveAutoTest class >> solutionsFor: primitiveCode forArch: arch [
 
-	| theSetUpTest suite |
-
-	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-	
-	theSetUpTest := suite detect: [ :e | 
-				   e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
-					e wordSize = arch value
-				].
-
-	^ self exploreSolutions: primitiveCode fromSetUp: theSetUpTest
+	^ self exploreSolutions: primitiveCode fromSetUp: nil "theSetUpTest"
 ]
 
 { #category : 'building suites' }
@@ -168,6 +158,11 @@ RAPrimitiveAutoTest class >> testParameters [
 RAPrimitiveAutoTest >> execute [
 
 	solution exitCondition executeTest: self
+	"We attach a CoverageCollector to measure the compile methods"
+	"CompilerCoverageCollector measure: [
+		solution exitCondition executeTest: self
+	]
+"
 ]
 
 { #category : 'executing' }

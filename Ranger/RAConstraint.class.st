@@ -151,7 +151,7 @@ RAConstraint >> simplify [
 
 { #category : 'printing' }
 RAConstraint >> toString [
-	
+
 	^ '(' , operands first toString , ' ' , self operator , ' ' , operands second toString , ')' 
 ]
 
