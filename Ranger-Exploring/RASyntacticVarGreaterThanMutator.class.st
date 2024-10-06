@@ -32,10 +32,10 @@ RASyntacticVarGreaterThanMutator >> mutations: constraints [
 
 	"If exist a constraint Var(x) > n"
 	"By each x, we construct a new set of constraints adding Var(A) >= n+1"
-
-	^ (constraints inject: OrderedCollection new into: [ :result :constraint |
-		(self varIsGreaterThan: constraint) ifTrue:
-			[ result add: (constraints copy , { (self constraintMutation: constraint) }) ].
-		result
-	]) asArray
+	^ (constraints inject: OrderedCollection new writeStream into: [ :stream :constraint |
+		(self varIsGreaterThan: constraint) ifTrue: [
+				stream nextPut: constraints copy, { self constraintMutation: constraint  }
+			].
+		stream
+	]) contents asArray
 ]

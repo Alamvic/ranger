@@ -27,6 +27,7 @@ RAPathMutator >> addSyntacticMutator: mutator [
 RAPathMutator >> initialize [ 
 
 	syntacticMutators := OrderedCollection new.
+	syntacticMutators add: RASyntacticVarGreaterThanMutator new.
 ]
 
 { #category : 'as yet unclassified' }
