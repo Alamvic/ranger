@@ -248,8 +248,9 @@ RAPrimitiveAutoTest >> testPrimitive [
 
 	(solution isInvalidIn: self) ifTrue: [ ^ self ].
 
-	primitiveAddress := self compile: [ 
+	primitiveAddress := self compile: [
 		compilationResult := cogit objectRepresentation perform: generator.
+
 		"If the primitive fails it continues, so we need to have an instruction to detect the end"
 		endInstruction := cogit Stop ]
 		bytecodes: 15.

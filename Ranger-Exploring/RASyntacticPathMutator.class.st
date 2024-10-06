@@ -65,6 +65,7 @@ RASyntacticPathMutator >> mutationsFrom: aRAPath [ "return an array of paths"
 
 { #category : 'testing' }
 RASyntacticPathMutator >> varIsGreaterThan: aConstraint [
+	(self isGreaterThan: aConstraint) ifFalse: [ ^ false ].
 	
-	^ (self isGreaterThan: aConstraint) and: (self isVarOpInt: aConstraint)
+	^ self isVarOpInt: aConstraint
 ]

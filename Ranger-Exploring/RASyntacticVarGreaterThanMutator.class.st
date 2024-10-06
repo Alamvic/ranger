@@ -6,6 +6,20 @@ Class {
 }
 
 { #category : 'as yet unclassified' }
+RASyntacticVarGreaterThanMutator >> constraintMutation: constraint [
+
+	| var const |
+	var := (self isVar: constraint operands first) ifTrue: [ constraint operands first ]
+																 ifFalse: [ constraint operands second ].
+
+	const := (self isInt: constraint operands first) ifTrue: [ constraint operands first ]
+																 ifFalse: [ constraint operands second ].
+	
+	"Var(A) >= n+1"
+	^ RAGreaterOrEqualsConstraint new operands: { var . RAConstant new value: (const value + 1) } ; yourself 
+]
+
+{ #category : 'as yet unclassified' }
 RASyntacticVarGreaterThanMutator >> isMutable: aRAPath [
 
 	"If exist a constraint Var(x) > n"
@@ -16,7 +30,12 @@ RASyntacticVarGreaterThanMutator >> isMutable: aRAPath [
 { #category : 'as yet unclassified' }
 RASyntacticVarGreaterThanMutator >> mutations: constraints [
 
-	"We only returns a mutation where we add the constraint X "
-	"
-	^ ()"
+	"If exist a constraint Var(x) > n"
+	"By each x, we construct a new set of constraints adding Var(A) >= n+1"
+
+	^ (constraints inject: OrderedCollection new into: [ :result :constraint |
+		(self varIsGreaterThan: constraint) ifTrue:
+			[ result add: (constraints copy , { (self constraintMutation: constraint) }) ].
+		result
+	]) asArray
 ]
