@@ -104,7 +104,7 @@ RASyntacticPathMutator >> mutationsFrom: aRAPath [ "return an array of paths"
 	^ ( self mutations: aRAPath pathConstraints ) collect: [ :constraints |
 		RAPath new pathConstraints: constraints;
 			parent: aRAPath parent;
-			inputFrame: aRAPath input;
+			inputFrame: aRAPath inputs;
 			exitCondition: aRAPath exitCondition;
 		yourself
 	]

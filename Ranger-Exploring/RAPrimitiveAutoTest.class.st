@@ -51,7 +51,7 @@ RAPrimitiveAutoTest class >> exploreSolutions: primitiveCode fromSetUp: theSetUp
 
 	^ RAPathExplorer new
 		  failOnError: true;
-		  explore: (RAPrimitiveConcolicCase new
+		  exploreAndMutate: (RAPrimitiveConcolicCase new
 				   selector: primitiveCode;
 				   yourself)
 		  vmBuildingBlock: [ RATest new newVM"theSetUpTest setUp; interpreter" ]
