@@ -18,6 +18,12 @@ RASyntacticPathMutator >> isCommutativeOperation: aConstraint [
 ]
 
 { #category : 'testing' }
+RASyntacticPathMutator >> isGreaterOrEqualThan: aConstraint [
+	
+	^ aConstraint class = RAGreaterOrEqualsConstraint 
+]
+
+{ #category : 'testing' }
 RASyntacticPathMutator >> isGreaterThan: aConstraint [
 	
 	^ aConstraint class = RAGreaterConstraint
@@ -102,6 +108,13 @@ RASyntacticPathMutator >> mutationsFrom: aRAPath [ "return an array of paths"
 			exitCondition: aRAPath exitCondition;
 		yourself
 	]
+]
+
+{ #category : 'testing' }
+RASyntacticPathMutator >> varIsGreaterOrEqualThan: aConstraint [
+	(self isGreaterOrEqualThan: aConstraint) ifFalse: [ ^ false ].
+	
+	^ self isVarOpInt: aConstraint
 ]
 
 { #category : 'testing' }

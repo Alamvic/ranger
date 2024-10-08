@@ -16,6 +16,7 @@ RAPathMutator class >> lastestPathMutator [
 		addSyntacticMutator: RASyntacticVarGreaterThanMutator new;
 		addSyntacticMutator: RASyntacticCommutativeOperationMutatorTest new;
 		addSyntacticMutator: RASyntacticVarLessThanMutator new;
+		addSyntacticMutator: RASyntacticNLessThanVarMutator new;
 	yourself
 ]
 

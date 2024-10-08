@@ -65,6 +65,18 @@ RASyntacticPathMutatorTest >> op: aConstraint and: otherConstraint [
 	^ RAAndConstraint new operands: { aConstraint . otherConstraint }; yourself
 ]
 
+{ #category : 'adding' }
+RASyntacticPathMutatorTest >> op: aConstraint eq: otherConstraint [
+	
+	^ RAEqualsConstraint new operands: { aConstraint . otherConstraint }; yourself
+]
+
+{ #category : 'adding' }
+RASyntacticPathMutatorTest >> op: aConstraint or: otherConstraint [
+	
+	^ RAOrConstraint new operands: { aConstraint . otherConstraint }; yourself
+]
+
 { #category : 'private - initialization' }
 RASyntacticPathMutatorTest >> pathFrom: constraints [
 
