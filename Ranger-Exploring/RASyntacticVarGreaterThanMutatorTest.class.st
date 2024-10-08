@@ -29,8 +29,8 @@ RASyntacticVarGreaterThanMutatorTest >> testWhenThereIsAConstraintThatMatchWithT
 	
 	varA := self var: 'A'.
 	constraints := {
-		self const: 42 .
-		self isInt: (self const: 'x') .
+		self const: 42.
+		self isInt: (self const: 'x').
 		self isGreater: varA than: 42
 	}.
 
@@ -46,15 +46,15 @@ RASyntacticVarGreaterThanMutatorTest >> testWhenThereIsMoreThanAConstraintThatMa
 	varA := self var: 'A'.
 	varB := self var: 'B'.
 	constraints := {
-		self const: 42 .
-		self isInt: (self const: 'x') .
-		self isGreater: varA than: 42 .
-		self isGreater: varB than: 1 .
+		self const: 42.
+		self isInt: (self const: 'x').
+		self isGreater: varA than: 42.
+		self isGreater: varB than: 1.
 		self isGreater: varA than: varB 
 	}.
 
 	self assert: (mutator mutations: constraints) equals: {
-		constraints, { self isGreaterOrEquals: varA than: 43 } .
+		constraints, { self isGreaterOrEquals: varA than: 43 }.
 		constraints, { self isGreaterOrEquals: varB than: 2 }
 	}
 ]

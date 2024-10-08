@@ -48,6 +48,24 @@ RASyntacticPathMutatorTest >> isLess: aConstraint than: number [
 ]
 
 { #category : 'adding' }
+RASyntacticPathMutatorTest >> op: aConstraint add: otherConstraint [
+	
+	^ RAAddConstraint new operands: { aConstraint . otherConstraint }; yourself
+]
+
+{ #category : 'adding' }
+RASyntacticPathMutatorTest >> op: aConstraint and: otherConstraint [
+	
+	^ RAAndConstraint new operands: { aConstraint . otherConstraint }; yourself
+]
+
+{ #category : 'private - initialization' }
+RASyntacticPathMutatorTest >> pathFrom: constraints [
+
+	^ RAPath new pathConstraints: constraints ; yourself
+]
+
+{ #category : 'adding' }
 RASyntacticPathMutatorTest >> var: name [
 	
 	^ MzVariable new name: name; yourself

@@ -5,6 +5,18 @@ Class {
 	#package : 'Ranger-Exploring'
 }
 
+{ #category : 'as yet unclassified' }
+RASyntacticPathMutator >> constraintMutation: constraint [
+
+	self subclassResponsibility 
+]
+
+{ #category : 'testing' }
+RASyntacticPathMutator >> isCommutativeOperation: aConstraint [
+
+	^ { RAAndConstraint . RAOrConstraint . RAEqualsConstraint . RANotEqualsConstraint . RAAddConstraint . RABitAndConstraint . RABitOrConstraint . RAMultiplicationConstraint } includes: aConstraint class
+]
+
 { #category : 'testing' }
 RASyntacticPathMutator >> isGreaterThan: aConstraint [
 	
@@ -24,6 +36,12 @@ RASyntacticPathMutator >> isMutable: aRAPath [
 ]
 
 { #category : 'testing' }
+RASyntacticPathMutator >> isMutableConstraint: aConstraint [
+
+	self subclassResponsibility 
+]
+
+{ #category : 'testing' }
 RASyntacticPathMutator >> isVar: aConstraint [
 
 	^ aConstraint class = MzVariable 
@@ -37,6 +55,16 @@ RASyntacticPathMutator >> isVarOpInt: aConstraint [
 	x2 := aConstraint operands second.
 	
 	^ ((self isVar: x1 ) and: (self isInt: x2) ) or: ((self isVar: x2 ) and: (self isInt: x1))
+]
+
+{ #category : 'as yet unclassified' }
+RASyntacticPathMutator >> mutateByEachConstraint: constraints [ 
+	^ (constraints inject: OrderedCollection new writeStream into: [ :stream :constraint |
+		(self isMutableConstraint: constraint) ifTrue: [
+				stream nextPut: constraints copy, { self constraintMutation: constraint  }
+			].
+		stream
+	]) contents asArray
 ]
 
 { #category : 'as yet unclassified' }
