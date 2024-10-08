@@ -12,8 +12,10 @@ Class {
 RAPathMutator class >> lastestPathMutator [
 	
 	^self new
-		"This returns the most updated mutator"
-		addSyntacticMutator: RASyntacticArrayPathMutator new;
+		"This returns the most updated mutators"
+		addSyntacticMutator: RASyntacticVarGreaterThanMutator new;
+		addSyntacticMutator: RASyntacticCommutativeOperationMutatorTest new;
+		addSyntacticMutator: RASyntacticVarLessThanMutator new;
 	yourself
 ]
 
@@ -27,7 +29,6 @@ RAPathMutator >> addSyntacticMutator: mutator [
 RAPathMutator >> initialize [ 
 
 	syntacticMutators := OrderedCollection new.
-	syntacticMutators add: RASyntacticVarGreaterThanMutator new.
 ]
 
 { #category : 'as yet unclassified' }
