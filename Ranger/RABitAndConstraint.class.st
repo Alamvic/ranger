@@ -18,6 +18,16 @@ RABitAndConstraint >> mutate: mutator [
 	^ mutator mutateBitAddConstraint: self
 ]
 
+{ #category : 'microzinc' }
+RABitAndConstraint >> mzConstraintOnInterpreter: interpreter [ 
+	
+	| leftOperand rightOperand |
+	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
+	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
+
+	^ leftOperand bitAnd: rightOperand
+]
+
 { #category : 'printing' }
 RABitAndConstraint >> operator [
 

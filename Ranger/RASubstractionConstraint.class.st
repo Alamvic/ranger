@@ -15,13 +15,11 @@ RASubstractionConstraint >> mutate: mutator [
 { #category : 'microzinc' }
 RASubstractionConstraint >> mzConstraintOnInterpreter: interpreter [ 
 	
-	| leftOperand rightOperand leftValue rightValue |
+	| leftOperand rightOperand |
 	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
 	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
 
-	leftValue := leftOperand.
-	rightValue := rightOperand.
-	^ leftValue - rightValue
+	^ leftOperand - rightOperand
 ]
 
 { #category : 'printing' }
