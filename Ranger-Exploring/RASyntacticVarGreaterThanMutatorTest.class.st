@@ -25,17 +25,19 @@ RASyntacticVarGreaterThanMutatorTest >> testWhenNoConstraintHasTheMatchFormThenD
 
 { #category : 'tests' }
 RASyntacticVarGreaterThanMutatorTest >> testWhenThereIsAConstraintThatMatchWithTheCriteriaThenReturnsAMutation [
-	| constraints varA |
+	| constraints varA literal |
 	
 	varA := self var: 'A'.
+	literal := self const: 42.
+	
 	constraints := {
-		self const: 42.
+		literal.
 		self isInt: (self const: 'x').
-		self isGreater: varA than: 42
+		self isGreater: varA than: literal
 	}.
 
 	self assert: (mutator mutations: constraints) equals: {
-		constraints, { self isGreaterOrEquals: varA than: 43 }
+		constraints, { self isGreaterOrEquals: varA than: (self const: 43) }
 	}
 ]
 
@@ -45,16 +47,17 @@ RASyntacticVarGreaterThanMutatorTest >> testWhenThereIsMoreThanAConstraintThatMa
 	
 	varA := self var: 'A'.
 	varB := self var: 'B'.
+	
 	constraints := {
 		self const: 42.
 		self isInt: (self const: 'x').
-		self isGreater: varA than: 42.
-		self isGreater: varB than: 1.
+		self isGreater: varA than: (self const: 42).
+		self isGreater: varB than: (self const: 1).
 		self isGreater: varA than: varB 
 	}.
 
 	self assert: (mutator mutations: constraints) equals: {
-		constraints, { self isGreaterOrEquals: varA than: 43 }.
-		constraints, { self isGreaterOrEquals: varB than: 2 }
+		constraints, { self isGreaterOrEquals: varA than: (self const: 43) }.
+		constraints, { self isGreaterOrEquals: varB than: (self const: 2) }
 	}
 ]

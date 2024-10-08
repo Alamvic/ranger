@@ -48,6 +48,13 @@ RASyntacticPathMutator >> isMutableConstraint: aConstraint [
 ]
 
 { #category : 'testing' }
+RASyntacticPathMutator >> isNLessThan: aConstraint [
+	(self isLessThan: aConstraint) ifFalse: [ ^ false ].
+	
+	^ self isInt: aConstraint operands first
+]
+
+{ #category : 'testing' }
 RASyntacticPathMutator >> isVar: aConstraint [
 
 	^ aConstraint class = MzVariable 

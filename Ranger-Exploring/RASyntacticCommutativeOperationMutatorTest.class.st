@@ -21,10 +21,11 @@ RASyntacticCommutativeOperationMutatorTest >> testWhenNoConstraintHasTheMatchFor
 	| constraints varA |
 	
 	varA := self var: 'A'.
+	
 	constraints := {
 		self const: 42.
 		self isInt: (self const: 'x').
-		self isGreater: varA than: 42
+		self isGreater: varA than: (self const: 42)
 	}.
 
 	self assert: (mutator mutations: constraints) equals: {}
@@ -32,15 +33,16 @@ RASyntacticCommutativeOperationMutatorTest >> testWhenNoConstraintHasTheMatchFor
 
 { #category : 'tests' }
 RASyntacticCommutativeOperationMutatorTest >> testWhenThereIsAConstraintThatMatchWithTheCriteriaThenReturnsAMutation [
-	| constraints varA varB |
+	| constraints varA varB literal |
 	
 	varA := self var: 'A'.
 	varB := self var: 'B'.
+	literal := self const: 42.
 	
 	constraints := {
-		self const: 42.
+		literal.
 		self isInt: (self const: 'x').
-		self isGreater: varA than: 42.
+		self isGreater: varA than: literal .
 		self op: varA and: varB 
 	}.
 
@@ -51,14 +53,16 @@ RASyntacticCommutativeOperationMutatorTest >> testWhenThereIsAConstraintThatMatc
 
 { #category : 'tests' }
 RASyntacticCommutativeOperationMutatorTest >> testWhenThereIsMoreThanAConstraintThatMatchWithTheCriteriaThenReturnsAMutationPerEachVariable [
-	| constraints varA varB |
+	| constraints varA varB literal |
 	
 	varA := self var: 'A'.
 	varB := self var: 'B'.
+	literal := self const: 42.
+	
 	constraints := {
-		self const: 42.
+		literal.
 		self isInt: (self const: 'x').
-		self isGreater: varA than: 42.
+		self isGreater: varA than: literal.
 		self op: varA and: varB.
 		self op: varB add: varA 
 	}.

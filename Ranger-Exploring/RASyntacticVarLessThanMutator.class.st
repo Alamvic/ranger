@@ -9,11 +9,8 @@ Class {
 RASyntacticVarLessThanMutator >> constraintMutation: constraint [
 
 	| var const |
-	var := (self isVar: constraint operands first) ifTrue: [ constraint operands first ]
-																 ifFalse: [ constraint operands second ].
-
-	const := (self isInt: constraint operands first) ifTrue: [ constraint operands first ]
-																 ifFalse: [ constraint operands second ].
+	var := constraint operands first.
+	const := constraint operands second.
 	
 	"Var(A) <= n+1"
 	^ RALessOrEqualsConstraint new operands: { var . RAConstant new value: (const value - 1) } ; yourself 

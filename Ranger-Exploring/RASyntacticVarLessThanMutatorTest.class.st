@@ -20,42 +20,46 @@ RASyntacticVarLessThanMutatorTest >> testWhenNoConstraintHasTheMatchFormThenDoes
 	| constraints varA |
 	
 	varA := self var: 'A'.
-	constraints := { self isGreater: varA than: 42 . self isInt: (self const: 'x') . varA }.
+	constraints := { self isGreater: varA than: (self const: 42) . self isInt: (self const: 'x') . varA }.
 
 	self assert: (mutator mutations: constraints) equals: {}
 ]
 
 { #category : 'tests' }
 RASyntacticVarLessThanMutatorTest >> testWhenThereIsAConstraintThatMatchWithTheCriteriaThenReturnsAMutation [
-	| constraints varA |
+	| constraints varA literal |
 	
 	varA := self var: 'A'.
+	literal := self const: 42.
+	
 	constraints := {
-		self const: 42.
+		literal.
 		self isInt: (self const: 'x').
-		self isLess: varA than: 0
+		self isLess: varA than: (self const: 0)
 	}.
 
 	self assert: (mutator mutations: constraints) equals: {
-		constraints, { self isLessOrEquals: varA than: -1 }
+		constraints, { self isLessOrEquals: varA than: (self const: -1) }
 	}
 ]
 
 { #category : 'tests' }
 RASyntacticVarLessThanMutatorTest >> testWhenThereIsMoreThanAConstraintThatMatchWithTheCriteriaThenReturnsAMutationPerEachVariable [
-	| constraints varA varB |
+	| constraints varA varB literal |
 	
 	varA := self var: 'A'.
 	varB := self var: 'B'.
+	literal := self const: 42.
+	
 	constraints := {
-		self const: 42.
+		literal.
 		self isLess: varA than: varB .
 		self isInt: (self const: 'x').
-		self isGreater: varA than: 42.
-		self isLess: varB than: 1.
+		self isGreater: varA than: literal.
+		self isLess: varB than: (self const: 1).
 	}.
 
 	self assert: (mutator mutations: constraints) equals: {
-		constraints, { self isLessOrEquals: varB than: 0 }.
+		constraints, { self isLessOrEquals: varB than: (self const: 0) }.
 	}
 ]

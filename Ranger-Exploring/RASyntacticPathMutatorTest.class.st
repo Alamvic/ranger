@@ -24,15 +24,15 @@ RASyntacticPathMutatorTest >> isChar: aConstraint [
 ]
 
 { #category : 'adding' }
-RASyntacticPathMutatorTest >> isGreater: aConstraint than: number [
+RASyntacticPathMutatorTest >> isGreater: aConstraint than: otherConstraint [
 	
-	^ RAGreaterConstraint new operands: { aConstraint . self const: number }; yourself 
+	^ RAGreaterConstraint new operands: { aConstraint . otherConstraint }; yourself 
 ]
 
 { #category : 'adding' }
-RASyntacticPathMutatorTest >> isGreaterOrEquals: aConstraint than: number [
+RASyntacticPathMutatorTest >> isGreaterOrEquals: aConstraint than: otherConstraint [
 	
-	^ RAGreaterOrEqualsConstraint new operands: { aConstraint . self const: number }; yourself 
+	^ RAGreaterOrEqualsConstraint new operands: { aConstraint . otherConstraint }; yourself 
 ]
 
 { #category : 'adding' }
@@ -42,15 +42,15 @@ RASyntacticPathMutatorTest >> isInt: aConstraint [
 ]
 
 { #category : 'adding' }
-RASyntacticPathMutatorTest >> isLess: aConstraint than: number [
+RASyntacticPathMutatorTest >> isLess: aConstraint than: otherConstraint [
 	
-	^ RALessConstraint new operands: { aConstraint . self const: number }; yourself
+	^ RALessConstraint new operands: { aConstraint . otherConstraint }; yourself
 ]
 
 { #category : 'adding' }
-RASyntacticPathMutatorTest >> isLessOrEquals: aConstraint than: number [
+RASyntacticPathMutatorTest >> isLessOrEquals: aConstraint than: otherConstraint [
 	
-	^ RALessOrEqualsConstraint new operands: { aConstraint . self const: number }; yourself 
+	^ RALessOrEqualsConstraint new operands: { aConstraint . otherConstraint }; yourself 
 ]
 
 { #category : 'adding' }
