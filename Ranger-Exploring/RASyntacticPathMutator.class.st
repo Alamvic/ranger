@@ -29,6 +29,12 @@ RASyntacticPathMutator >> isInt: aConstraint [
 	^ (aConstraint class = RAConstant) and: aConstraint value class = SmallInteger 
 ]
 
+{ #category : 'testing' }
+RASyntacticPathMutator >> isLessThan: aConstraint [
+	
+	^ aConstraint class = RALessConstraint 
+]
+
 { #category : 'as yet unclassified' }
 RASyntacticPathMutator >> isMutable: aRAPath [
 
@@ -94,6 +100,13 @@ RASyntacticPathMutator >> mutationsFrom: aRAPath [ "return an array of paths"
 { #category : 'testing' }
 RASyntacticPathMutator >> varIsGreaterThan: aConstraint [
 	(self isGreaterThan: aConstraint) ifFalse: [ ^ false ].
+	
+	^ self isVarOpInt: aConstraint
+]
+
+{ #category : 'testing' }
+RASyntacticPathMutator >> varIsLessThan: aConstraint [
+	(self isLessThan: aConstraint) ifFalse: [ ^ false ].
 	
 	^ self isVarOpInt: aConstraint
 ]

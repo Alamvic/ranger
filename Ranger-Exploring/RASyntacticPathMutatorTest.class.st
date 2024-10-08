@@ -48,6 +48,12 @@ RASyntacticPathMutatorTest >> isLess: aConstraint than: number [
 ]
 
 { #category : 'adding' }
+RASyntacticPathMutatorTest >> isLessOrEquals: aConstraint than: number [
+	
+	^ RALessOrEqualsConstraint new operands: { aConstraint . self const: number }; yourself 
+]
+
+{ #category : 'adding' }
 RASyntacticPathMutatorTest >> op: aConstraint add: otherConstraint [
 	
 	^ RAAddConstraint new operands: { aConstraint . otherConstraint }; yourself
