@@ -21,13 +21,13 @@ RASyntacticVarGreaterThanMutator >> isMutable: aRAPath [
 
 	"If exist a constraint Var(x) > n"
 
-	^ aRAPath pathConstraints anySatisfy: [ :constraint | self varIsGreaterThan: constraint ]
+	^ aRAPath pathConstraints anySatisfy: [ :constraint | self varIsGreaterThanN: constraint ]
 ]
 
 { #category : 'testing' }
 RASyntacticVarGreaterThanMutator >> isMutableConstraint: aConstraint [
 
-	^ self varIsGreaterThan: aConstraint 
+	^ self varIsGreaterThanN: aConstraint 
 ]
 
 { #category : 'as yet unclassified' }

@@ -21,13 +21,13 @@ RASyntacticVarLessThanMutator >> isMutable: aRAPath [
 
 	"If exist a constraint Var(x) < n"
 
-	^ aRAPath pathConstraints anySatisfy: [ :constraint | self varIsLessThan: constraint ]
+	^ aRAPath pathConstraints anySatisfy: [ :constraint | self varIsLessThanN: constraint ]
 ]
 
 { #category : 'testing' }
 RASyntacticVarLessThanMutator >> isMutableConstraint: aConstraint [
 
-	^ self varIsLessThan: aConstraint 
+	^ self varIsLessThanN: aConstraint 
 ]
 
 { #category : 'as yet unclassified' }

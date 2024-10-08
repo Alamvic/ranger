@@ -73,7 +73,7 @@ RASyntacticPathMutator >> isVarOpInt: aConstraint [
 	x1 := aConstraint operands first.
 	x2 := aConstraint operands second.
 	
-	^ ((self isVar: x1 ) and: (self isInt: x2) ) or: ((self isVar: x2 ) and: (self isInt: x1))
+	^ (self isVar: x1) and: (self isInt: x2)
 ]
 
 { #category : 'as yet unclassified' }
@@ -111,21 +111,21 @@ RASyntacticPathMutator >> mutationsFrom: aRAPath [ "return an array of paths"
 ]
 
 { #category : 'testing' }
-RASyntacticPathMutator >> varIsGreaterOrEqualThan: aConstraint [
+RASyntacticPathMutator >> varIsGreaterOrEqualThanN: aConstraint [
 	(self isGreaterOrEqualThan: aConstraint) ifFalse: [ ^ false ].
 	
 	^ self isVarOpInt: aConstraint
 ]
 
 { #category : 'testing' }
-RASyntacticPathMutator >> varIsGreaterThan: aConstraint [
+RASyntacticPathMutator >> varIsGreaterThanN: aConstraint [
 	(self isGreaterThan: aConstraint) ifFalse: [ ^ false ].
 	
 	^ self isVarOpInt: aConstraint
 ]
 
 { #category : 'testing' }
-RASyntacticPathMutator >> varIsLessThan: aConstraint [
+RASyntacticPathMutator >> varIsLessThanN: aConstraint [
 	(self isLessThan: aConstraint) ifFalse: [ ^ false ].
 	
 	^ self isVarOpInt: aConstraint
