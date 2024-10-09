@@ -6,17 +6,6 @@ Class {
 }
 
 { #category : 'as yet unclassified' }
-RASyntacticVarLessThanMutator >> constraintMutation: constraint [
-
-	| var const |
-	var := constraint operands first.
-	const := constraint operands second.
-	
-	"Var(A) <= n+1"
-	^ RALessOrEqualsConstraint new operands: { var . RAConstant new value: (const value - 1) } ; yourself 
-]
-
-{ #category : 'as yet unclassified' }
 RASyntacticVarLessThanMutator >> isMutable: aRAPath [
 
 	"If exist a constraint Var(x) < n"
@@ -28,6 +17,17 @@ RASyntacticVarLessThanMutator >> isMutable: aRAPath [
 RASyntacticVarLessThanMutator >> isMutableConstraint: aConstraint [
 
 	^ self varIsLessThanN: aConstraint 
+]
+
+{ #category : 'as yet unclassified' }
+RASyntacticVarLessThanMutator >> mutation: constraint [
+
+	| var const |
+	var := constraint operands first.
+	const := constraint operands second.
+	
+	"Var(A) <= n+1"
+	^ RALessOrEqualsConstraint new operands: { var . RAConstant new value: (const value - 1) } ; yourself 
 ]
 
 { #category : 'as yet unclassified' }

@@ -7,8 +7,24 @@ Class {
 
 { #category : 'as yet unclassified' }
 RASyntacticPathMutator >> constraintMutation: constraint [
+	| mutations |
+	mutations := OrderedCollection new.
 
-	self subclassResponsibility 
+	(self isMutableConstraint: constraint) ifTrue: [ mutations add: (self mutation: constraint) ].
+	
+	(constraint respondsTo: #operands) ifFalse: [ ^mutations ].
+
+	constraint operands doWithIndex: [ :child :index |
+		child ifNotNil: [
+			mutations addAll: ((self constraintMutation: child) collect: [ :childMutation | | mutation |
+				mutation := constraint copy.
+				mutation operands at: index put: childMutation.
+				mutation
+	 		])
+		]
+	].
+
+	^ mutations
 ]
 
 { #category : 'testing' }
@@ -79,9 +95,10 @@ RASyntacticPathMutator >> isVarOpInt: aConstraint [
 { #category : 'as yet unclassified' }
 RASyntacticPathMutator >> mutateByEachConstraint: constraints [ 
 	^ (constraints inject: OrderedCollection new writeStream into: [ :stream :constraint |
-		(self isMutableConstraint: constraint) ifTrue: [
-				stream nextPut: constraints copy, { self constraintMutation: constraint  }
-			].
+		| mutations |
+		mutations := self constraintMutation: constraint.
+		mutations ifNotEmpty: [ stream nextPut: constraints copy, mutations ].
+		
 		stream
 	]) contents asArray
 ]
@@ -90,6 +107,12 @@ RASyntacticPathMutator >> mutateByEachConstraint: constraints [
 RASyntacticPathMutator >> mutatePath: path [
 
 	^ (self isMutable: path) ifTrue: [ self mutationsFrom: path ] ifFalse: [ {} ].
+]
+
+{ #category : 'as yet unclassified' }
+RASyntacticPathMutator >> mutation: constraint [
+
+	self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }

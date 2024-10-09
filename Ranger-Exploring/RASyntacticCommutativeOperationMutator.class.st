@@ -6,13 +6,6 @@ Class {
 }
 
 { #category : 'as yet unclassified' }
-RASyntacticCommutativeOperationMutator >> constraintMutation: constraint [
-
-	^ constraint class new operands: {  constraint operands second . constraint operands first }; yourself
-
-]
-
-{ #category : 'as yet unclassified' }
 RASyntacticCommutativeOperationMutator >> isMutable: aRAPath [
 
 	"If exist a constraint constraintA OP constraintB ( where OP is a commutative operation )"
@@ -24,6 +17,12 @@ RASyntacticCommutativeOperationMutator >> isMutable: aRAPath [
 RASyntacticCommutativeOperationMutator >> isMutableConstraint: aConstraint [
 
 	^ self isCommutativeOperation: aConstraint 
+]
+
+{ #category : 'as yet unclassified' }
+RASyntacticCommutativeOperationMutator >> mutation: constraint [
+	^ constraint class new operands: {  constraint operands second . constraint operands first }; yourself
+
 ]
 
 { #category : 'as yet unclassified' }
