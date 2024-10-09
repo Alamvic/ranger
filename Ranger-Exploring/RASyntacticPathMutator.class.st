@@ -7,6 +7,7 @@ Class {
 
 { #category : 'as yet unclassified' }
 RASyntacticPathMutator >> constraintMutation: constraint [
+
 	| mutations |
 	mutations := OrderedCollection new.
 

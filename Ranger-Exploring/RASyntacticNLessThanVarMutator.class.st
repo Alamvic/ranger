@@ -28,7 +28,8 @@ RASyntacticNLessThanVarMutator >> mutation: constraint [
 	
 	"A >= n+1"
 	^ RAGreaterOrEqualsConstraint new operands: {
-		constraint operands second . RAConstant new value: (n value + 1) } ; yourself 
+		constraint operands second . RAConstant new value: (n value + 1)
+	} ; yourself 
 ]
 
 { #category : 'as yet unclassified' }
