@@ -17,7 +17,7 @@ RAPathMutator class >> lastestPathMutator [
 		addSyntacticMutator: RASyntacticCommutativeOperationMutator new;
 		addSyntacticMutator: RASyntacticVarLessThanMutator new;
 		addSyntacticMutator: RASyntacticNLessThanVarMutator new;
-		addSyntacticMutator: RASyntacticVarGreaterOrEqualsThanVarMutator new; 
+		addSyntacticMutator: RASyntacticVarGreaterOrEqualsThanVarMutator new;
 	yourself
 ]
 
@@ -35,6 +35,8 @@ RAPathMutator >> initialize [
 
 { #category : 'as yet unclassified' }
 RAPathMutator >> mutatePath: path [
+	
+	path ifNil: [ ^ {} ].
 
 	^ (syntacticMutators inject: OrderedCollection new writeStream into: [ :stream :syntacticMutator |
 		stream nextPutAll: (syntacticMutator mutatePath: path); yourself

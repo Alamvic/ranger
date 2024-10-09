@@ -22,7 +22,7 @@ RATest >> explorePrimitive: aPrimitiveName [
 	explorer failOnError: true.
 
 	^ explorer
-		  explore: (RAPrimitiveConcolicCase new
+		  exploreAndMutate: (RAPrimitiveConcolicCase new
 				   selector: aPrimitiveName;
 				   yourself)
 		  vmBuildingBlock: [ self newVM ]

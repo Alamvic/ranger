@@ -33,7 +33,7 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 		               interpreter.
 	^ RAPathExplorer new
 		  failOnError: true;
-		  explore: (RAPrimitiveConcolicCase new
+		  exploreAndMutate: (RAPrimitiveConcolicCase new
 				   selector: aPrimitive;
 				   yourself)
 		  vmBuildingBlock: [ 
@@ -46,8 +46,6 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 
 { #category : 'building suites' }
 RAPrimitiveAutoTest class >> exploreSolutions: primitiveCode fromSetUp: theSetUpTest [
-
-	
 
 	^ RAPathExplorer new
 		  failOnError: true;
@@ -132,7 +130,7 @@ RAPrimitiveAutoTest class >> testParameters [
 					               interpreter.
 				solutions := RAPathExplorer new
 					             failOnError: false;
-					             explore: (RAPrimitiveConcolicCase new
+					             exploreAndMutate: (RAPrimitiveConcolicCase new
 							              selector: primitive first;
 							              yourself)
 					             vmBuildingBlock: [
