@@ -68,8 +68,9 @@ RABytecodeAutoTest class >> testParameters [
 
 	| suite matrix architectures |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-	matrix := ParametrizedTestMatrix new.
 
+	matrix := ParametrizedTestMatrix new.
+	
 	architectures := {
 		                 {
 			                 (#ISA -> #IA32).

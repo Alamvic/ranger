@@ -28,6 +28,9 @@ RAEqualsConstraint >> mutate: mutator [
 RAEqualsConstraint >> mzConstraintOnInterpreter: interpreter [ 
 
 	| leftOperand rightOperand |
+	
+	self sanitizeOperands. "TODO: REVIEW THIS"
+
 	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
 	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
 

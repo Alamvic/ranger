@@ -143,6 +143,14 @@ RAConstraint >> printOn: aStream [
 	
 ]
 
+{ #category : 'testing' }
+RAConstraint >> sanitizeOperands [
+	
+	operands withIndexDo: [ :element :index |
+		element class = SmallInteger ifTrue: [ operands at: index put: (RAConstant new value: element) ].
+	]
+]
+
 { #category : 'as yet unclassified' }
 RAConstraint >> simplify [
 

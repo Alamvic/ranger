@@ -25,9 +25,11 @@ RASyntacticVarLessThanMutator >> mutation: constraint [
 	| var const |
 	var := constraint operands first.
 	const := constraint operands second.
+	constraint operands first class = SmallInteger ifTrue: [ 1 halt. ].
+	constraint operands second class = SmallInteger ifTrue: [ 1 halt. ].
 	
 	"Var(A) <= n+1"
-	^ RALessOrEqualsConstraint new operands: { var . RAConstant new value: (const value - 1) } ; yourself 
+	^ RALessOrEqualsConstraint new operands: { var . RAConstant new value: (const value - 1) }
 ]
 
 { #category : 'as yet unclassified' }

@@ -38,6 +38,15 @@ RAObject >> = anotherVariable [
 	^ variableName = anotherVariable variableName
 ]
 
+{ #category : 'testing' }
+RAObject >> asVariable [
+
+	^ MzVariable new
+		name: variableName;
+		value: typeTag;
+		value: integerValue
+]
+
 { #category : 'accessing' }
 RAObject >> classIndex [
 
@@ -273,6 +282,13 @@ RAObject >> isVariable [
 	^ true
 ]
 
+{ #category : 'testing' }
+RAObject >> lessOrEquals: anOperand [
+
+	"TODO: I have no idea why I am doing this here, It never shouldn't be entering here"
+	^ anOperand lessOrEquals: self asVariable
+]
+
 { #category : 'accessing' }
 RAObject >> long32Slots [
 
@@ -295,6 +311,13 @@ RAObject >> mzConstraintOnInterpreter: interpreter [
 RAObject >> name [
 	
 	^ variableName
+]
+
+{ #category : 'testing' }
+RAObject >> notEquals: anOperand [
+
+	"TODO: I have no idea why I am doing this here, It never shouldn't be entering here"
+	^ anOperand notEquals: self asVariable
 ]
 
 { #category : 'accessing' }

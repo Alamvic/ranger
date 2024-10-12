@@ -22,7 +22,7 @@ RASyntacticCommutativeOperationMutator >> isMutableConstraint: aConstraint [
 { #category : 'as yet unclassified' }
 RASyntacticCommutativeOperationMutator >> mutation: constraint [
 
-	^ constraint class new operands: {  constraint operands second . constraint operands first }; yourself
+	^ constraint class new operands: {  constraint operands second . constraint operands first }
 
 ]
 
