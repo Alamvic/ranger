@@ -66,6 +66,12 @@ RASyntacticPathMutator >> isIsConstraint: aConstraint [
 ]
 
 { #category : 'testing' }
+RASyntacticPathMutator >> isIsNotInt: aConstraint [
+
+	^ aConstraint class = RAIsNonIntegerObject 
+]
+
+{ #category : 'testing' }
 RASyntacticPathMutator >> isLessThan: aConstraint [
 	
 	^ aConstraint class = RALessConstraint 
@@ -139,6 +145,12 @@ RASyntacticPathMutator >> mutation: constraint [
 RASyntacticPathMutator >> mutations: constraints [
 	
 	self subclassResponsibility 
+]
+
+{ #category : 'as yet unclassified' }
+RASyntacticPathMutator >> randomNum [
+	
+	^ (SmallInteger minVal to: SmallInteger maxVal) atRandom
 ]
 
 { #category : 'testing' }

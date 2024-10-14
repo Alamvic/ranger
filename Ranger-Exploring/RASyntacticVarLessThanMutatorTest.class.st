@@ -44,7 +44,7 @@ RASyntacticVarLessThanMutatorTest >> testWhenThereIsAConstraintThatMatchWithTheC
 	}
 ]
 
-{ #category : 'tests' }
+{ #category : 'as yet unclassified' }
 RASyntacticVarLessThanMutatorTest >> testWhenThereIsMoreThanAConstraintThatMatchWithTheCriteriaThenReturnsAMutationPerEachVariable [
 	| constraints varA varB literal |
 	

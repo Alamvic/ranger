@@ -61,6 +61,12 @@ RASyntacticPathMutatorTest >> isNotChar: aConstraint [
 ]
 
 { #category : 'adding' }
+RASyntacticPathMutatorTest >> isNotInt: aConstraint [
+	
+	^ RAIsNonIntegerObject new operands: { aConstraint }
+]
+
+{ #category : 'adding' }
 RASyntacticPathMutatorTest >> op: aConstraint add: otherConstraint [
 	
 	^ RAAddConstraint new operands: { aConstraint . otherConstraint }
@@ -76,6 +82,12 @@ RASyntacticPathMutatorTest >> op: aConstraint and: otherConstraint [
 RASyntacticPathMutatorTest >> op: aConstraint eq: otherConstraint [
 	
 	^ RAEqualsConstraint new operands: { aConstraint . otherConstraint }
+]
+
+{ #category : 'adding' }
+RASyntacticPathMutatorTest >> op: aConstraint neq: otherConstraint [
+	
+	^ RANotEqualsConstraint new operands: { aConstraint . otherConstraint }
 ]
 
 { #category : 'adding' }
