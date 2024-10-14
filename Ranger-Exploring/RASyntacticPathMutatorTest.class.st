@@ -93,5 +93,5 @@ RASyntacticPathMutatorTest >> pathFrom: constraints [
 { #category : 'adding' }
 RASyntacticPathMutatorTest >> var: name [
 	
-	^ MzVariable new name: name
+	^ MzVariable new name: name; type: '0..1000000'
 ]
