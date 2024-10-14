@@ -8,8 +8,9 @@ Class {
 		'methodAddress',
 		'jitCompilerClass'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Tests',
+	#package : 'Ranger-Exploring',
+	#tag : 'Tests'
 }
 
 { #category : 'building suites' }

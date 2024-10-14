@@ -1,8 +1,9 @@
 Class {
 	#name : 'RAStackToRegisterMappingCogitTest',
 	#superclass : 'RABytecodeAutoTest',
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Tests',
+	#package : 'Ranger-Exploring',
+	#tag : 'Tests'
 }
 
 { #category : 'accessing' }

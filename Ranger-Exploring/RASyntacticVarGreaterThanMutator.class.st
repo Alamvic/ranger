@@ -1,8 +1,9 @@
 Class {
 	#name : 'RASyntacticVarGreaterThanMutator',
 	#superclass : 'RASyntacticPathMutator',
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Mutation',
+	#package : 'Ranger-Exploring',
+	#tag : 'Mutation'
 }
 
 { #category : 'as yet unclassified' }

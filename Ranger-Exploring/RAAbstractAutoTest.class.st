@@ -6,8 +6,9 @@ Class {
 		'objectBuilder',
 		'sendTrampolineStop'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Tests',
+	#package : 'Ranger-Exploring',
+	#tag : 'Tests'
 }
 
 { #category : 'building' }
