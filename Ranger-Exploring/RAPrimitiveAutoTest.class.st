@@ -4,9 +4,8 @@ Class {
 	#instVars : [
 		'endInstruction',
 		'primitiveAddress',
-		'generator',
-		'primitive',
-		'compilationResult'
+		'compilationResult',
+		'case'
 	],
 	#category : 'Ranger-Exploring-Tests',
 	#package : 'Ranger-Exploring',
@@ -71,169 +70,27 @@ RAPrimitiveAutoTest class >> solutionsFor: primitiveCode forArch: arch [
 { #category : 'building suites' }
 RAPrimitiveAutoTest class >> testParameters [
 
-	| suite matrix interpreter primitives |
-	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-	matrix := ParametrizedTestMatrix new.
-
-	"Find the list of primitives to test"
-	interpreter := suite anyOne
-		               setUp;
-		               interpreter.
-
-	primitives := (interpreter class primitiveTable withIndexCollect: [
-		               :e
-		               :i | i -> e ])
-		              select: [ :e |
-			              interpreter cogit class primitiveTable size > e key
-				              and: [
-					              e value isSymbol and: [
-						              (interpreter cogit class primitiveTable at: e key)
-							              primitiveGenerator notNil
-						              ]
-					              ]
-			              ]
-		              thenCollect: [ :e |
-			              {
-				              e value.
-				              (interpreter cogit class primitiveTable at: e key)
-					              primitiveGenerator }
-			              ].
-
-	"force the progress bar"
-	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].
-
-	"Build the entire set of tests:
-	 - for each architecture
-	  - for each primitive to test
-	    - for each explored path
-	      => build a test case"
-	primitives
-		do: [ :primitive |
-			| architectures solutions |
-			architectures := {
-				                 {
-					                 (#ISA -> #IA32).
-					                 (#wordSize -> 4) }.
-				                 "{ #ISA -> #'X64'. #wordSize -> 8}."
-				                 {
-					                 (#ISA -> #ARMv5).
-					                 (#wordSize -> 4) } }.
-			"{ #ISA -> #'aarch64'. #wordSize -> 8}."
-			architectures do: [ :arch |
-				| theSetUpTest |
-				theSetUpTest := suite detect: [ :e |
-					                e parametersToUse do: [ :aParameter |
-						                aParameter applyTo: e ].
-					                e wordSize = arch second value
-					                ].
-				interpreter := theSetUpTest
-					               setUp;
-					               interpreter.
-				solutions := RAPathExplorer new
-					             failOnError: false;
-					             exploreAndMutate: (RAPrimitiveConcolicCase new
-							              selector: primitive first;
-							              yourself)
-					             vmBuildingBlock: [
-						             theSetUpTest
-							             setUp;
-							             interpreter
-						             ].
-				solutions do: [ :solution |
-					matrix addCase: {
-							arch first.
-							arch second.
-							(#primitive -> primitive first).
-							(#generator -> primitive second).
-							(#solution -> solution) }
-					]
-				]
-			]
-		displayingProgress: [ :p | (p first -> p second) asString ].
-	^ matrix
-]
-
-{ #category : 'running' }
-RAPrimitiveAutoTest >> execute [
-
-	solution exitCondition executeTest: self
-	"We attach a CoverageCollector to measure the compile methods"
-	"CompilerCoverageCollector measure: [
-		solution exitCondition executeTest: self
-	]
-"
-]
-
-{ #category : 'executing' }
-RAPrimitiveAutoTest >> executePrimitiveFailure: aRAPrimitiveFailure [ 
-
-	self runFrom: primitiveAddress until: endInstruction address
-]
-
-{ #category : 'executing' }
-RAPrimitiveAutoTest >> executeUntilReturn [
-
-	self runFrom: primitiveAddress until: callerAddress.
-	self
-		assert: machineSimulator receiverRegisterValue
-		equals: (objectBuilder instantiate: solution result)
+	| runner |
+	runner := RAConcolicRunner new.
+	runner testParameters
 ]
 
 { #category : 'accessing' }
-RAPrimitiveAutoTest >> generator: aString [ 
-	generator := aString
-]
+RAPrimitiveAutoTest >> case [
 
-{ #category : 'testing' }
-RAPrimitiveAutoTest >> isInvalidMemoryAccessInvalid [
-	
-	^ false
+	^ case
 ]
 
 { #category : 'accessing' }
-RAPrimitiveAutoTest >> prepareAutoCall [
+RAPrimitiveAutoTest >> case: anObject [
 
-	| receiver primitiveReceiver primitiveArguments |
-	receiver := objectBuilder instantiate: solution inputConstraints receiver.
-	self
-		prepareStackForSendReceiver: receiver
-		arguments: (solution inputConstraints arguments collect: [:e | (objectBuilder instantiate: e) ]).
-	
-	"previous frame"
-	self pushAddress: self machineSimulator framePointerRegisterValue.
-	self machineSimulator framePointerRegisterValue: self machineSimulator smalltalkStackPointerRegisterValue.
-	
-	self pushAddress: (objectBuilder instantiate: solution inputConstraints method).
-	self pushAddress: 0. "context"
-	self pushAddress: receiver.
-
-	solution inputConstraints locals do: [ :aLocalValue | 
-		self pushAddress: (objectBuilder instantiate: aLocalValue) ].
-
-	primitiveReceiver := objectBuilder instantiate: self primitiveReceiver.
-	primitiveArguments := solution inputConstraints operandStack allButLast
-		collect: [ :e | objectBuilder instantiate: e].
-	self
-		prepareStackForSendReceiver: primitiveReceiver
-		arguments: primitiveArguments
+	case := anObject
 ]
 
 { #category : 'accessing' }
-RAPrimitiveAutoTest >> primitive: aString [ 
-	
-	primitive := aString
-]
+RAPrimitiveAutoTest >> objectBuilder [
 
-{ #category : 'accessing' }
-RAPrimitiveAutoTest >> primitiveReceiver [
-
-	^ solution inputConstraints operandStack last
-]
-
-{ #category : 'executing' }
-RAPrimitiveAutoTest >> receiverTags [
-
-	^ self primitiveReceiver typeTag value ifNil: [ 0 ]
+	^ objectBuilder
 ]
 
 { #category : 'running' }
@@ -245,16 +102,5 @@ RAPrimitiveAutoTest >> solution: aSolution [
 { #category : 'running' }
 RAPrimitiveAutoTest >> testPrimitive [
 
-	(solution isInvalidIn: self) ifTrue: [ ^ self ].
-
-	primitiveAddress := self compile: [
-		compilationResult := cogit objectRepresentation perform: generator.
-
-		"If the primitive fails it continues, so we need to have an instruction to detect the end"
-		endInstruction := cogit Stop ]
-		bytecodes: 15.
-
-	self prepareAutoCall.
-
-	self execute.
+	case runOn: self
 ]

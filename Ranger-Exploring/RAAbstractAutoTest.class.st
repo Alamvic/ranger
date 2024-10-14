@@ -68,12 +68,12 @@ RAAbstractAutoTest >> runCaseManaged [
 ]
 
 { #category : 'running' }
-RAAbstractAutoTest >> setUp [
+RAAbstractAutoTest >> setUp: aCase [
 
 	super setUp.
 	
-	solution checkSupported.
-	(solution isInvalidIn: self) ifTrue: [ ^ self ].
+	aCase solution checkSupported.
+	(aCase solution isInvalidIn: self) ifTrue: [ ^ self ].
 	
 	cogit maybeGenerateCheckFeatures.
 	self installFloatClass.
@@ -84,13 +84,13 @@ RAAbstractAutoTest >> setUp [
 			 instSpec: (memory byteFormatForNumBytes: 0)).
 
 
-	cogit receiverTags: self receiverTags.
-	cogit methodOrBlockNumArgs: solution inputConstraints arguments size.
+	cogit receiverTags: aCase receiverTags.
+	cogit methodOrBlockNumArgs: aCase solution inputConstraints arguments size.
 	
 	self jitCompilerClass = SimpleStackBasedCogit ifFalse:[
 		"Assume single bytecode set for the tests"
 		cogit bytecodeSetOffset: 0. 
-		cogit methodOrBlockNumTemps: solution inputConstraints locals size + solution inputConstraints arguments size.
+		cogit methodOrBlockNumTemps: aCase solution inputConstraints locals size + aCase solution inputConstraints arguments size.
 		cogit initSimStackForFramefulMethod: 0.
 		cogit regArgsHaveBeenPushed: false ].
 	

@@ -8,7 +8,9 @@ Class {
 { #category : 'as yet unclassified' }
 CompilerCoverageCollector class >> compilerMethods [
 
-	^ Cogit methods , SimpleStackBasedCogit methods , StackToRegisterMappingCogit methods
+	^ Cogit methods , SimpleStackBasedCogit methods
+	  , StackToRegisterMappingCogit methods
+	  , (CogAbstractInstruction withAllSubclasses flatCollect: #methods)
 ]
 
 { #category : 'as yet unclassified' }
@@ -20,5 +22,5 @@ CompilerCoverageCollector class >> measure: code [
 { #category : 'initialization' }
 CompilerCoverageCollector >> initialize [ 
 
-	self methods: Cogit methods , SimpleStackBasedCogit methods , StackToRegisterMappingCogit methods
+	self methods: self class compilerMethods
 ]
