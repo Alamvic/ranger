@@ -11,6 +11,12 @@ Class {
 }
 
 { #category : 'tests' }
+RAConcolicRunner >> casesForAllPrimitives [
+	
+	^ self casesForPrimitives: (self primitivesFrom: interpreter)
+]
+
+{ #category : 'tests' }
 RAConcolicRunner >> casesForPrimitive: primitive [
 
 	| generator |
@@ -42,6 +48,12 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 			  case solution: solution
 			  ]
 		  ]
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> casesForPrimitives: primitives [
+	
+	^ primitives flatCollect: [ :primitive | self casesForPrimitive: primitive ]
 ]
 
 { #category : 'accessing' }

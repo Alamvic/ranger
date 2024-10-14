@@ -6,6 +6,12 @@ Class {
 	#tag : 'Mutation'
 }
 
+{ #category : 'testing' }
+RASyntacticPathMutator >> allISConstraints [
+
+	^ { RAIsCharacterObject . RAIsIntegerObject }
+]
+
 { #category : 'as yet unclassified' }
 RASyntacticPathMutator >> constraintMutation: constraint [
 
@@ -51,6 +57,12 @@ RASyntacticPathMutator >> isGreaterThan: aConstraint [
 RASyntacticPathMutator >> isInt: aConstraint [
 
 	^ (aConstraint class = RAConstant) and: aConstraint value class = SmallInteger 
+]
+
+{ #category : 'testing' }
+RASyntacticPathMutator >> isIsConstraint: aConstraint [
+
+	^ self allISConstraints includes: aConstraint class 
 ]
 
 { #category : 'testing' }
@@ -106,9 +118,15 @@ RASyntacticPathMutator >> mutateByEachConstraint: constraints [
 ]
 
 { #category : 'as yet unclassified' }
-RASyntacticPathMutator >> mutatePath: path [
+RASyntacticPathMutator >> mutatePath: aRAPath [ "return an array of paths"
 
-	^ (self isMutable: path) ifTrue: [ self mutationsFrom: path ] ifFalse: [ {} ].
+	^ ( self mutations: aRAPath pathConstraints ) collect: [ :constraints |
+		RAPath new pathConstraints: constraints;
+			parent: aRAPath parent;
+			inputFrame: aRAPath inputs;
+			exitCondition: aRAPath exitCondition;
+		yourself
+	]
 ]
 
 { #category : 'as yet unclassified' }
@@ -121,18 +139,6 @@ RASyntacticPathMutator >> mutation: constraint [
 RASyntacticPathMutator >> mutations: constraints [
 	
 	self subclassResponsibility 
-]
-
-{ #category : 'as yet unclassified' }
-RASyntacticPathMutator >> mutationsFrom: aRAPath [ "return an array of paths"
-
-	^ ( self mutations: aRAPath pathConstraints ) collect: [ :constraints |
-		RAPath new pathConstraints: constraints;
-			parent: aRAPath parent;
-			inputFrame: aRAPath inputs;
-			exitCondition: aRAPath exitCondition;
-		yourself
-	]
 ]
 
 { #category : 'testing' }

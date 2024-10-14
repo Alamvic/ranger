@@ -6,14 +6,6 @@ Class {
 	#tag : 'Mutation'
 }
 
-{ #category : 'as yet unclassified' }
-RASyntacticCommutativeOperationMutator >> isMutable: aRAPath [
-
-	"If exist a constraint constraintA OP constraintB ( where OP is a commutative operation )"
-
-	^ aRAPath pathConstraints anySatisfy: [ :constraint | self isCommutativeOperation: constraint ]
-]
-
 { #category : 'testing' }
 RASyntacticCommutativeOperationMutator >> isMutableConstraint: aConstraint [
 

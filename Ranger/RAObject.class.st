@@ -44,6 +44,7 @@ RAObject >> asVariable [
 	^ MzVariable new
 		name: variableName;
 		value: typeTag;
+		type: '-100000..100000';
 		value: integerValue
 ]
 

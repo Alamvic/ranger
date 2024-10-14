@@ -7,6 +7,12 @@ Class {
 }
 
 { #category : 'as yet unclassified' }
+RAIsNonCharacterObject class >> inverseClass [
+
+	^ RAIsCharacterObject 
+]
+
+{ #category : 'as yet unclassified' }
 RAIsNonCharacterObject >> mutate: mutator [
 
 	^ mutator mutateIsNonCharacterConstraint: self

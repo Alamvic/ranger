@@ -6,6 +6,12 @@ Class {
 	#tag : 'VMSpecificConstraints'
 }
 
+{ #category : 'as yet unclassified' }
+RAIsIntegerObject class >> inverseClass [
+
+	^ RAIsNonIntegerObject 
+]
+
 { #category : 'microzinc' }
 RAIsIntegerObject >> isInSmallIntegerRangeConstraintFor: aConstraint inInterpreter: anInterpreter [
 

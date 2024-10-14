@@ -6,6 +6,12 @@ Class {
 	#tag : 'VMSpecificConstraints'
 }
 
+{ #category : 'as yet unclassified' }
+RAIsCharacterObject class >> inverseClass [
+
+	^ RAIsNonCharacterObject 
+]
+
 { #category : 'negating' }
 RAIsCharacterObject >> isInCharacterRangeConstraintFor: valueConstraint inInterpreter: anInterpreter [
 
