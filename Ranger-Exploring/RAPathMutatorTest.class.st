@@ -112,7 +112,7 @@ RAPathMutatorTest >> setUp [
 { #category : 'tests' }
 RAPathMutatorTest >> testMutatePathGivenTwoPossibleMutationsShouldReturnAnArrayWithBothMutations [
 
-	| path varA varB literal isInt x |
+	| mutations path varA varB literal isInt x |
 
 	x := self const: 'x'.
 	varA := self var: 'A'.
@@ -125,14 +125,14 @@ RAPathMutatorTest >> testMutatePathGivenTwoPossibleMutationsShouldReturnAnArrayW
 		isInt.
 		self isGreaterOrEquals: varA than: literal
 	}.
+	
+	mutations := mutator mutatePath: path.
 
-	self assert: (mutator mutatePath: path) asArray equals: {
-		path copy pathConstraints: (path pathConstraints, {
+	self assert: (mutations asArray collect: [ :_path | _path pathConstraints ]) equals: {
+		path pathConstraints, {
 			self op: (self op: varA eq: literal) or: (self op: varA gr: literal)
-		} ).
-		path copy pathConstraints: (path pathConstraints, {
-			self op: (self isNotChar: x) and: (self isInt: x)
-		}).
+		}.
+		path pathConstraints, { self op: (self isNotChar: x) and: (self isInt: x) }
 	}
 ]
 
