@@ -52,7 +52,7 @@ RASyntacticCommutativeOperationMutatorTest >> testWhenThereIsAConstraintThatMatc
 	}
 ]
 
-{ #category : 'tests' }
+{ #category : 'as yet unclassified' }
 RASyntacticCommutativeOperationMutatorTest >> testWhenThereIsMoreThanAConstraintThatMatchWithTheCriteriaThenReturnsAMutationPerEachVariable [
 	| constraints varA varB literal |
 	

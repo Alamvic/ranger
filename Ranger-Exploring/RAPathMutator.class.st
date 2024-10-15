@@ -24,6 +24,7 @@ RAPathMutator class >> lastestPathMutator [
 		addSyntacticMutator: RASyntacticVarGreaterThanIntroducingNewVarMutator new;
 		
 		addSyntacticMutator: RASyntacticIsNotIntNotEqualsRandomMutator new;
+		addSyntacticMutator: RASyntacticBinaryArithOpWithRandomMutator new;
 	yourself
 ]
 

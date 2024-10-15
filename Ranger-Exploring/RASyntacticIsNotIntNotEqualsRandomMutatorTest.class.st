@@ -33,7 +33,7 @@ RASyntacticIsNotIntNotEqualsRandomMutatorTest >> testWhenThereIsAConstraintThatM
 	varA := self var: 'A'.
 	literal := self const: 42.
 	isNot := self isNotInt: (self const: 'x').
-	notEq := self op: (isNot operands first) neq: 42.
+	notEq := self op: (isNot operands first) neq: 42 "TODO: Stub random values".
 	
 	constraints := {
 		literal.

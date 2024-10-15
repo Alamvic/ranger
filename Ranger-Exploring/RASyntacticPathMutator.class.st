@@ -97,6 +97,12 @@ RASyntacticPathMutator >> isNLessThan: aConstraint [
 ]
 
 { #category : 'testing' }
+RASyntacticPathMutator >> isSimpleBinaryArithmeticOperation: aConstraint [
+	
+	^ (aConstraint class = RAAddConstraint) or: aConstraint class = RASubstractionConstraint 
+]
+
+{ #category : 'testing' }
 RASyntacticPathMutator >> isVar: aConstraint [
 
 	^ aConstraint class = MzVariable 
@@ -150,7 +156,7 @@ RASyntacticPathMutator >> mutations: constraints [
 { #category : 'as yet unclassified' }
 RASyntacticPathMutator >> randomNum [
 	
-	^ (SmallInteger minVal to: SmallInteger maxVal) atRandom
+	^ (0 to: 100) atRandom
 ]
 
 { #category : 'testing' }
