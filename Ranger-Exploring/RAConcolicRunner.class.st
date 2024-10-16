@@ -3,17 +3,34 @@ Class {
 	#superclass : 'Object',
 	#instVars : [
 		'suite',
-		'interpreter'
+		'interpreter',
+		'primitives'
 	],
 	#category : 'Ranger-Exploring-Runner',
 	#package : 'Ranger-Exploring',
 	#tag : 'Runner'
 }
 
+{ #category : 'as yet unclassified' }
+RAConcolicRunner class >> primitivesFrom: interpreter [
+
+	^ (interpreter class primitiveTable withIndexCollect: [ :elem :index |
+		   index -> elem ])
+		  select: [ :elem |
+			  interpreter cogit class primitiveTable size > elem key and: [
+				  elem value isSymbol and: [
+					  (interpreter cogit class primitiveTable at: elem key)
+						  primitiveGenerator notNil
+					  ]
+				  ]
+			  ]
+		  thenCollect: [ :elem | elem value ]
+]
+
 { #category : 'tests' }
 RAConcolicRunner >> casesForAllPrimitives [
 	
-	^ self casesForPrimitives: (self primitivesFrom: interpreter)
+	^ self casesForPrimitives: primitives
 ]
 
 { #category : 'tests' }
@@ -23,20 +40,15 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 	generator := self primitiveGeneratorFor: primitive.
 	
 	^ self supportedArchitectures flatCollect: [ :arch |
-		  | primitiveSolutions theSetUpTest interpreter |
+		  | primitiveSolutions theSetUpTest |
 		  theSetUpTest := suite detect: [ :e |
-			                  e parametersToUse do: [ :aParameter |
-				                  aParameter applyTo: e ].
+			                  e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
 			                  e wordSize = arch second value
-			                  ].
-		  interpreter := theSetUpTest
+			               ].
+"		  interpreter := theSetUpTest
 			                 setUp;
-			                 interpreter.
-		  primitiveSolutions := self solutionsFor: primitive from: [
-			                        theSetUpTest
-				                        setUp;
-				                        interpreter
-			                        ].
+			                 interpreter."
+		  primitiveSolutions := self solutionsFor: primitive from: [ theSetUpTest setUp; interpreter ].
 
 		  primitiveSolutions collect: [ :solution |
 			  | case |
@@ -46,14 +58,14 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 			  case primitive: primitive.
 			  case generator: generator.
 			  case solution: solution
-			  ]
 		  ]
+	]
 ]
 
 { #category : 'tests' }
-RAConcolicRunner >> casesForPrimitives: primitives [
+RAConcolicRunner >> casesForPrimitives: _primitives [
 	
-	^ primitives flatCollect: [ :primitive | self casesForPrimitive: primitive ]
+	^ _primitives flatCollect: [ :primitive | self casesForPrimitive: primitive ]
 ]
 
 { #category : 'accessing' }
@@ -67,9 +79,8 @@ RAConcolicRunner >> initialize [
 
 	super initialize.
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-	interpreter := suite anyOne
-		               setUp;
-		               interpreter
+	interpreter := suite anyOne setUp; interpreter.
+	primitives := self class primitivesFrom: interpreter.
 ]
 
 { #category : 'accessing' }
@@ -81,17 +92,18 @@ RAConcolicRunner >> interpreterClass [
 { #category : 'tests' }
 RAConcolicRunner >> primitiveGeneratorFor: primitive [
 
-	| indexInInterpreterPrimitiveTable |
+	^ (self compilerClass primitiveTable at: (self primitiveIndex: primitive)) primitiveGenerator
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> primitiveIndex: primitive [
+
 	"The table is on base 1 and should"
-	indexInInterpreterPrimitiveTable := (self interpreterClass
-		                                     primitiveTable indexOf:
-		                                     primitive) - 1.
-	^ (self compilerClass primitiveTable at:
-		   indexInInterpreterPrimitiveTable) primitiveGenerator
+	^ (self interpreterClass primitiveTable indexOf: primitive) - 1.
 ]
 
 { #category : 'as yet unclassified' }
-RAConcolicRunner >> primitivesFrom: interpreter [
+RAConcolicRunner >> primitives [
 
 	^ (interpreter class primitiveTable withIndexCollect: [ :elem :index |
 		   index -> elem ])
@@ -128,11 +140,8 @@ RAConcolicRunner >> supportedArchitectures [
 { #category : 'tests' }
 RAConcolicRunner >> testParameters [
 
-	| matrix primitives |
+	| matrix |
 	matrix := ParametrizedTestMatrix new.
-
-	"Find the list of primitives to test"
-	primitives := self primitivesFrom: interpreter.
 
 	"force the progress bar"
 	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].
@@ -142,12 +151,10 @@ RAConcolicRunner >> testParameters [
 	  - for each primitive to test
 	    - for each explored path
 	      => build a test case"
-	primitives
-		do: [ :primitive |
-			| cases |
-			cases := self casesForPrimitive: primitive.
-			cases do: [ :case | matrix addCase: { (#case -> case) } ]
-			]
-		displayingProgress: [ :p | p value asString ].
+	primitives do: [ :primitive | | cases |
+		cases := self casesForPrimitive: primitive.
+		cases do: [ :case | matrix addCase: { (#case -> case) } ]
+	] displayingProgress: [ :p | p value asString ].
+
 	^ matrix
 ]
