@@ -39,6 +39,8 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 	| generator |
 	generator := self primitiveGeneratorFor: primitive.
 	
+	generator = nil ifTrue: [ ^{} ].
+	
 	^ self supportedArchitectures flatCollect: [ :arch |
 		  | primitiveSolutions theSetUpTest |
 		  theSetUpTest := suite detect: [ :e |
@@ -92,7 +94,11 @@ RAConcolicRunner >> interpreterClass [
 { #category : 'tests' }
 RAConcolicRunner >> primitiveGeneratorFor: primitive [
 
-	^ (self compilerClass primitiveTable at: (self primitiveIndex: primitive)) primitiveGenerator
+	| index |
+	index := self primitiveIndex: primitive.
+	(index <= 0 or: (index >= self compilerClass primitiveTable size)) ifTrue: [ ^ nil ].
+	
+	^ (self compilerClass primitiveTable at: index) primitiveGenerator
 ]
 
 { #category : 'tests' }

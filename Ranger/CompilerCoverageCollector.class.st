@@ -1,6 +1,6 @@
 Class {
 	#name : 'CompilerCoverageCollector',
-	#superclass : 'CoverageCollector',
+	#superclass : 'DTCoverageCollector',
 	#category : 'Ranger',
 	#package : 'Ranger'
 }
