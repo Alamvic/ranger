@@ -26,7 +26,7 @@ RAConcolicCase >> execute [
 { #category : 'executing' }
 RAConcolicCase >> executePrimitiveFailure: aRAPrimitiveFailure [ 
 
-	self runFrom: primitiveAddress until: endInstruction address
+	aTest runFrom: primitiveAddress until: endInstruction address
 ]
 
 { #category : 'executing' }
@@ -69,9 +69,10 @@ RAConcolicCase >> isa: anObject [
 ]
 
 { #category : 'running' }
-RAConcolicCase >> prepareAutoCall: aTest [
+RAConcolicCase >> prepareAutoCall [
 
 	| receiver primitiveReceiver primitiveArguments |
+
 	receiver := aTest objectBuilder instantiate: solution inputConstraints receiver.
 	aTest
 		prepareStackForSendReceiver: receiver
@@ -123,8 +124,8 @@ RAConcolicCase >> receiverTags [
 { #category : 'running' }
 RAConcolicCase >> runOn: theTest [
 
+	"Setting test instance"
 	aTest := theTest.
-	
 	aTest setUp: self.
 	
 	(self solution isInvalidIn: self) ifTrue: [ ^ self ].
@@ -133,10 +134,10 @@ RAConcolicCase >> runOn: theTest [
 		compilationResult := aTest cogit objectRepresentation perform: self generator.
 
 		"If the primitive fails it continues, so we need to have an instruction to detect the end"
-		endInstruction := aTest cogit Stop ]
-		bytecodes: 15.
+		endInstruction := aTest cogit Stop
+	] bytecodes: 15.
 
-	self prepareAutoCall: aTest.
+	self prepareAutoCall.
 
 	self execute.
 ]

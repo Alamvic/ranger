@@ -72,7 +72,7 @@ RAPrimitiveAutoTest class >> testParameters [
 
 	| runner |
 	runner := RAConcolicRunner new.
-	runner testParameters
+	runner primitivesTestParameters
 ]
 
 { #category : 'accessing' }

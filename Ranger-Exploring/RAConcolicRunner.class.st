@@ -118,27 +118,8 @@ RAConcolicRunner >> primitives [
 		  thenCollect: [ :elem | elem value ]
 ]
 
-{ #category : 'as yet unclassified' }
-RAConcolicRunner >> solutionsFor: primitive from: vmBuildingBlock [
-
-	^ RAPathExplorer new failOnError: false;
-		exploreAndMutate: (RAPrimitiveConcolicCase new selector: primitive; yourself)
-			vmBuildingBlock: vmBuildingBlock.
-]
-
-{ #category : 'as yet unclassified' }
-RAConcolicRunner >> supportedArchitectures [
-
-	^ { 
-			{ (#ISA -> #IA32) . (#wordSize -> 4) } .
-			"{ #ISA -> #'X64'. #wordSize -> 8}."
-			{ (#ISA -> #ARMv5) . (#wordSize -> 4) }
-		}.
-			"{ #ISA -> #'aarch64'. #wordSize -> 8}."
-]
-
 { #category : 'tests' }
-RAConcolicRunner >> testParameters [
+RAConcolicRunner >> primitivesTestParameters [
 
 	| matrix |
 	matrix := ParametrizedTestMatrix new.
@@ -157,4 +138,23 @@ RAConcolicRunner >> testParameters [
 	] displayingProgress: [ :p | p value asString ].
 
 	^ matrix
+]
+
+{ #category : 'as yet unclassified' }
+RAConcolicRunner >> solutionsFor: primitive from: vmBuildingBlock [
+
+	^ RAPathExplorer new failOnError: false;
+		exploreAndMutate: (RAPrimitiveConcolicCase new selector: primitive; yourself)
+			vmBuildingBlock: vmBuildingBlock.
+]
+
+{ #category : 'as yet unclassified' }
+RAConcolicRunner >> supportedArchitectures [
+
+	^ { 
+			{ (#ISA -> #IA32) . (#wordSize -> 4) } .
+			"{ #ISA -> #'X64'. #wordSize -> 8}."
+			{ (#ISA -> #ARMv5) . (#wordSize -> 4) }
+		}.
+			"{ #ISA -> #'aarch64'. #wordSize -> 8}."
 ]
