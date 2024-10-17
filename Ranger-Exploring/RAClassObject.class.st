@@ -7,8 +7,9 @@ Class {
 		'classIndex',
 		'definedFixedFields'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Exploring',
+	#package : 'Ranger-Exploring',
+	#tag : 'Exploring'
 }
 
 { #category : 'accessing' }
@@ -48,7 +49,6 @@ RAClassObject >> format [
 
 { #category : 'accessing' }
 RAClassObject >> format: anObject [
-1halt.
 	format := anObject
 ]
 

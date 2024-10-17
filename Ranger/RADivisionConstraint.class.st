@@ -21,3 +21,9 @@ RADivisionConstraint >> mzConstraintOnInterpreter: interpreter [
 
 	^ leftOperand div: rightOperand
 ]
+
+{ #category : 'printing' }
+RADivisionConstraint >> operator [
+
+	^ '/'
+]

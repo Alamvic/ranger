@@ -102,6 +102,12 @@ RAConstraint >> operands: anObject [
 ]
 
 { #category : 'accessing' }
+RAConstraint >> operator [
+	
+	self subclassResponsibility 
+]
+
+{ #category : 'accessing' }
 RAConstraint >> origin: aStackTrace [
 
 ]
@@ -137,10 +143,24 @@ RAConstraint >> printOn: aStream [
 	
 ]
 
+{ #category : 'testing' }
+RAConstraint >> sanitizeOperands [
+	
+	operands withIndexDo: [ :element :index |
+		element class = SmallInteger ifTrue: [ operands at: index put: (RAConstant new value: element) ].
+	]
+]
+
 { #category : 'as yet unclassified' }
 RAConstraint >> simplify [
 
 	^ self
+]
+
+{ #category : 'printing' }
+RAConstraint >> toString [
+
+	^ '(' , operands first toString , ' ' , self operator , ' ' , operands second toString , ')' 
 ]
 
 { #category : 'testing' }

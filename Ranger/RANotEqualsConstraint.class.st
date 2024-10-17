@@ -39,3 +39,9 @@ RANotEqualsConstraint >> negated [
 
 	^ RAEqualsConstraint operands: self operands
 ]
+
+{ #category : 'accessing' }
+RANotEqualsConstraint >> operator [
+	
+	^ '≠'
+]

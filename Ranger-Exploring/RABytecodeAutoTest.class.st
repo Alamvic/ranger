@@ -8,8 +8,9 @@ Class {
 		'methodAddress',
 		'jitCompilerClass'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Tests',
+	#package : 'Ranger-Exploring',
+	#tag : 'Tests'
 }
 
 { #category : 'building suites' }
@@ -17,8 +18,7 @@ RABytecodeAutoTest class >> exploreSolutions: bytecode fromSetUp: theSetUpTest [
 
 	^ RAPathExplorer new
 		  failOnError: false;
-		  mutator: GreaterIntConstraintMutator new;
-		  explore: (RABytecodeConcolicCase new
+		  exploreAndMutate: (RABytecodeConcolicCase new
 				   vm: (self interpreterFrom: theSetUpTest);
 				   bytecode: bytecode;
 				   yourself)
@@ -44,9 +44,8 @@ RABytecodeAutoTest class >> solutionsFor: bytecode [
 { #category : 'building suites' }
 RABytecodeAutoTest class >> solutionsFor: bytecode forArch: arch [
 
-	| suite matrix theSetUpTest |
+	| suite theSetUpTest |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-	matrix := ParametrizedTestMatrix new.
 
 	"force the progress bar"
 	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].
@@ -70,8 +69,9 @@ RABytecodeAutoTest class >> testParameters [
 
 	| suite matrix architectures |
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-	matrix := ParametrizedTestMatrix new.
 
+	matrix := ParametrizedTestMatrix new.
+	
 	architectures := {
 		                 {
 			                 (#ISA -> #IA32).
@@ -102,16 +102,14 @@ RABytecodeAutoTest class >> testParameters [
 					                e wordSize = arch second value
 					                ].
 
-				solutions := self
-					             exploreSolutions: bytecode
-					             fromSetUp: theSetUpTest.
+				solutions := self exploreSolutions: bytecode fromSetUp: theSetUpTest.
 
-				solutions do: [ :e |
+				solutions do: [ :solution |
 					matrix addCase: {
 							arch first.
 							arch second.
 							(#bytecode -> bytecode).
-							(#solution -> e) }
+							(#solution -> solution) }
 					]
 				]
 			]

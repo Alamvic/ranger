@@ -27,7 +27,7 @@ ManifestRangerExploring class >> ruleSentNotImplementedRuleV1FalsePositive [
 ManifestRangerExploring class >> ruleUnclassifiedMethodsRuleV1FalsePositive [
 
 	<ignoreForCoverage>
-	^ #(#(#(#RGMethodDefinition #(#IdMutator #mutateConstraint: #false)) #'2024-09-18T17:19:50.544958+02:00') #(#(#RGMethodDefinition #(#Mutator #mutate: #false)) #'2024-09-18T17:21:53.160732+02:00') #(#(#RGMethodDefinition #(#Mutator #mutateConstraints: #false)) #'2024-09-19T09:18:23.401388+02:00') )
+	^ #(#(#(#RGMethodDefinition #(#IdMutator #mutateConstraint: #false)) #'2024-09-18T17:19:50.544958+02:00') #(#(#RGMethodDefinition #(#ConstraintsMutator #mutate: #false)) #'2024-09-18T17:21:53.160732+02:00') #(#(#RGMethodDefinition #(#ConstraintsMutator #mutateConstraints: #false)) #'2024-09-19T09:18:23.401388+02:00') )
 ]
 
 { #category : 'code-critics' }

@@ -12,6 +12,12 @@ RABitShiftConstraint >> mutate: mutator [
 	^ mutator mutateBitShiftConstraint: self
 ]
 
+{ #category : 'printing' }
+RABitShiftConstraint >> operator [
+
+	^ '<<' "OR should we use >> ?"
+]
+
 { #category : 'as yet unclassified' }
 RABitShiftConstraint >> simplify [
 

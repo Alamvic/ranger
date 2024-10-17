@@ -25,3 +25,9 @@ RAQuotientConstraint >> mzConstraintOnInterpreter: interpreter [
 
 	^ leftOperand div: rightOperand
 ]
+
+{ #category : 'microzinc' }
+RAQuotientConstraint >> operator [
+
+	^ '//'
+]
