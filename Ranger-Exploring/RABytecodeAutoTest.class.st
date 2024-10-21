@@ -112,21 +112,6 @@ RABytecodeAutoTest >> compileEndInstructionForSuccess: aRASuccess [
 	cogit genReturnTopFromMethod
 ]
 
-{ #category : 'running' }
-RABytecodeAutoTest >> execute [
-
-	solution exitCondition executeTest: self
-]
-
-{ #category : 'executing' }
-RABytecodeAutoTest >> executePrimitiveFailure: aRAPrimitiveFailure [ 
-	
-	"If this is a primitive failure during a bytecode instruction, this means it was a success!
-	Actually, this means that the bytecode tried to execute a primitive inside, it failed, and tried something else.
-	If this were a real failure case, the exit status would be another one (like send exit)"
-	self executeUntilReturn
-]
-
 { #category : 'executing' }
 RABytecodeAutoTest >> executeUntilReturn [
 
@@ -149,13 +134,6 @@ RABytecodeAutoTest >> executeUntilSendTrampoline [
 		equals: (objectBuilder instantiate: solution exitCondition messageSelector)
 ]
 
-{ #category : 'testing' }
-RABytecodeAutoTest >> isInvalidMemoryAccessInvalid [
-	
-	"Bytecode assume all objects are correct... Otherwise it's a bytecode sequence problem"
-	^ true
-]
-
 { #category : 'accessing' }
 RABytecodeAutoTest >> jitCompilerClass [
 
@@ -166,27 +144,6 @@ RABytecodeAutoTest >> jitCompilerClass [
 RABytecodeAutoTest >> jitCompilerClass: aClass [ 
 	
 	jitCompilerClass := aClass
-]
-
-{ #category : 'running' }
-RABytecodeAutoTest >> prepareAutoCall [
-
-	| receiver |
-	receiver := objectBuilder instantiate: solution inputConstraints receiver.
-	self
-		prepareStackForSendReceiver: receiver
-		arguments: (solution inputConstraints arguments collect: [:e | (objectBuilder instantiate: e) ]).
-	
-	"previous frame"
-	self pushAddress: self machineSimulator framePointerRegisterValue.
-	self machineSimulator framePointerRegisterValue: self machineSimulator smalltalkStackPointerRegisterValue.
-	
-	self pushAddress: (objectBuilder instantiate: solution inputConstraints method).
-	self pushAddress: 0. "context"
-	self pushAddress: receiver.
-
-	solution inputConstraints locals do: [ :aLocalValue | 
-		self pushAddress: (objectBuilder instantiate: aLocalValue) ]
 ]
 
 { #category : 'running' }
@@ -210,22 +167,5 @@ RABytecodeAutoTest >> receiverTags [
 { #category : 'running' }
 RABytecodeAutoTest >> testBytecode [
 
-	(solution isInvalidIn: self) ifTrue: [ ^ self ].
-
-	methodAddress := self compile: [ | descriptor result |
-		cogit needsFrame: true.
-		cogit methodObj: (objectBuilder instantiate: solution inputConstraints method).
-		cogit byte0: bytecode.
-		cogit bytecodePC: 0.
-		cogit endPC: 0.
-		solution inputConstraints operandStack reversed do: [ :aStackValue | 
-			cogit genPushLiteral: (objectBuilder instantiate: aStackValue) ].
-
-		descriptor := cogit generatorAt: bytecode.
-		result := cogit perform: descriptor generator.
-		solution exitCondition returnResultInto: self
-	] bytecodes: 15.
-
-	self prepareAutoCall.
-	self execute.
+	case runOn: self
 ]
