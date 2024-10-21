@@ -6,7 +6,8 @@ Class {
 		'endInstruction',
 		'compilationResult',
 		'methodAddress',
-		'jitCompilerClass'
+		'jitCompilerClass',
+		'case'
 	],
 	#category : 'Ranger-Exploring-Tests',
 	#package : 'Ranger-Exploring',
@@ -66,59 +67,10 @@ RABytecodeAutoTest class >> solutionsFor: bytecode forArch: arch [
 
 { #category : 'building suites' }
 RABytecodeAutoTest class >> testParameters [
-
-	| suite matrix architectures |
-	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-
-	matrix := ParametrizedTestMatrix new.
+	| runner |
+	runner := RAConcolicRunner new.
+	runner bytecodesTestParameters
 	
-	architectures := {
-		                 {
-			                 (#ISA -> #IA32).
-			                 (#wordSize -> 4) }.
-		                 "{ #ISA -> #'X64'. #wordSize -> 8}."
-		                 {
-			                 (#ISA -> #ARMv5).
-			                 (#wordSize -> 4) }
-						}.
-
-	"force the progress bar"
-	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].
-
-	"Build the entire set of tests:
-	 - for each architecture
-	  - for each primitive to test
-	    - for each explored path
-	      => build a test case"
-	(1 to: 175)
-		do: [ :bytecode |
-			| solutions |
-			"{ #ISA -> #'aarch64'. #wordSize -> 8}."
-			architectures do: [ :arch |
-				| theSetUpTest |
-				theSetUpTest := suite detect: [ :e |
-					                e parametersToUse do: [ :aParameter |
-						                aParameter applyTo: e ].
-					                e wordSize = arch second value
-					                ].
-
-				solutions := self exploreSolutions: bytecode fromSetUp: theSetUpTest.
-
-				solutions do: [ :solution |
-					matrix addCase: {
-							arch first.
-							arch second.
-							(#bytecode -> bytecode).
-							(#solution -> solution) }
-					]
-				]
-			]
-		displayingProgress: [ :bytecode | bytecode asString ].
-
-	^ matrix * (ParametrizedTestMatrix new
-		   forSelector: #jitCompilerClass
-		   addOptions: { SimpleStackBasedCogit };
-		   yourself)
 ]
 
 { #category : 'accessing' }
@@ -131,6 +83,18 @@ RABytecodeAutoTest >> bytecode [
 RABytecodeAutoTest >> bytecode: anObject [
 
 	bytecode := anObject
+]
+
+{ #category : 'accessing' }
+RABytecodeAutoTest >> case [
+
+	^ case
+]
+
+{ #category : 'accessing' }
+RABytecodeAutoTest >> case: anObject [
+
+	case := anObject
 ]
 
 { #category : 'compiling' }

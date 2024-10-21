@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'suite',
 		'interpreter',
-		'primitives'
+		'primitives',
+		'bytecodes'
 	],
 	#category : 'Ranger-Exploring-Runner',
 	#package : 'Ranger-Exploring',
@@ -28,9 +29,69 @@ RAConcolicRunner class >> primitivesFrom: interpreter [
 ]
 
 { #category : 'tests' }
+RAConcolicRunner >> bytecodesTestParameters [
+
+	| matrix |
+	matrix := ParametrizedTestMatrix new.
+
+	"force the progress bar"
+	(1 to: 1) do: [ :e |  ] displayingProgress: [ :e | "nothing" ].
+
+	"Build the entire set of tests:
+	 - for each architecture
+	  - for each bytecode to test
+	    - for each explored path
+	      => build a test case"
+	bytecodes do: [ :bytecode | | cases |
+		cases := self casesForBytecode: bytecode.
+		cases do: [ :case | matrix addCase: { (#case -> case) } ]
+	] displayingProgress: [ :p | p value asString ].
+
+	^ matrix * (ParametrizedTestMatrix new
+		   forSelector: #jitCompilerClass
+		   addOptions: { SimpleStackBasedCogit };
+		   yourself)
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> casesForAllBytecodes [
+	
+	^ self casesForBytecodes: bytecodes
+]
+
+{ #category : 'tests' }
 RAConcolicRunner >> casesForAllPrimitives [
 	
 	^ self casesForPrimitives: primitives
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> casesForBytecode: bytecode [
+	
+	^ self supportedArchitectures flatCollect: [ :arch |
+		  | solutions theSetUpTest |
+		  theSetUpTest := suite detect: [ :e |
+			                  e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
+			                  e wordSize = arch second value
+			               ].
+
+		  solutions := self solutionsForBytecode: bytecode from: [ theSetUpTest setUp; interpreter ].
+
+		  solutions collect: [ :solution |
+			  | case |
+			  case := RAConcolicBytecodeCase new. "TODO: Implement me"
+			  case isa: arch first.
+			  case wordsize: arch second.
+			  case bytecode: bytecode.
+			  case solution: solution
+		  ]
+	]
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> casesForBytecodes: _bytecodes [
+	
+	^ _bytecodes flatCollect: [ :bytecode | self casesForBytecode: bytecode ]
 ]
 
 { #category : 'tests' }
@@ -50,11 +111,11 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 "		  interpreter := theSetUpTest
 			                 setUp;
 			                 interpreter."
-		  primitiveSolutions := self solutionsFor: primitive from: [ theSetUpTest setUp; interpreter ].
+		  primitiveSolutions := self solutionsForPrimitive: primitive from: [ theSetUpTest setUp; interpreter ].
 
 		  primitiveSolutions collect: [ :solution |
 			  | case |
-			  case := RAConcolicCase new.
+			  case := RAConcolicPrimitiveCase new.
 			  case isa: arch first.
 			  case wordsize: arch second.
 			  case primitive: primitive.
@@ -83,6 +144,7 @@ RAConcolicRunner >> initialize [
 	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
 	interpreter := suite anyOne setUp; interpreter.
 	primitives := self class primitivesFrom: interpreter.
+	bytecodes := 1 to: 175
 ]
 
 { #category : 'accessing' }
@@ -146,8 +208,29 @@ RAConcolicRunner >> primitivesTestParameters [
 	^ matrix
 ]
 
+{ #category : 'tests' }
+RAConcolicRunner >> run: cases with: test [
+
+	^ cases collect: [ :case | test parametersToUse: { 
+			(#case -> 1) asTestParameter.
+			(case isa) asTestParameter.
+			(case wordsize) asTestParameter
+		}; setUp.
+		[ case runOn: test ] on: Error, TestFailure do: [ :e | e freeze ].
+		case solution
+	]
+]
+
 { #category : 'as yet unclassified' }
-RAConcolicRunner >> solutionsFor: primitive from: vmBuildingBlock [
+RAConcolicRunner >> solutionsForBytecode: bytecode from: vmBuildingBlock [
+
+	^ RAPathExplorer new failOnError: false;
+		exploreAndMutate: (RABytecodeConcolicCase new vm: interpreter; bytecode: bytecode; yourself)
+			vmBuildingBlock: vmBuildingBlock.
+]
+
+{ #category : 'as yet unclassified' }
+RAConcolicRunner >> solutionsForPrimitive: primitive from: vmBuildingBlock [
 
 	^ RAPathExplorer new failOnError: false;
 		exploreAndMutate: (RAPrimitiveConcolicCase new selector: primitive; yourself)
