@@ -84,7 +84,7 @@ RAPathExplorer >> exploreAndMutate: aConcolicCase vmBuildingBlock: aBuildingBloc
 	^((self explore: aConcolicCase vmBuildingBlock: aBuildingBlock) inject: OrderedCollection new writeStream into: [
 		:stream :solution |
 			stream nextPutAll: { solution };
-			nextPutAll: (self solutionMutations: solution withInterpreter: interpreter);
+			nextPutAll: (self solutionMutations: solution" withInterpreter: interpreter");
 			yourself
 	]) contents
 
@@ -167,6 +167,13 @@ RAPathExplorer >> pathMutations: pathToMutate [ "{ constraints, inputs, expected
 RAPathExplorer >> recordSolution: aSolution [
 
 	solutions add: aSolution
+]
+
+{ #category : 'as yet unclassified' }
+RAPathExplorer >> solutionMutations: solution [
+
+	^ self pathMutations: solution path
+
 ]
 
 { #category : 'as yet unclassified' }

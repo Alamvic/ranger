@@ -108,9 +108,7 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 			                  e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
 			                  e wordSize = arch second value
 			               ].
-"		  interpreter := theSetUpTest
-			                 setUp;
-			                 interpreter."
+
 		  primitiveSolutions := self solutionsForPrimitive: primitive from: [ theSetUpTest setUp; interpreter ].
 
 		  primitiveSolutions collect: [ :solution |
@@ -128,7 +126,9 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 { #category : 'tests' }
 RAConcolicRunner >> casesForPrimitives: _primitives [
 	
-	^ _primitives flatCollect: [ :primitive | self casesForPrimitive: primitive ]
+	^ _primitives flatCollect: [ :primitive |
+		self casesForPrimitive: primitive
+	]
 ]
 
 { #category : 'accessing' }
