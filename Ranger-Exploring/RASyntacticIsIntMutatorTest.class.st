@@ -55,13 +55,14 @@ RASyntacticIsIntMutatorTest >> testWhenThereIsAConstraintThatMatchWithTheCriteri
 { #category : 'as yet unclassified' }
 RASyntacticIsIntMutatorTest >> testWhenThereIsMoreThanAConstraintThatMatchWithTheCriteriaAndThereIsTwoBoundsThenReturnsAMutationPerEachVariable [
 
-	| constraints varA varB maxBound zeroBound |
+	| constraints varA varB minBound maxBound |
 	
-	"Setting bounds = 0 and max val"
-	mutator bounds: { 0, SmallInteger maxVal }.
+	"Setting bounds = -1000, 1000"
 	
-	zeroBound := self const: 0. 
-	maxBound := self const: SmallInteger maxVal.
+	mutator bounds: (OrderedCollection withAll: #(-1000 1000)).
+	
+	minBound := self const: -1000. 
+	maxBound := self const: 1000.
 	varA := self var: 'A'.
 	varB := self var: 'B'.
 	
@@ -72,10 +73,14 @@ RASyntacticIsIntMutatorTest >> testWhenThereIsMoreThanAConstraintThatMatchWithTh
 	}.
 
 	self assert: (mutator mutations: constraints) equals: {
-		constraints, { self op: (self isGreater: varA than: zeroBound) or: (self isLessOrEquals: varA than: zeroBound) }.
-		constraints, { self op: (self isGreater: varB than: zeroBound) or: (self isLessOrEquals: varB than: zeroBound) }.
-		constraints, { self op: (self isGreater: varA than: maxBound) or: (self isLessOrEquals: varA than: maxBound) }.
-		constraints, { self op: (self isGreater: varB than: maxBound) or: (self isLessOrEquals: varB than: maxBound) }
+		constraints, {
+			self op: (self isGreater: varA than: minBound) or: (self isLessOrEquals: varA than: minBound).
+			self op: (self isGreater: varA than: maxBound) or: (self isLessOrEquals: varA than: maxBound)
+		}.
+		constraints, {
+			self op: (self isGreater: varB than: minBound) or: (self isLessOrEquals: varB than: minBound).
+			self op: (self isGreater: varB than: maxBound) or: (self isLessOrEquals: varB than: maxBound)
+		}
 	}
 ]
 

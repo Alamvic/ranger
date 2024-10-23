@@ -10,6 +10,12 @@ Class {
 }
 
 { #category : 'as yet unclassified' }
+RASyntacticIsIntMutator >> bounds [
+	
+	^ bounds
+]
+
+{ #category : 'as yet unclassified' }
 RASyntacticIsIntMutator >> bounds: boundNumbers [
 
 	bounds := boundNumbers

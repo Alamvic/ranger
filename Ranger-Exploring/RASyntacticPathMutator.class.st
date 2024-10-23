@@ -21,7 +21,7 @@ RASyntacticPathMutator >> constraintMutation: constraint [
 	(self isMutableConstraint: constraint) ifTrue: [ mutations addAll: (self mutantVariants: constraint) ].
 	
 	(constraint respondsTo: #operands) ifFalse: [ ^mutations ].
-
+	
 	constraint operands doWithIndex: [ :child :index |
 		child ifNotNil: [
 			mutations addAll: ((self constraintMutation: child) collect: [ :childMutation | | mutation |

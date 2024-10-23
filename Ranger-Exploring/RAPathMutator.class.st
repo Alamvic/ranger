@@ -14,9 +14,11 @@ RAPathMutator class >> lastestPathMutator [
 	
 	^self new
 		"This returns the most updated mutators"
-		addSyntacticMutator: (RASyntacticIsIntMutator new bounds: {
-			0, SmallInteger maxVal, SmallInteger minVal, SmallInteger maxVal / 2, SmallInteger minVal / 2
-		});
+		addSyntacticMutator: (RASyntacticIsIntMutator new bounds: (
+			OrderedCollection new
+			add: 0; add: SmallInteger maxVal; add: SmallInteger minVal;
+			add: SmallInteger maxVal / 2; add: SmallInteger minVal / 2; yourself
+		));
 "		addSyntacticMutator: RASyntacticVarGreaterThanMutator new;
 		addSyntacticMutator: RASyntacticCommutativeOperationMutator new;
 		addSyntacticMutator: RASyntacticVarLessThanMutator new;
