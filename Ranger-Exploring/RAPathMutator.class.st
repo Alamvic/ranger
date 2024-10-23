@@ -14,17 +14,21 @@ RAPathMutator class >> lastestPathMutator [
 	
 	^self new
 		"This returns the most updated mutators"
-"		addSyntacticMutator: RASyntacticVarGreaterThanMutator new; "
-	"	addSyntacticMutator: RASyntacticCommutativeOperationMutator new;"
-		"addSyntacticMutator: RASyntacticVarLessThanMutator new;"
-		addSyntacticMutator: RASyntacticNLessThanVarMutator new;
-	"	addSyntacticMutator: RASyntacticVarGreaterOrEqualsThanVarMutator new;"
-
-"		addSyntacticMutator: RASyntacticTypeObjectMutator new;"
-		"addSyntacticMutator: RASyntacticVarGreaterThanIntroducingNewVarMutator new;"
+		addSyntacticMutator: (RASyntacticIsIntMutator new bounds: {
+			0, SmallInteger maxVal, SmallInteger minVal, SmallInteger maxVal / 2, SmallInteger minVal / 2
+		});
+"		addSyntacticMutator: RASyntacticVarGreaterThanMutator new;
+		addSyntacticMutator: RASyntacticCommutativeOperationMutator new;
+		addSyntacticMutator: RASyntacticVarLessThanMutator new;
+		addSyntacticMutator: RASyntacticNLessThanVarMutator new;"
 		
-		"addSyntacticMutator: RASyntacticIsNotIntNotEqualsRandomMutator new;"
-		"addSyntacticMutator: RASyntacticBinaryArithOpWithRandomMutator new;"
+"		addSyntacticMutator: RASyntacticVarGreaterOrEqualsThanVarMutator new;
+
+		addSyntacticMutator: RASyntacticTypeObjectMutator new;
+		addSyntacticMutator: RASyntacticVarGreaterThanIntroducingNewVarMutator new;
+		
+		addSyntacticMutator: RASyntacticIsNotIntNotEqualsRandomMutator new;
+		addSyntacticMutator: RASyntacticBinaryArithOpWithRandomMutator new;"
 	yourself
 ]
 

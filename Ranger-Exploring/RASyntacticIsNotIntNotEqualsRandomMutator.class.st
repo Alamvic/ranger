@@ -13,12 +13,14 @@ RASyntacticIsNotIntNotEqualsRandomMutator >> isMutableConstraint: aConstraint [
 ]
 
 { #category : 'as yet unclassified' }
-RASyntacticIsNotIntNotEqualsRandomMutator >> mutation: constraint [
+RASyntacticIsNotIntNotEqualsRandomMutator >> mutantVariants: constraint [
 		
 	"IsNonInt(x) and x != RAND"
-	^ RAAndConstraint new operands: {
-		constraint .
-		RANotEqualsConstraint new operands: { constraint operands first . RAConstant new value: self randomNum }
+	^ {
+		RAAndConstraint new operands: {
+			constraint .
+			RANotEqualsConstraint new operands: { constraint operands first . RAConstant new value: self randomNum }
+		}
 	}
 ]
 

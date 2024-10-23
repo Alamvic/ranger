@@ -13,9 +13,9 @@ RASyntacticCommutativeOperationMutator >> isMutableConstraint: aConstraint [
 ]
 
 { #category : 'as yet unclassified' }
-RASyntacticCommutativeOperationMutator >> mutation: constraint [
+RASyntacticCommutativeOperationMutator >> mutantVariants: constraint [
 
-	^ constraint class new operands: {  constraint operands second . constraint operands first }
+	^ {	 constraint class new operands: {  constraint operands second . constraint operands first } }
 
 ]
 

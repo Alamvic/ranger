@@ -13,7 +13,7 @@ RASyntacticVarGreaterThanIntroducingNewVarMutator >> isMutableConstraint: aConst
 ]
 
 { #category : 'as yet unclassified' }
-RASyntacticVarGreaterThanIntroducingNewVarMutator >> mutation: constraint [
+RASyntacticVarGreaterThanIntroducingNewVarMutator >> mutantVariants: constraint [
 
 	| var const newVar |
 	var := constraint operands first.
@@ -21,9 +21,10 @@ RASyntacticVarGreaterThanIntroducingNewVarMutator >> mutation: constraint [
 
 	"Var(A) + Var(B) > n + Var(B)"
 	newVar := MzVariable new name: (var name) , '_B'; type: '0..1000000'.
-	^ RAGreaterConstraint new operands: {
-		RAAddConstraint new operands: { var . newVar }.
-		RAAddConstraint new operands: { const . newVar }
+	^ { RAGreaterConstraint new operands: {
+			RAAddConstraint new operands: { var . newVar }.
+			RAAddConstraint new operands: { const . newVar }
+		}
 	}
 ]
 

@@ -13,20 +13,23 @@ RASyntacticTypeObjectMutator >> isMutableConstraint: aConstraint [
 ]
 
 { #category : 'as yet unclassified' }
-RASyntacticTypeObjectMutator >> mutation: constraint [
+RASyntacticTypeObjectMutator >> mutantVariants: constraint [
 
 	| value |
 	value := constraint operands first.
 	
 	"isX(A) -> Add isNotY AND, for all Y != X"
-	^ self allISConstraints inject: constraint into: [ :andOp :currentClass |
-		({ currentClass . currentClass inverseClass } includes: constraint class) ifFalse: [
-			RAAndConstraint new operands: {
-				(currentClass inverseClass new operands: { value }; yourself).
-				andOp
-			}
-		] ifTrue: [ andOp ]
-	]
+	^ {
+		self allISConstraints inject: constraint into: [ :andOp :currentClass |
+			({ currentClass . currentClass inverseClass } includes: constraint class) ifFalse: [
+				RAAndConstraint new operands: {
+					(currentClass inverseClass new operands: { value }; yourself).
+					andOp
+				}
+			] ifTrue: [ andOp ]
+		]
+	
+	}
 
 
 ]

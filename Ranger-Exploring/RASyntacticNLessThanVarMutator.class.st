@@ -13,11 +13,13 @@ RASyntacticNLessThanVarMutator >> isMutableConstraint: aConstraint [
 ]
 
 { #category : 'as yet unclassified' }
-RASyntacticNLessThanVarMutator >> mutation: constraint [
+RASyntacticNLessThanVarMutator >> mutantVariants: constraint [
 
 	"A >= n+1"
-	^ RAGreaterOrEqualsConstraint new operands: {
-		constraint operands second . RAConstant new value: (constraint operands first value + 1)
+	^ {
+		RAGreaterOrEqualsConstraint new operands: {
+			constraint operands second . RAConstant new value: (constraint operands first value + 1)
+		}
 	}
 ]
 

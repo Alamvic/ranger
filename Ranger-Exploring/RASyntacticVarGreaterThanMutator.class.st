@@ -13,14 +13,14 @@ RASyntacticVarGreaterThanMutator >> isMutableConstraint: aConstraint [
 ]
 
 { #category : 'as yet unclassified' }
-RASyntacticVarGreaterThanMutator >> mutation: constraint [
+RASyntacticVarGreaterThanMutator >> mutantVariants: constraint [
 
 	| var const |
 	var := constraint operands first.
 	const := constraint operands second.
 
 	"Var(A) >= n+1"
-	^ RAGreaterOrEqualsConstraint new operands: { var . RAConstant new value: (const value + 1) }
+	^ { RAGreaterOrEqualsConstraint new operands: { var . RAConstant new value: (const value + 1) } }
 ]
 
 { #category : 'as yet unclassified' }

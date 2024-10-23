@@ -18,7 +18,7 @@ RASyntacticPathMutator >> constraintMutation: constraint [
 	| mutations |
 	mutations := OrderedCollection new.
 
-	(self isMutableConstraint: constraint) ifTrue: [ mutations add: (self mutation: constraint) ].
+	(self isMutableConstraint: constraint) ifTrue: [ mutations addAll: (self mutantVariants: constraint) ].
 	
 	(constraint respondsTo: #operands) ifFalse: [ ^mutations ].
 
@@ -57,6 +57,15 @@ RASyntacticPathMutator >> isGreaterThan: aConstraint [
 RASyntacticPathMutator >> isInt: aConstraint [
 
 	^ (aConstraint class = RAConstant) and: aConstraint value class = SmallInteger 
+]
+
+{ #category : 'testing' }
+RASyntacticPathMutator >> isIntObjVar: aConstraint [
+
+	"Force short circuit"
+	aConstraint class = RAIsIntegerObject ifFalse: [ ^false ].
+
+	^ aConstraint operands first class = MzVariable 
 ]
 
 { #category : 'testing' }
@@ -119,6 +128,12 @@ RASyntacticPathMutator >> isVarOpInt: aConstraint [
 ]
 
 { #category : 'as yet unclassified' }
+RASyntacticPathMutator >> mutantVariants: constraint [
+
+	self subclassResponsibility 
+]
+
+{ #category : 'as yet unclassified' }
 RASyntacticPathMutator >> mutateByEachConstraint: constraints [ 
 	^ (constraints inject: OrderedCollection new writeStream into: [ :stream :constraint |
 		| mutations |
@@ -139,12 +154,6 @@ RASyntacticPathMutator >> mutatePath: aRAPath [ "return an array of paths"
 			exitCondition: aRAPath exitCondition;
 		yourself
 	]
-]
-
-{ #category : 'as yet unclassified' }
-RASyntacticPathMutator >> mutation: constraint [
-
-	self subclassResponsibility 
 ]
 
 { #category : 'as yet unclassified' }

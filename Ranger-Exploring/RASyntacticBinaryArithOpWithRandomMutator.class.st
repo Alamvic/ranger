@@ -13,7 +13,7 @@ RASyntacticBinaryArithOpWithRandomMutator >> isMutableConstraint: aConstraint [
 ]
 
 { #category : 'as yet unclassified' }
-RASyntacticBinaryArithOpWithRandomMutator >> mutation: constraint [
+RASyntacticBinaryArithOpWithRandomMutator >> mutantVariants: constraint [
 
 	| first second random |
 	first := constraint operands first.
@@ -21,9 +21,11 @@ RASyntacticBinaryArithOpWithRandomMutator >> mutation: constraint [
 	random := RAConstant new value: self randomNum.
 	
 	"X + Z OP Y + Z"
-	^ constraint class new operands: {
-		RAAddConstraint new operands: { first . random }.
-		RAAddConstraint new operands: {  second . random }
+	^	{ 
+		constraint class new operands: {
+			RAAddConstraint new operands: { first . random }.
+			RAAddConstraint new operands: {  second . random }
+		}
 	}
 ]
 
