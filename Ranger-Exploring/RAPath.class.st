@@ -7,8 +7,9 @@ Class {
 		'inputs',
 		'exitCondition'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Exploring',
+	#package : 'Ranger-Exploring',
+	#tag : 'Exploring'
 }
 
 { #category : 'copying' }
@@ -150,4 +151,13 @@ RAPath >> solveWithInterpreter: interpreter [
 		  path: self;
 		  solver: solver;
 		  yourself
+]
+
+{ #category : 'printing' }
+RAPath >> toString [
+	
+	| separator |
+	"To improve, this is the first iteration to see easily path patterns"
+	separator := ';', Character lf asString, Character tab asString.
+	^ (pathConstraints collect: [ :constraint | constraint toString ]) joinUsing: separator
 ]

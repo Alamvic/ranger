@@ -1,10 +1,16 @@
 Class {
 	#name : 'RAIsNonIntegerObject',
-	#superclass : 'RAValueConstraint',
+	#superclass : 'VMConstraint',
 	#category : 'Ranger-VMSpecificConstraints',
 	#package : 'Ranger',
 	#tag : 'VMSpecificConstraints'
 }
+
+{ #category : 'as yet unclassified' }
+RAIsNonIntegerObject class >> inverseClass [
+
+	^ RAIsIntegerObject 
+]
 
 { #category : 'as yet unclassified' }
 RAIsNonIntegerObject >> mutate: mutator [
@@ -22,4 +28,10 @@ RAIsNonIntegerObject >> mzConstraintOnInterpreter: anInterpreter [
 RAIsNonIntegerObject >> negated [
 	
 	^ RAIsIntegerObject operands: self operands
+]
+
+{ #category : 'printing' }
+RAIsNonIntegerObject >> operator [ 
+
+	^ 'IsNotInt'
 ]

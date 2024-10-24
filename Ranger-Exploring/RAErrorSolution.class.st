@@ -6,8 +6,9 @@ Class {
 		'vm',
 		'error'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Exploring',
+	#package : 'Ranger-Exploring',
+	#tag : 'Exploring'
 }
 
 { #category : 'validating' }
@@ -68,6 +69,12 @@ RAErrorSolution >> selector [
 RAErrorSolution >> selector: anObject [
 
 	selector := anObject
+]
+
+{ #category : 'printing' }
+RAErrorSolution >> solutionLabel [
+
+	^ 'Error'
 ]
 
 { #category : 'accessing' }

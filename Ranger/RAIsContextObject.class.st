@@ -1,6 +1,6 @@
 Class {
 	#name : 'RAIsContextObject',
-	#superclass : 'RAValueConstraint',
+	#superclass : 'VMConstraint',
 	#category : 'Ranger-VMSpecificConstraints',
 	#package : 'Ranger',
 	#tag : 'VMSpecificConstraints'
@@ -15,4 +15,10 @@ RAIsContextObject >> mutate: mutator [
 { #category : 'negating' }
 RAIsContextObject >> negated [
 	self shouldBeImplemented.
+]
+
+{ #category : 'printing' }
+RAIsContextObject >> operator [ 
+
+	^ 'IsContextObj'
 ]

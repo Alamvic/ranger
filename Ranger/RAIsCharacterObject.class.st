@@ -1,10 +1,16 @@
 Class {
 	#name : 'RAIsCharacterObject',
-	#superclass : 'RAValueConstraint',
+	#superclass : 'VMConstraint',
 	#category : 'Ranger-VMSpecificConstraints',
 	#package : 'Ranger',
 	#tag : 'VMSpecificConstraints'
 }
+
+{ #category : 'as yet unclassified' }
+RAIsCharacterObject class >> inverseClass [
+
+	^ RAIsNonCharacterObject 
+]
 
 { #category : 'negating' }
 RAIsCharacterObject >> isInCharacterRangeConstraintFor: valueConstraint inInterpreter: anInterpreter [
@@ -36,4 +42,10 @@ RAIsCharacterObject >> mzConstraintOnInterpreter: anInterpreter [
 RAIsCharacterObject >> negated [
 	
 	^ RAIsNonCharacterObject operands: self operands
+]
+
+{ #category : 'printing' }
+RAIsCharacterObject >> operator [ 
+
+	^ 'IsCharObj'
 ]

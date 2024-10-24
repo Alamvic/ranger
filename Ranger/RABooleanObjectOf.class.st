@@ -1,6 +1,6 @@
 Class {
 	#name : 'RABooleanObjectOf',
-	#superclass : 'RAValueConstraint',
+	#superclass : 'VMConstraint',
 	#category : 'Ranger-VMSpecificConstraints',
 	#package : 'Ranger',
 	#tag : 'VMSpecificConstraints'
@@ -22,4 +22,10 @@ RABooleanObjectOf >> isBooleanObjectOf [
 RABooleanObjectOf >> mutate: mutator [
 
 	^ mutator mutateIsBooleanObjectOfConstraint: self
+]
+
+{ #category : 'printing' }
+RABooleanObjectOf >> operator [ 
+
+	^ 'BoolObjOf'
 ]

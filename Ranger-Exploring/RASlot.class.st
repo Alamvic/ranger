@@ -5,8 +5,9 @@ Class {
 		'index',
 		'value'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Exploring',
+	#package : 'Ranger-Exploring',
+	#tag : 'Exploring'
 }
 
 { #category : 'accessing' }

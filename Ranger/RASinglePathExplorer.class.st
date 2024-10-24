@@ -70,6 +70,7 @@ RASinglePathExplorer >> explore: aSelector on: vm withFrame: aFrame explorer: an
 
 	path := RAPath new.
 	path inputFrame: aFrame.
+	
 	path pathConstraints: pathConstraints.
 	[ 
 		self interpretMethod: method ast receiver: { 

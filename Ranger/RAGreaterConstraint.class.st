@@ -39,3 +39,9 @@ RAGreaterConstraint >> negated [
 	
 	^ RALessOrEqualsConstraint operands: self operands
 ]
+
+{ #category : 'accessing' }
+RAGreaterConstraint >> operator [
+	
+	^ '>'
+]
