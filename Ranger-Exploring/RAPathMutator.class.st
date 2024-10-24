@@ -19,7 +19,7 @@ RAPathMutator class >> lastestPathMutator [
 			add: 0; add: SmallInteger maxVal; add: SmallInteger minVal;
 			add: SmallInteger maxVal / 2; add: SmallInteger minVal / 2; yourself
 		));
-"		addSyntacticMutator: RASyntacticVarGreaterThanMutator new;
+		addSyntacticMutator: RASyntacticVarGreaterThanMutator new;
 		addSyntacticMutator: RASyntacticCommutativeOperationMutator new;
 		addSyntacticMutator: RASyntacticVarLessThanMutator new;
 		addSyntacticMutator: RASyntacticNLessThanVarMutator new;"
@@ -30,7 +30,7 @@ RAPathMutator class >> lastestPathMutator [
 		addSyntacticMutator: RASyntacticVarGreaterThanIntroducingNewVarMutator new;
 		
 		addSyntacticMutator: RASyntacticIsNotIntNotEqualsRandomMutator new;
-		addSyntacticMutator: RASyntacticBinaryArithOpWithRandomMutator new;"
+		addSyntacticMutator: RASyntacticBinaryArithOpWithRandomMutator new;
 	yourself
 ]
 
