@@ -140,12 +140,16 @@ RAPath >> solveWithInterpreter: interpreter [
 
 	| solver |
 	solver := MzSolver new.
-	pathConstraints do: [ :constraint | 
-		solver addConstraint: (constraint mzConstraintOnInterpreter: interpreter).
-	].
 
-	solver timeout: 2 seconds.
-	solver satisfy.
+	[  pathConstraints do: [ :constraint | solver addConstraint: (constraint mzConstraintOnInterpreter: interpreter)].
+		solver timeout: 2 seconds.
+		solver satisfy
+	] on: Error, Exception do: [ :e | RAErrorSolution new
+		path: self;
+		vm: interpreter ;
+		error: e freeze;
+		yourself
+	].
 
 	^ RAConstraintSolution new
 		  path: self;
