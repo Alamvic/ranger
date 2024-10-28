@@ -145,7 +145,7 @@ RASyntacticPathMutator >> mutateByEachConstraint: constraints [
 ]
 
 { #category : 'as yet unclassified' }
-RASyntacticPathMutator >> mutatePath: aRAPath [ "return an array of paths"
+RASyntacticPathMutator >> mutatePath: aRAPath [
 
 	^ ( self mutations: aRAPath pathConstraints ) collect: [ :constraints |
 		RAPath new pathConstraints: constraints;

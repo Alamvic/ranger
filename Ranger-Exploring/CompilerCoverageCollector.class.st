@@ -44,11 +44,18 @@ CompilerCoverageCollector class >> compilerFrontendCoverage: result [
 { #category : 'as yet unclassified' }
 CompilerCoverageCollector class >> compilerMethods [
 
-	^  Cogit methods,
-		SimpleStackBasedCogit methods, "Used in the rest of Concolic tests"
-		StackToRegisterMappingCogit methods, "Used in RAStackToRegisterMappingCogitTest"
-		
-		(CogAbstractInstruction withAllSubclasses flatCollect: #methods) "Backend"
+	^  (
+			Cogit methods,
+			SimpleStackBasedCogit methods, "Used in the rest of Concolic tests"
+			StackToRegisterMappingCogit methods "Used in RAStackToRegisterMappingCogitTest"
+		), "Frontend" (
+			(CogAbstractInstruction withAllSubclasses flatCollect: #methods) difference: (
+				CogOutOfLineLiteralsX64Compiler methods, CogInLineLiteralsARMCompiler methods,
+				CogOutOfLineLiteralsARMv8Compiler methods, CogX64Compiler methods,
+				CogMIPSELCompiler methods, CogICacheFlushingIA32Compiler methods,
+				CogInLineLiteralsX64Compiler methods, CogARMv8Compiler methods
+			)
+		) "Backend"
 ]
 
 { #category : 'as yet unclassified' }
@@ -81,13 +88,7 @@ CompilerCoverageCollector class >> frontendClasses [
 ]
 
 { #category : 'as yet unclassified' }
-CompilerCoverageCollector class >> measure: block [
-
-	^ CoverageCollector new methods: self compilerMethods; runOn: block
-]
-
-{ #category : 'as yet unclassified' }
-CompilerCoverageCollector class >> printCompilerCoverage: result [
+CompilerCoverageCollector class >> generateCompilerCoverage: result [ 
 
     | tempDict jsonString  writeStream fileName |
 
@@ -100,6 +101,12 @@ CompilerCoverageCollector class >> printCompilerCoverage: result [
     writeStream := fileName asFileReference createFile writeStream.
     writeStream nextPutAll: jsonString.
     writeStream close
+]
+
+{ #category : 'as yet unclassified' }
+CompilerCoverageCollector class >> measure: block [
+
+	^ CoverageCollector new methods: self compilerMethods; runOn: block
 ]
 
 { #category : 'initialization' }

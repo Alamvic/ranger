@@ -40,13 +40,10 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 		constraintFactory: constraintFactory.
 
 	[ | timeToExplore |
-	timeToExplore := [| objectBuilder |
+	timeToExplore := [ | objectBuilder |
 	vm := aBuildingBlock value.
 
-	objectBuilder := RAObjectBuilder new
-		                 interpreter: vm;
-		                 nextIndex: 100;
-		                 yourself.
+	objectBuilder := RAObjectBuilder new interpreter: vm; nextIndex: 100; yourself.
 
 	aConcolicCase initializeVM: vm.
 
@@ -84,7 +81,7 @@ RAPathExplorer >> exploreAndMutate: aConcolicCase vmBuildingBlock: aBuildingBloc
 	^((self explore: aConcolicCase vmBuildingBlock: aBuildingBlock) inject: OrderedCollection new writeStream into: [
 		:stream :solution |
 			stream nextPutAll: { solution };
-			nextPutAll: (self solutionMutations: solution" withInterpreter: interpreter");
+			nextPutAll: (self solutionMutations: solution);
 			yourself
 	]) contents
 
@@ -172,14 +169,7 @@ RAPathExplorer >> recordSolution: aSolution [
 { #category : 'as yet unclassified' }
 RAPathExplorer >> solutionMutations: solution [
 
-	^ self pathMutations: solution path
-
-]
-
-{ #category : 'as yet unclassified' }
-RAPathExplorer >> solutionMutations: solution withInterpreter: interpreter [ 
-
-	^ (self pathMutations: solution path) collect: [ :path | path solveWithInterpreter: interpreter ]
+	^ (self pathMutations: solution path) collect: [:path | path solveWithInterpreter: vm ]
 
 ]
 
