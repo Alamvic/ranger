@@ -28,7 +28,8 @@ CompilerCoverageCollector class >> compilerCoverage: result [
 	dict := Dictionary new.
 	dict at: 'Frontend' put: (self compilerFrontendCoverage: result).
 	dict at: 'Backend' put: (self compilerBackendCoverage: result).
-
+	dict at: 'Node paths' put: (self nodePathsFrom: result).
+	
 	^ dict
 ]
 
@@ -88,11 +89,15 @@ CompilerCoverageCollector class >> frontendClasses [
 ]
 
 { #category : 'as yet unclassified' }
-CompilerCoverageCollector class >> generateCompilerCoverage: result [ 
+CompilerCoverageCollector class >> generateCompilerCoverage: result [
+	
+	self generateCompilerCoverage: result at: 'CompilerCoverage.json'
+]
 
-    | tempDict jsonString  writeStream fileName |
+{ #category : 'as yet unclassified' }
+CompilerCoverageCollector class >> generateCompilerCoverage: result at: fileName [ 
 
-    fileName := 'CompilerCoverageResult.json'.
+    | tempDict jsonString  writeStream |
 
     tempDict := self compilerCoverage: result.
 
@@ -107,6 +112,20 @@ CompilerCoverageCollector class >> generateCompilerCoverage: result [
 CompilerCoverageCollector class >> measure: block [
 
 	^ CoverageCollector new methods: self compilerMethods; runOn: block
+]
+
+{ #category : 'as yet unclassified' }
+CompilerCoverageCollector class >> nodePathsFrom: result [
+
+	^ result nodes inject: Dictionary new into: [ :dict :node |
+		  | methodName path |
+		  methodName := node methodNode compiledMethod name.
+		  path := node path.
+		  dict
+			  at: methodName
+			  ifPresent: [ (dict at: methodName) add: path ]
+			  ifAbsentPut: [ OrderedCollection new add: path; yourself ].
+		  dict ]
 ]
 
 { #category : 'initialization' }
