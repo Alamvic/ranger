@@ -14,7 +14,7 @@ RAPathMutator class >> lastestPathMutator [
 	
 	^self new
 		"This returns the most updated mutators"
-		addSyntacticMutator: (RASyntacticIsIntMutator new bounds: (
+		"addSyntacticMutator: (RASyntacticIsIntMutator new bounds: (
 			OrderedCollection new
 			add: 0; add: SmallInteger maxVal; add: SmallInteger minVal;
 			add: SmallInteger maxVal / 2; add: SmallInteger minVal / 2; yourself
@@ -22,15 +22,15 @@ RAPathMutator class >> lastestPathMutator [
 		addSyntacticMutator: RASyntacticVarGreaterThanMutator new;
 		addSyntacticMutator: RASyntacticCommutativeOperationMutator new;
 		addSyntacticMutator: RASyntacticVarLessThanMutator new;
-		addSyntacticMutator: RASyntacticNLessThanVarMutator new;"
+		addSyntacticMutator: RASyntacticNLessThanVarMutator new;""
 		
-"		addSyntacticMutator: RASyntacticVarGreaterOrEqualsThanVarMutator new;
+""		addSyntacticMutator: RASyntacticVarGreaterOrEqualsThanVarMutator new;
 
 		addSyntacticMutator: RASyntacticTypeObjectMutator new;
 		addSyntacticMutator: RASyntacticVarGreaterThanIntroducingNewVarMutator new;
 		
 		addSyntacticMutator: RASyntacticIsNotIntNotEqualsRandomMutator new;
-		addSyntacticMutator: RASyntacticBinaryArithOpWithRandomMutator new;
+		addSyntacticMutator: RASyntacticBinaryArithOpWithRandomMutator new;"
 	yourself
 ]
 

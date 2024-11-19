@@ -111,9 +111,8 @@ RAPathExplorer >> explorePathWithFrame: inputFrame solver: solver [
 			self recordSolution: (RAErrorSolution new
 					 inputConstraints: inputFrame frameConstraints;
 					 outputConstraints: outputFrame frameConstraints;
-					 vm: vm;
 					 selector: selector;
-					 error: e freeze;
+					 error: e signalerContext shortDebugStack;
 					 yourself) ].
 	^ explorer path
 ]
@@ -194,9 +193,8 @@ RAPathExplorer >> solve: aRAPath [
 			Then retry with the next one"
 			self recordSolution: (RAErrorSolution new
 					 path: nextPath;
-					 vm: vm;
 					 selector: selector;
-					 error: e freeze;
+					 error: e signalerContext shortDebugStack;
 					 yourself).
 
 			^ self solve: (aRAPath copyWithNumberOfSegments: ktry - 1) ].

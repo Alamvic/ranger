@@ -7,7 +7,7 @@ Class {
 		'solution',
 		'compilationResult',
 		'endInstruction',
-		'aTest'
+		'testToExecute'
 	],
 	#category : 'Ranger-Exploring-Runner',
 	#package : 'Ranger-Exploring',
@@ -48,6 +48,13 @@ RAConcolicCase >> solution [
 RAConcolicCase >> solution: anObject [
 
 	solution := anObject
+]
+
+{ #category : 'running' }
+RAConcolicCase >> tearDown [
+
+	endInstruction := nil.
+	testToExecute cleanUpInstanceVariables
 ]
 
 { #category : 'accessing' }

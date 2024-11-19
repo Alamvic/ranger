@@ -22,7 +22,7 @@ RAConcolicBytecodeCase >> executePrimitiveFailure: aRAPrimitiveFailure [
 	"If this is a primitive failure during a bytecode instruction, this means it was a success!
 	Actually, this means that the bytecode tried to execute a primitive inside, it failed, and tried something else.
 	If this were a real failure case, the exit status would be another one (like send exit)"
-	aTest executeUntilReturn
+	testToExecute executeUntilReturn
 ]
 
 { #category : 'testing' }
@@ -36,43 +36,43 @@ RAConcolicBytecodeCase >> isInvalidMemoryAccessInvalid [
 RAConcolicBytecodeCase >> prepareAutoCall [
 
 	| receiver |
-	receiver := aTest objectBuilder instantiate: solution inputConstraints receiver.
-	aTest
+	receiver := testToExecute objectBuilder instantiate: solution inputConstraints receiver.
+	testToExecute
 		prepareStackForSendReceiver: receiver
-		arguments: (solution inputConstraints arguments collect: [:e | (aTest objectBuilder instantiate: e) ]).
+		arguments: (solution inputConstraints arguments collect: [:e | (testToExecute objectBuilder instantiate: e) ]).
 	
 	"previous frame"
-	aTest pushAddress: aTest machineSimulator framePointerRegisterValue.
-	aTest machineSimulator framePointerRegisterValue: aTest machineSimulator smalltalkStackPointerRegisterValue.
+	testToExecute pushAddress: testToExecute machineSimulator framePointerRegisterValue.
+	testToExecute machineSimulator framePointerRegisterValue: testToExecute machineSimulator smalltalkStackPointerRegisterValue.
 	
-	aTest pushAddress: (aTest objectBuilder instantiate: solution inputConstraints method).
-	aTest pushAddress: 0. "context"
-	aTest pushAddress: receiver.
+	testToExecute pushAddress: (testToExecute objectBuilder instantiate: solution inputConstraints method).
+	testToExecute pushAddress: 0. "context"
+	testToExecute pushAddress: receiver.
 
 	solution inputConstraints locals do: [ :aLocalValue | 
-		aTest pushAddress: (aTest objectBuilder instantiate: aLocalValue) ]
+		testToExecute pushAddress: (testToExecute objectBuilder instantiate: aLocalValue) ]
 ]
 
 { #category : 'running' }
-RAConcolicBytecodeCase >> runOn: theTest [
+RAConcolicBytecodeCase >> runOn: aTest [
 
 	"Setting test instance"
 	| cogit |
-	aTest := theTest.
-	aTest setUp: self.
+	testToExecute := aTest.
+	testToExecute setUp: self.
 	
 	(solution isInvalidIn: self) ifTrue: [ ^ self ].
 	
-	cogit := aTest cogit.
+	cogit := testToExecute cogit.
 	
-	methodAddress := theTest compile: [ | descriptor result |
+	methodAddress := aTest compile: [ | descriptor result |
 		cogit needsFrame: true.
-		cogit methodObj: (aTest objectBuilder instantiate: solution inputConstraints method).
+		cogit methodObj: (testToExecute objectBuilder instantiate: solution inputConstraints method).
 		cogit byte0: bytecode.
 		cogit bytecodePC: 0.
 		cogit endPC: 0.
 		solution inputConstraints operandStack reversed do: [ :aStackValue | 
-			cogit genPushLiteral: (aTest objectBuilder instantiate: aStackValue) ].
+			cogit genPushLiteral: (testToExecute objectBuilder instantiate: aStackValue) ].
 
 		descriptor := cogit generatorAt: bytecode.
 		result := cogit perform: descriptor generator.

@@ -2,7 +2,6 @@ Class {
 	#name : 'RAConcolicRunner',
 	#superclass : 'Object',
 	#instVars : [
-		'suite',
 		'interpreter',
 		'primitives',
 		'bytecodes'
@@ -67,15 +66,12 @@ RAConcolicRunner >> casesForAllPrimitives [
 
 { #category : 'tests' }
 RAConcolicRunner >> casesForBytecode: bytecode [
-	
-	^ self supportedArchitectures flatCollect: [ :arch |
-		  | solutions theSetUpTest |
-		  theSetUpTest := suite detect: [ :e |
-			                  e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
-			                  e wordSize = arch second value
-			               ].
 
-		  solutions := self solutionsForBytecode: bytecode from: [ theSetUpTest setUp; interpreter ].
+	^ self supportedArchitectures flatCollect: [ :arch |
+		  | solutions |
+		  solutions := self
+			               solutionsForBytecode: bytecode
+			               from: [ self newInterpreterForArchitecture: arch ].
 
 		  solutions collect: [ :solution |
 			  | case |
@@ -83,9 +79,7 @@ RAConcolicRunner >> casesForBytecode: bytecode [
 			  case isa: arch first.
 			  case wordsize: arch second.
 			  case bytecode: bytecode.
-			  case solution: solution
-		  ]
-	]
+			  case solution: solution ] ]
 ]
 
 { #category : 'tests' }
@@ -99,17 +93,14 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 
 	| generator |
 	generator := self primitiveGeneratorFor: primitive.
-	
-	generator = nil ifTrue: [ ^{} ].
-	
-	^ self supportedArchitectures flatCollect: [ :arch |
-		  | primitiveSolutions theSetUpTest |
-		  theSetUpTest := suite detect: [ :e |
-			                  e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
-			                  e wordSize = arch second value
-			               ].
+	generator ifNil: [ ^ #(  ) ].
 
-		  primitiveSolutions := self solutionsForPrimitive: primitive from: [ theSetUpTest setUp; interpreter ].
+	^ self supportedArchitectures flatCollect: [ :arch |
+		  | primitiveSolutions |
+		  primitiveSolutions := self
+			                        solutionsForPrimitive: primitive
+			                        from: [
+			                        self newInterpreterForArchitecture: arch ].
 
 		  primitiveSolutions collect: [ :solution |
 			  | case |
@@ -118,9 +109,7 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 			  case wordsize: arch second.
 			  case primitive: primitive.
 			  case generator: generator.
-			  case solution: solution
-		  ]
-	]
+			  case solution: solution ] ]
 ]
 
 { #category : 'tests' }
@@ -134,23 +123,41 @@ RAConcolicRunner >> casesForPrimitives: _primitives [
 { #category : 'accessing' }
 RAConcolicRunner >> compilerClass [
 
-	^ interpreter cogit class
+	^ self interpreter cogit class
 ]
 
 { #category : 'tests' }
 RAConcolicRunner >> initialize [
 
 	super initialize.
-	suite := VMJittedGeneralPrimitiveTest buildSuite tests.
-	interpreter := suite anyOne setUp; interpreter.
+	interpreter := self suite anyOne setUp; interpreter.
 	primitives := self class primitivesFrom: interpreter.
 	bytecodes := 1 to: 175
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> interpreter [
+
+	^ interpreter
 ]
 
 { #category : 'accessing' }
 RAConcolicRunner >> interpreterClass [
 	
-	^ interpreter class
+	^ self interpreter class
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> newInterpreterForArchitecture: arch [
+
+	| theSetUpTest |
+	theSetUpTest := self suite detect: [ :e |
+		                e parametersToUse do: [ :aParameter |
+			                aParameter applyTo: e ].
+		                e wordSize = arch second value ].
+	^ theSetUpTest
+		  setUp;
+		  interpreter
 ]
 
 { #category : 'tests' }
@@ -173,12 +180,12 @@ RAConcolicRunner >> primitiveIndex: primitive [
 { #category : 'as yet unclassified' }
 RAConcolicRunner >> primitives [
 
-	^ (interpreter class primitiveTable withIndexCollect: [ :elem :index |
+	^ (self interpreterClass primitiveTable withIndexCollect: [ :elem :index |
 		   index -> elem ])
 		  select: [ :elem |
-			  interpreter cogit class primitiveTable size > elem key and: [
+			  self interpreter cogit class primitiveTable size > elem key and: [
 				  elem value isSymbol and: [
-					  (interpreter cogit class primitiveTable at: elem key)
+					  (self interpreter cogit class primitiveTable at: elem key)
 						  primitiveGenerator notNil
 					  ]
 				  ]
@@ -211,22 +218,31 @@ RAConcolicRunner >> primitivesTestParameters [
 { #category : 'tests' }
 RAConcolicRunner >> run: cases with: test [
 
-	^ cases collect: [ :case | test parametersToUse: { 
-			(#case -> 1) asTestParameter.
-			(case isa) asTestParameter.
-			(case wordsize) asTestParameter
-		}; setUp.
-		[ case runOn: test ] on: Error, TestFailure do: [ :e | e freeze ].
-		case solution
-	]
+	^ cases collect: [ :case |
+		  test
+			  parametersToUse: {
+					  (#case -> 1) asTestParameter.
+					  case isa asTestParameter.
+					  case wordsize asTestParameter };
+			  setUp.
+		  [ case runOn: test ]
+			  on: Error , TestFailure
+			  do: [ :e | "ignore the exception and continue" ].
+		  "Cleanup the test if required"
+		  case tearDown.
+		  case solution ]
 ]
 
 { #category : 'as yet unclassified' }
 RAConcolicRunner >> solutionsForBytecode: bytecode from: vmBuildingBlock [
 
-	^ RAPathExplorer new failOnError: false;
-		exploreAndMutate: (RABytecodeConcolicCase new vm: interpreter; bytecode: bytecode; yourself)
-			vmBuildingBlock: vmBuildingBlock.
+	^ RAPathExplorer new
+		  failOnError: false;
+		  exploreAndMutate: (RABytecodeConcolicCase new
+				   vm: self interpreter;
+				   bytecode: bytecode;
+				   yourself)
+		  vmBuildingBlock: vmBuildingBlock
 ]
 
 { #category : 'as yet unclassified' }
@@ -235,6 +251,13 @@ RAConcolicRunner >> solutionsForPrimitive: primitive from: vmBuildingBlock [
 	^ RAPathExplorer new failOnError: false;
 		exploreAndMutate: (RAPrimitiveConcolicCase new selector: primitive; yourself)
 			vmBuildingBlock: vmBuildingBlock.
+]
+
+{ #category : 'accessing' }
+RAConcolicRunner >> suite [
+
+	"Suite of tests used to set up a new interpreter"
+	^ VMJittedGeneralPrimitiveTest buildSuite tests
 ]
 
 { #category : 'as yet unclassified' }

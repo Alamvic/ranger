@@ -14,16 +14,16 @@ Class {
 { #category : 'executing' }
 RAConcolicPrimitiveCase >> executePrimitiveFailure: aRAPrimitiveFailure [ 
 
-	aTest runFrom: primitiveAddress until: endInstruction address
+	testToExecute runFrom: primitiveAddress until: endInstruction address
 ]
 
 { #category : 'executing' }
 RAConcolicPrimitiveCase >> executeUntilReturn [
 
-	aTest runFrom: primitiveAddress until: aTest callerAddress.
-	aTest
-		assert: aTest machineSimulator receiverRegisterValue
-		equals: (aTest objectBuilder instantiate: solution result)
+	testToExecute runFrom: primitiveAddress until: testToExecute callerAddress.
+	testToExecute
+		assert: testToExecute machineSimulator receiverRegisterValue
+		equals: (testToExecute objectBuilder instantiate: solution result)
 ]
 
 { #category : 'accessing' }
@@ -43,26 +43,26 @@ RAConcolicPrimitiveCase >> prepareAutoCall [
 
 	| receiver primitiveReceiver primitiveArguments |
 
-	receiver := aTest objectBuilder instantiate: solution inputConstraints receiver.
-	aTest
+	receiver := testToExecute objectBuilder instantiate: solution inputConstraints receiver.
+	testToExecute
 		prepareStackForSendReceiver: receiver
-		arguments: (solution inputConstraints arguments collect: [:e | (aTest objectBuilder instantiate: e) ]).
+		arguments: (solution inputConstraints arguments collect: [:e | (testToExecute objectBuilder instantiate: e) ]).
 	
 	"previous frame"
-	aTest pushAddress: aTest machineSimulator framePointerRegisterValue.
-	aTest machineSimulator framePointerRegisterValue: aTest machineSimulator smalltalkStackPointerRegisterValue.
+	testToExecute pushAddress: testToExecute machineSimulator framePointerRegisterValue.
+	testToExecute machineSimulator framePointerRegisterValue: testToExecute machineSimulator smalltalkStackPointerRegisterValue.
 	
-	aTest pushAddress: (aTest objectBuilder instantiate: solution inputConstraints method).
-	aTest pushAddress: 0. "context"
-	aTest pushAddress: receiver.
+	testToExecute pushAddress: (testToExecute objectBuilder instantiate: solution inputConstraints method).
+	testToExecute pushAddress: 0. "context"
+	testToExecute pushAddress: receiver.
 
 	solution inputConstraints locals do: [ :aLocalValue | 
-		aTest pushAddress: (aTest objectBuilder instantiate: aLocalValue) ].
+		testToExecute pushAddress: (testToExecute objectBuilder instantiate: aLocalValue) ].
 
-	primitiveReceiver := aTest objectBuilder instantiate: self primitiveReceiver.
+	primitiveReceiver := testToExecute objectBuilder instantiate: self primitiveReceiver.
 	primitiveArguments := solution inputConstraints operandStack allButLast
-		collect: [ :e | aTest objectBuilder instantiate: e].
-	aTest
+		collect: [ :e | testToExecute objectBuilder instantiate: e].
+	testToExecute
 		prepareStackForSendReceiver: primitiveReceiver
 		arguments: primitiveArguments
 ]
@@ -92,19 +92,19 @@ RAConcolicPrimitiveCase >> receiverTags [
 ]
 
 { #category : 'running' }
-RAConcolicPrimitiveCase >> runOn: theTest [
+RAConcolicPrimitiveCase >> runOn: aTest [
 
 	"Setting test instance"
-	aTest := theTest.
-	aTest setUp: self.
+	testToExecute := aTest.
+	testToExecute setUp: self.
 	
 	(self solution isInvalidIn: self) ifTrue: [ ^ self ].
 
-	primitiveAddress := theTest compile: [
-		compilationResult := aTest cogit objectRepresentation perform: self generator.
+	primitiveAddress := aTest compile: [
+		compilationResult := testToExecute cogit objectRepresentation perform: self generator.
 
 		"If the primitive fails it continues, so we need to have an instruction to detect the end"
-		endInstruction := aTest cogit Stop
+		endInstruction := testToExecute cogit Stop
 	] bytecodes: 15.
 
 	self prepareAutoCall.
