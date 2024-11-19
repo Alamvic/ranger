@@ -26,6 +26,8 @@ CompilerCoverageCollector class >> compilerCoverage: result [
 
 	| dict |
 	dict := Dictionary new.
+	dict at: 'Covered nodes' put: (result nodes size).
+	dict at: 'Percentage of covered nodes' put: (result nodes size * 100) / result collector nodes size.
 	dict at: 'Frontend' put: (self compilerFrontendCoverage: result).
 	dict at: 'Backend' put: (self compilerBackendCoverage: result).
 	dict at: 'Node paths' put: (self nodePathsFrom: result).
