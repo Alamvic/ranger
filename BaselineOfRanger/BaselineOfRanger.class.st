@@ -11,6 +11,9 @@ BaselineOfRanger >> baseline: spec [
 	<baseline>
 	spec for: #common do: [
 		spec
+			baseline: 'VMMaker'
+			with: [ spec repository: 'github://evref-inria/pharo-vm:ranger2' ].
+		spec
 			baseline: 'Minizinc'
 			with: [ spec repository: 'github://tesonep/pharo-minizinc:main' ].
 		spec package: 'Ranger' with: [ spec requires: #( 'Minizinc' ) ].
