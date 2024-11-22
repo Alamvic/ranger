@@ -28,6 +28,18 @@ RAConcolicRunner class >> primitivesFrom: interpreter [
 ]
 
 { #category : 'tests' }
+RAConcolicRunner >> bytecodeCaseBy: bytecode with: solution arch: arch [
+	
+	| case |
+	case := RAConcolicBytecodeCase new.
+	case isa: arch first.
+	case wordsize: arch second.
+	case bytecode: bytecode.
+	case solution: solution.
+	^ case
+]
+
+{ #category : 'tests' }
 RAConcolicRunner >> bytecodesTestParameters [
 
 	| matrix |
@@ -74,12 +86,10 @@ RAConcolicRunner >> casesForBytecode: bytecode [
 			               from: [ self newInterpreterForArchitecture: arch ].
 
 		  solutions collect: [ :solution |
-			  | case |
-			  case := RAConcolicBytecodeCase new. "TODO: Implement me"
-			  case isa: arch first.
-			  case wordsize: arch second.
-			  case bytecode: bytecode.
-			  case solution: solution ] ]
+				self bytecodeCaseBy: bytecode with: solution arch: arch
+			]
+		]
+
 ]
 
 { #category : 'tests' }
@@ -103,13 +113,9 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 			                        self newInterpreterForArchitecture: arch ].
 
 		  primitiveSolutions collect: [ :solution |
-			  | case |
-			  case := RAConcolicPrimitiveCase new.
-			  case isa: arch first.
-			  case wordsize: arch second.
-			  case primitive: primitive.
-			  case generator: generator.
-			  case solution: solution ] ]
+				self primitiveCaseBy: primitive with: solution arch: arch gen: generator
+			]
+		]
 ]
 
 { #category : 'tests' }
@@ -158,6 +164,19 @@ RAConcolicRunner >> newInterpreterForArchitecture: arch [
 	^ theSetUpTest
 		  setUp;
 		  interpreter
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> primitiveCaseBy: primitive with: solution arch: arch gen: generator [
+
+	| case |
+	case := RAConcolicPrimitiveCase new.
+	case isa: arch first.
+	case wordsize: arch second.
+	case primitive: primitive.
+	case generator: generator.
+	case solution: solution.
+	^ case
 ]
 
 { #category : 'tests' }
