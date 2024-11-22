@@ -151,7 +151,7 @@ RAPath >> solveWithInterpreter: interpreter [
 		do: [ :e |
 			RAErrorSolution new
 				path: self;
-				error: e shortDebugStack;
+				error: e signalerContext shortDebugStack;
 				yourself ].
 
 	^ RAConstraintSolution new
