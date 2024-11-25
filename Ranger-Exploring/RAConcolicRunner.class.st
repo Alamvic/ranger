@@ -110,7 +110,8 @@ RAConcolicRunner >> casesForPrimitive: primitive [
 		  primitiveSolutions := self
 			                        solutionsForPrimitive: primitive
 			                        from: [
-			                        self newInterpreterForArchitecture: arch ].
+			                        		self newInterpreterForArchitecture: arch
+											].
 
 		  primitiveSolutions collect: [ :solution |
 				self primitiveCaseBy: primitive with: solution arch: arch gen: generator
@@ -151,6 +152,16 @@ RAConcolicRunner >> interpreter [
 RAConcolicRunner >> interpreterClass [
 	
 	^ self interpreter class
+]
+
+{ #category : 'as yet unclassified' }
+RAConcolicRunner >> mutateCases: cases with: mutators [
+	
+	| pathMutator |
+	pathMutator := RAPathMutator new syntacticMutators: mutators.
+	^ (cases inject: OrderedCollection new writeStream into: [ :stream :case |
+			stream nextPutAll: (pathMutator mutateConcolicCase: case from: interpreter); yourself
+		]) contents
 ]
 
 { #category : 'tests' }

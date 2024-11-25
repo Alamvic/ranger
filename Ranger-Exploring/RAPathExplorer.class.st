@@ -152,13 +152,6 @@ RAPathExplorer >> mutator: aMutator [
 	mutator := aMutator 
 ]
 
-{ #category : 'as yet unclassified' }
-RAPathExplorer >> pathMutations: pathToMutate [ "{ constraints, inputs, expected }"
-	"Given a path, we use our mutator to generate all possible different mutations"
-
-	^ mutator mutatePath: pathToMutate
-]
-
 { #category : 'solving' }
 RAPathExplorer >> recordSolution: aSolution [
 
@@ -168,7 +161,7 @@ RAPathExplorer >> recordSolution: aSolution [
 { #category : 'as yet unclassified' }
 RAPathExplorer >> solutionMutations: solution [
 
-	^ (self pathMutations: solution path) collect: [:path | path solveWithInterpreter: vm ]
+	^ mutator mutateSolution: solution from: vm
 
 ]
 

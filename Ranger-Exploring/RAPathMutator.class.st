@@ -46,6 +46,22 @@ RAPathMutator >> initialize [
 	syntacticMutators := OrderedCollection new.
 ]
 
+{ #category : 'accessing' }
+RAPathMutator >> mutateConcolicCase: case [
+
+	^ (self mutateSolution: case solution) collect: [ :sol |
+		case copy solution: sol; yourself
+	]
+]
+
+{ #category : 'accessing' }
+RAPathMutator >> mutateConcolicCase: case from: interpreter [
+
+	^ (self mutateSolution: case solution from: interpreter) collect: [ :sol |
+		case copy solution: sol; yourself
+	]
+]
+
 { #category : 'as yet unclassified' }
 RAPathMutator >> mutatePath: path [
 	
@@ -57,7 +73,19 @@ RAPathMutator >> mutatePath: path [
 ]
 
 { #category : 'accessing' }
+RAPathMutator >> mutateSolution: solution from: vm [
+
+	^ (self mutatePath: solution path) collect: [:path | path solveWithInterpreter: vm ]
+]
+
+{ #category : 'accessing' }
 RAPathMutator >> syntacticMutators [
 	
 	^ syntacticMutators
+]
+
+{ #category : 'accessing' }
+RAPathMutator >> syntacticMutators: array [
+	
+	syntacticMutators := array
 ]

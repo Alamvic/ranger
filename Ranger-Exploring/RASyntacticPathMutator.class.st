@@ -16,6 +16,7 @@ RASyntacticPathMutator >> allISConstraints [
 RASyntacticPathMutator >> constraintMutation: constraint [
 
 	| mutations |
+	
 	mutations := OrderedCollection new.
 
 	(self isMutableConstraint: constraint) ifTrue: [ mutations addAll: (self mutantVariants: constraint) ].
