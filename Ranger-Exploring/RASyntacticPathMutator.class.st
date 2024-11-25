@@ -66,7 +66,7 @@ RASyntacticPathMutator >> isIntObjVar: aConstraint [
 	"Force short circuit"
 	aConstraint class = RAIsIntegerObject ifFalse: [ ^false ].
 
-	^ aConstraint operands first class = MzVariable 
+	^ { MzVariable . RAObject } includes: aConstraint operands first class
 ]
 
 { #category : 'testing' }
