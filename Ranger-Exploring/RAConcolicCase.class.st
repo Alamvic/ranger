@@ -38,6 +38,12 @@ RAConcolicCase >> isa: anObject [
 	isa := anObject
 ]
 
+{ #category : 'as yet unclassified' }
+RAConcolicCase >> replicate: sol from: runner [
+
+	^ self subclassResponsibility 
+]
+
 { #category : 'accessing' }
 RAConcolicCase >> solution [
 

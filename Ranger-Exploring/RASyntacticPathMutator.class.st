@@ -32,7 +32,6 @@ RASyntacticPathMutator >> constraintMutation: constraint [
 	 		])
 		]
 	].
-
 	^ mutations
 ]
 
@@ -142,12 +141,12 @@ RASyntacticPathMutator >> mutateByEachConstraint: constraints [
 		mutations ifNotEmpty: [ stream nextPut: constraints copy, mutations ].
 		
 		stream
-	]) contents asArray
+	]) contents asArray.
 ]
 
 { #category : 'as yet unclassified' }
 RASyntacticPathMutator >> mutatePath: aRAPath [
-
+	
 	^ ( self mutations: aRAPath pathConstraints ) collect: [ :constraints |
 		RAPath new pathConstraints: constraints;
 			parent: aRAPath parent;

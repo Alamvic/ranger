@@ -31,9 +31,7 @@ RASyntacticIsIntMutator >> isMutableConstraint: aConstraint [
 RASyntacticIsIntMutator >> mutantVariants: constraint [
 		
 	| var |
-	
 	var := constraint operands first.
-	
 	^ bounds collect: [ :n | 
 		| bound |
 		bound := RAConstant new value: n.

@@ -160,7 +160,7 @@ RAConcolicRunner >> mutateCases: cases with: mutators [
 	| pathMutator |
 	pathMutator := RAPathMutator new syntacticMutators: mutators.
 	^ (cases inject: OrderedCollection new writeStream into: [ :stream :case |
-			stream nextPutAll: (pathMutator mutateConcolicCase: case from: interpreter); yourself
+			stream nextPutAll: (pathMutator mutateConcolicCase: case from: self); yourself
 		]) contents
 ]
 

@@ -53,6 +53,12 @@ RAConcolicBytecodeCase >> prepareAutoCall [
 		testToExecute pushAddress: (testToExecute objectBuilder instantiate: aLocalValue) ]
 ]
 
+{ #category : 'as yet unclassified' }
+RAConcolicBytecodeCase >> replicate: sol from: runner [
+
+	^ runner bytecodeCaseBy: bytecode  with: sol  arch: { isa . wordsize }
+]
+
 { #category : 'running' }
 RAConcolicBytecodeCase >> runOn: aTest [
 

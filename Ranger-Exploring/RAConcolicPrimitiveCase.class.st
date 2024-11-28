@@ -91,6 +91,12 @@ RAConcolicPrimitiveCase >> receiverTags [
 	^ self primitiveReceiver typeTag value ifNil: [ 0 ]
 ]
 
+{ #category : 'as yet unclassified' }
+RAConcolicPrimitiveCase >> replicate: sol from: runner [
+
+	^ runner primitiveCaseBy: primitive with: sol arch: { isa . wordsize } gen: generator
+]
+
 { #category : 'running' }
 RAConcolicPrimitiveCase >> runOn: aTest [
 
