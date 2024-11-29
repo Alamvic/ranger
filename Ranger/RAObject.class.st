@@ -120,6 +120,13 @@ RAObject >> format [
 	^ classObject format
 ]
 
+{ #category : 'testing' }
+RAObject >> greaterThan: anotherVariable [
+
+	^ self asVariable greaterThan: anotherVariable
+	
+]
+
 { #category : 'accessing' }
 RAObject >> hashBits [
 
