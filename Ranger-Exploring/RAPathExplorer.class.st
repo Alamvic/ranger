@@ -50,7 +50,7 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	inputFrame := previousInputFrameConstraints
 		              instantiateWith: objectBuilder
 		              constraintBuilder: constraintFactory.
-	exploredPath := self
+	exploredPath := self "This generate the solution too, not only get the explored Path"
 		                explorePathWithFrame: inputFrame
 		                solver: solution solver.
 

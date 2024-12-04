@@ -57,7 +57,9 @@ RAPathMutator >> mutateConcolicCase: case [
 { #category : 'accessing' }
 RAPathMutator >> mutateConcolicCase: case from: runner [
 
-	^ (self mutateSolution: case solution from: runner interpreter) collect: [ :sol | case replicate: sol from: runner ]
+	^ (self mutateSolution: case solution from: runner interpreter) collect: [ :solution |
+			case replicate: solution from: runner
+		]
 ]
 
 { #category : 'as yet unclassified' }
@@ -72,7 +74,12 @@ RAPathMutator >> mutatePath: path [
 
 { #category : 'accessing' }
 RAPathMutator >> mutateSolution: solution from: vm [
-	^ (self mutatePath: solution path) collect: [:path | path solveWithInterpreter: vm ]
+	^ (self mutatePath: solution path) collect: [ :path |
+		(path solveWithInterpreter: vm)
+			inputConstraints: solution inputConstraints;
+			outputConstraints: solution outputConstraints;
+			timeToExplore: solution timeToExplore
+	]
 ]
 
 { #category : 'accessing' }

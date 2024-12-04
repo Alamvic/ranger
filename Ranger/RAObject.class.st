@@ -294,7 +294,7 @@ RAObject >> isVariable [
 RAObject >> lessOrEquals: anOperand [
 
 	"TODO: I have no idea why I am doing this here, It never shouldn't be entering here"
-	^ anOperand lessOrEquals: self asVariable
+	^ self asVariable lessOrEquals: anOperand  
 ]
 
 { #category : 'accessing' }

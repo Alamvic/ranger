@@ -94,7 +94,7 @@ RAConcolicPrimitiveCase >> receiverTags [
 { #category : 'as yet unclassified' }
 RAConcolicPrimitiveCase >> replicate: sol from: runner [
 
-	^ runner primitiveCaseBy: primitive with: sol arch: { isa . wordsize } gen: generator
+	^ runner primitiveCaseBy: primitive with: sol arch: self arch gen: generator
 ]
 
 { #category : 'running' }

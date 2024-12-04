@@ -14,6 +14,12 @@ Class {
 	#tag : 'Runner'
 }
 
+{ #category : 'as yet unclassified' }
+RAConcolicCase >> arch [
+
+	^ { isa . wordsize }
+]
+
 { #category : 'running' }
 RAConcolicCase >> execute [
 

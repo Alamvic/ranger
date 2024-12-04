@@ -56,7 +56,7 @@ RAConcolicBytecodeCase >> prepareAutoCall [
 { #category : 'as yet unclassified' }
 RAConcolicBytecodeCase >> replicate: sol from: runner [
 
-	^ runner bytecodeCaseBy: bytecode  with: sol  arch: { isa . wordsize }
+	^ runner bytecodeCaseBy: bytecode  with: sol  arch: self arch
 ]
 
 { #category : 'running' }

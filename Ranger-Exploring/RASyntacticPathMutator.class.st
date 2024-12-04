@@ -135,13 +135,12 @@ RASyntacticPathMutator >> mutantVariants: constraint [
 
 { #category : 'as yet unclassified' }
 RASyntacticPathMutator >> mutateByEachConstraint: constraints [ 
+
 	^ (constraints inject: OrderedCollection new writeStream into: [ :stream :constraint |
-		| mutations |
-		mutations := self constraintMutation: constraint.
-		mutations ifNotEmpty: [ stream nextPut: constraints copy, mutations ].
-		
-		stream
-	]) contents asArray.
+		stream nextPutAll: ((self constraintMutation: constraint) collect: [ :mutation |
+			constraints copy, { mutation }
+		]); yourself
+	]) contents asArray
 ]
 
 { #category : 'as yet unclassified' }
