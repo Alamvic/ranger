@@ -14,7 +14,7 @@ Class {
 { #category : 'validating' }
 RAErrorSolution >> checkSupported [
 	
-	RAUnsupportedTestFailure signal: error messageText
+	RAUnsupportedTestFailure signal: error
 ]
 
 { #category : 'accessing' }

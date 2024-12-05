@@ -53,7 +53,7 @@ RASuccess >> result: anAbstractValue [
 ]
 
 { #category : 'compiling' }
-RASuccess >> returnResultInto: aTest [
+RASuccess >> returnResultInto: aCase [
 
-	aTest compileEndInstructionForSuccess: self
+	aCase compileEndInstructionForSuccess: self
 ]

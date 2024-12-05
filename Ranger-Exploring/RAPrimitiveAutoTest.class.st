@@ -87,12 +87,6 @@ RAPrimitiveAutoTest >> case: anObject [
 	case := anObject
 ]
 
-{ #category : 'accessing' }
-RAPrimitiveAutoTest >> objectBuilder [
-
-	^ objectBuilder
-]
-
 { #category : 'running' }
 RAPrimitiveAutoTest >> solution: aSolution [
 

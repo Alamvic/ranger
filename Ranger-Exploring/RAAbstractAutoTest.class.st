@@ -55,6 +55,12 @@ RAAbstractAutoTest >> isInvalidMemoryAccessInvalid [
 	^ self subclassResponsibility
 ]
 
+{ #category : 'accessing' }
+RAAbstractAutoTest >> objectBuilder [
+
+	^ objectBuilder
+]
+
 { #category : 'running' }
 RAAbstractAutoTest >> receiverTags [
 
@@ -68,12 +74,20 @@ RAAbstractAutoTest >> runCaseManaged [
 ]
 
 { #category : 'running' }
+RAAbstractAutoTest >> sendTrampolineStop [
+
+	^ sendTrampolineStop
+]
+
+{ #category : 'running' }
 RAAbstractAutoTest >> setUp: aCase [
 
-	super setUp.
+	environmentBuilder doBuildSimulator.
+	self jitCompilerClass initializeWithOptions: (Cogit asOptionsDictionary: self jitOptions).
+	self setUpMachineCodeSimulator.
 	
 	aCase solution checkSupported.
-	(aCase solution isInvalidIn: self) ifTrue: [ ^ self ].
+	(aCase solution isInvalidIn: aCase ) ifTrue: [ ^ self ].
 	
 	cogit maybeGenerateCheckFeatures.
 	self installFloatClass.

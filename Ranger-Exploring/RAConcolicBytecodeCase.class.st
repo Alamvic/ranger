@@ -16,6 +16,21 @@ RAConcolicBytecodeCase >> bytecode: anObject [
 	bytecode := anObject.
 ]
 
+{ #category : 'compiling' }
+RAConcolicBytecodeCase >> compileEndInstructionForPrimitiveFailure: aRAPrimitiveFailure [ 
+	
+	"In bytecodes, primitive failures should be ignored"
+	self compileEndInstructionForSuccess: aRAPrimitiveFailure
+]
+
+{ #category : 'compiling' }
+RAConcolicBytecodeCase >> compileEndInstructionForSuccess: aRASuccess [
+	
+	"I'm a success and my value has been pushed to the operand stack.
+	Make a return top"
+	testToExecute cogit genReturnTopFromMethod
+]
+
 { #category : 'executing' }
 RAConcolicBytecodeCase >> executePrimitiveFailure: aRAPrimitiveFailure [ 
 	
@@ -23,6 +38,28 @@ RAConcolicBytecodeCase >> executePrimitiveFailure: aRAPrimitiveFailure [
 	Actually, this means that the bytecode tried to execute a primitive inside, it failed, and tried something else.
 	If this were a real failure case, the exit status would be another one (like send exit)"
 	testToExecute executeUntilReturn
+]
+
+{ #category : 'executing' }
+RAConcolicBytecodeCase >> executeUntilReturn [
+
+	testToExecute runFrom: methodAddress until: testToExecute callerAddress.
+	testToExecute
+		assert: testToExecute machineSimulator receiverRegisterValue
+		equals: (testToExecute objectBuilder instantiate: solution result)
+]
+
+{ #category : 'executing' }
+RAConcolicBytecodeCase >> executeUntilSendTrampoline [
+
+	testToExecute runFrom: methodAddress until: testToExecute sendTrampolineStop address.
+
+	testToExecute
+		assert: testToExecute machineSimulator receiverRegisterValue
+		equals: (testToExecute objectBuilder instantiate: solution exitCondition messageReceiver).
+	testToExecute
+		assert: testToExecute machineSimulator classRegisterValue
+		equals: (testToExecute objectBuilder instantiate: solution exitCondition messageSelector)
 ]
 
 { #category : 'testing' }
@@ -51,6 +88,12 @@ RAConcolicBytecodeCase >> prepareAutoCall [
 
 	solution inputConstraints locals do: [ :aLocalValue | 
 		testToExecute pushAddress: (testToExecute objectBuilder instantiate: aLocalValue) ]
+]
+
+{ #category : 'executing' }
+RAConcolicBytecodeCase >> receiverTags [
+
+	^ solution inputConstraints receiver typeTag value ifNil: [ 0 ]
 ]
 
 { #category : 'as yet unclassified' }

@@ -97,21 +97,6 @@ RABytecodeAutoTest >> case: anObject [
 	case := anObject
 ]
 
-{ #category : 'compiling' }
-RABytecodeAutoTest >> compileEndInstructionForPrimitiveFailure: aRAPrimitiveFailure [ 
-	
-	"In bytecodes, primitive failures should be ignored"
-	self compileEndInstructionForSuccess: aRAPrimitiveFailure
-]
-
-{ #category : 'compiling' }
-RABytecodeAutoTest >> compileEndInstructionForSuccess: aRASuccess [
-	
-	"I'm a success and my value has been pushed to the operand stack.
-	Make a return top"
-	cogit genReturnTopFromMethod
-]
-
 { #category : 'executing' }
 RABytecodeAutoTest >> executeUntilReturn [
 
@@ -119,19 +104,6 @@ RABytecodeAutoTest >> executeUntilReturn [
 	self
 		assert: machineSimulator receiverRegisterValue
 		equals: (objectBuilder instantiate: solution result)
-]
-
-{ #category : 'executing' }
-RABytecodeAutoTest >> executeUntilSendTrampoline [
-
-	self runFrom: methodAddress until: sendTrampolineStop address.
-
-	self
-		assert: machineSimulator receiverRegisterValue
-		equals: (objectBuilder instantiate: solution exitCondition messageReceiver).
-	self
-		assert: machineSimulator classRegisterValue
-		equals: (objectBuilder instantiate: solution exitCondition messageSelector)
 ]
 
 { #category : 'accessing' }

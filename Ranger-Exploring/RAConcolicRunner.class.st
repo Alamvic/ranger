@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'interpreter',
 		'primitives',
-		'bytecodes'
+		'bytecodes',
+		'testCache'
 	],
 	#category : 'Ranger-Exploring-Runner',
 	#package : 'Ranger-Exploring',
@@ -137,9 +138,13 @@ RAConcolicRunner >> compilerClass [
 RAConcolicRunner >> initialize [
 
 	super initialize.
-	interpreter := self suite anyOne setUp; interpreter.
+	interpreter := self suite anyOne
+		               setUp;
+		               interpreter.
 	primitives := self class primitivesFrom: interpreter.
-	bytecodes := 1 to: 175
+	bytecodes := 1 to: 175.
+
+	testCache := Dictionary new
 ]
 
 { #category : 'tests' }
@@ -175,6 +180,24 @@ RAConcolicRunner >> newInterpreterForArchitecture: arch [
 	^ theSetUpTest
 		  setUp;
 		  interpreter
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> newTestForCase: aCase fromPrototype: aTestPrototype [
+
+	| serializedByteArray |
+	serializedByteArray := testCache at: aCase isa ifAbsentPut: [
+		                       aTestPrototype
+			                       parametersToUse: {
+					                       (#case -> 1) asTestParameter.
+					                       aCase isa asTestParameter.
+					                       aCase wordsize asTestParameter };
+			                       setUp;
+			                       serializeToByteArray ].
+
+	^ FLMaterializer new
+		  onStream: serializedByteArray readStream;
+		  materializeRoot
 ]
 
 { #category : 'tests' }
@@ -248,19 +271,18 @@ RAConcolicRunner >> primitivesTestParameters [
 { #category : 'tests' }
 RAConcolicRunner >> run: cases with: test [
 
-	^ cases collect: [ :case |
-		  test
-			  parametersToUse: {
-					  (#case -> 1) asTestParameter.
-					  case isa asTestParameter.
-					  case wordsize asTestParameter };
-			  setUp.
-		  [ case runOn: test ]
-			  on: Error , TestFailure
-			  do: [ :e | "ignore the exception and continue" ].
-		  "Cleanup the test if required"
-		  case tearDown.
-		  case solution ]
+	| res |
+	res := OrderedCollection new.
+	cases do: [ :case |
+		| theTestToRun |
+		theTestToRun := self newTestForCase: case fromPrototype: test.
+		[ case runOn: theTestToRun ]
+			on: Error, TestFailure
+			do: [ :e | res add: e freeze "ignore the exception and continue" ].
+		"Cleanup the test if required"
+		case tearDown.
+		case solution ].
+	^ res
 ]
 
 { #category : 'as yet unclassified' }

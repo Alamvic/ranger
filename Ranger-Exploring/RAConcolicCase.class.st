@@ -65,8 +65,7 @@ RAConcolicCase >> solution: anObject [
 { #category : 'running' }
 RAConcolicCase >> tearDown [
 
-	endInstruction := nil.
-	testToExecute cleanUpInstanceVariables
+	endInstruction := nil
 ]
 
 { #category : 'accessing' }

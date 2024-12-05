@@ -1414,7 +1414,7 @@ RASinglePathExplorer >> interpretiFrameNumArgsWith: aRBMessageNode [
 	theMessageFP := self popOperand.
 	
 	"We only implement single frames for now, if it wants to access some other frame, we need to implement it"
-	self assert: vm first localFP = theMessageFP first.
+	self assert: vm first framePointer = theMessageFP first.
 
 	self pushOperand: vmFrame numberOfArguments.
 ]
