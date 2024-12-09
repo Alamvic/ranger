@@ -77,6 +77,24 @@ RAPath >> isFailure [
 	^ exitCondition isFailure
 ]
 
+{ #category : 'accessing' }
+RAPath >> minimize [
+	"First iteration of minimization"
+	| minimizedConstraints|
+	minimizedConstraints := (pathConstraints inject: Set new into: [ :set :constraint |
+		constraint ifNotNil: [
+			constraint toCNF fndConjunctionOperands do: [ :operand |
+				set add: operand; yourself
+			]
+		].
+		set
+	]) asArray.
+	
+	pathConstraints := minimizedConstraints.
+
+	^ self
+]
+
 { #category : 'negating' }
 RAPath >> negateLastSegmentInCommonWith: aParent [ 
 	

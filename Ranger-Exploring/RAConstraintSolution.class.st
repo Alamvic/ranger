@@ -75,6 +75,16 @@ RAConstraintSolution >> isInvalidIn: aTest [
 ]
 
 { #category : 'accessing' }
+RAConstraintSolution >> minimize [
+	
+	path ifNotNil: [ self path: path minimize ].
+	
+	^ self
+	
+	
+]
+
+{ #category : 'accessing' }
 RAConstraintSolution >> outputConstraints [
 
 	^ outputConstraints

@@ -45,3 +45,12 @@ RAGreaterConstraint >> operator [
 	
 	^ '>'
 ]
+
+{ #category : 'microzinc' }
+RAGreaterConstraint >> removeRedundances [
+	
+	operands := operands collect: #removeRedundances.
+	operands first = operands second ifTrue: [ 1 halt. ^ RAFalse new ].
+	
+	^ self
+]

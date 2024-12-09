@@ -44,6 +44,14 @@ RAConcolicCase >> isa: anObject [
 	isa := anObject
 ]
 
+{ #category : 'window management' }
+RAConcolicCase >> minimize [
+
+	self solution: solution minimize.
+	
+	^ self
+]
+
 { #category : 'as yet unclassified' }
 RAConcolicCase >> replicate: sol from: runner [
 

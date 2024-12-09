@@ -26,6 +26,12 @@ RAConstant >> = anotherConstant [
 	^ value = anotherConstant value
 ]
 
+{ #category : 'accessing' }
+RAConstant >> distributeDisjunctions [
+
+	^ self
+]
+
 { #category : 'evaluating' }
 RAConstant >> evaluate [
 	
@@ -36,6 +42,12 @@ RAConstant >> evaluate [
 RAConstant >> evaluateWith: anObjectBuilder [
 	
 	^ self value
+]
+
+{ #category : 'accessing' }
+RAConstant >> isAnd [
+	
+	^ false
 ]
 
 { #category : 'testing' }
@@ -82,6 +94,18 @@ RAConstant >> printOn: aStream [
 	aStream nextPut: $(.
 	aStream print: value.
 	aStream nextPut: $).
+]
+
+{ #category : 'removing' }
+RAConstant >> removeRedundances [
+
+	^ self
+]
+
+{ #category : 'accessing' }
+RAConstant >> sanitize [
+
+	^ self 
 ]
 
 { #category : 'accessing' }

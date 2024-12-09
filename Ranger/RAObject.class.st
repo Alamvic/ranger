@@ -356,6 +356,18 @@ RAObject >> printOn: aStream [
 ]
 
 { #category : 'accessing' }
+RAObject >> removeRedundances [
+
+	^ self
+]
+
+{ #category : 'accessing' }
+RAObject >> sanitize [
+
+	^ self
+]
+
+{ #category : 'accessing' }
 RAObject >> slots [
 
 	^ slots

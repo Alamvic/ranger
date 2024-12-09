@@ -6,6 +6,31 @@ Class {
 	#tag : 'Constraints'
 }
 
+{ #category : 'accessing' }
+RAOrConstraint >> distributeDisjunctions [
+	"Distribute disjunction (v) over conjunction (^):
+        - A v (B ^ C) is (A v B) ^ (A v C)
+		  - (A v B) v (B ^ C) 
+	"
+	| _operands |
+	
+	_operands := operands collect: #distributeDisjunctions.
+	_operands first isAnd ifTrue: [ 1 halt. ^ RAAndConstraint new operands: { 
+			RAOrConstraint new operands: { _operands first operands first . _operands second } .
+			RAOrConstraint new operands: { _operands first operands second . _operands second } .
+		} distributeDisjunctions
+	].
+	
+	_operands second isAnd ifTrue: [ 1 halt. ^ RAAndConstraint new operands: { 
+			RAOrConstraint new operands: { _operands second operands first . _operands first } .
+			RAOrConstraint new operands: { _operands second operands second . _operands first } .
+		} distributeDisjunctions
+	].
+	
+	^ self
+
+]
+
 { #category : 'as yet unclassified' }
 RAOrConstraint >> mutate: mutator [
 
@@ -29,4 +54,13 @@ RAOrConstraint >> negated [
 RAOrConstraint >> operator [
 
 	^ 'OR'
+]
+
+{ #category : 'accessing' }
+RAOrConstraint >> removeRedundances [
+	
+	operands := operands collect: #removeRedundances.
+	operands first = operands second ifTrue: [ 1 halt. ^ operands first ].
+	
+	^ self
 ]
