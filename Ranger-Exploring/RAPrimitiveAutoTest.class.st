@@ -33,7 +33,7 @@ RAPrimitiveAutoTest class >> exploreCasesForPrimitive: aPrimitive withWordSize: 
 		               interpreter.
 	^ RAPathExplorer new
 		  failOnError: true;
-		  exploreAndMutate: (RAPrimitiveConcolicCase new
+		  explore: (RAPrimitiveConcolicCase new
 				   selector: aPrimitive;
 				   yourself)
 		  vmBuildingBlock: [ 
@@ -49,7 +49,7 @@ RAPrimitiveAutoTest class >> exploreSolutions: primitiveCode fromSetUp: theSetUp
 
 	^ RAPathExplorer new
 		  failOnError: true;
-		  exploreAndMutate: (RAPrimitiveConcolicCase new
+		  explore: (RAPrimitiveConcolicCase new
 				   selector: primitiveCode;
 				   yourself)
 		  vmBuildingBlock: [ RATest new newVM"theSetUpTest setUp; interpreter" ]

@@ -19,7 +19,7 @@ RABytecodeAutoTest class >> exploreSolutions: bytecode fromSetUp: theSetUpTest [
 
 	^ RAPathExplorer new
 		  failOnError: false;
-		  exploreAndMutate: (RABytecodeConcolicCase new
+		  explore: (RABytecodeConcolicCase new
 				   vm: (self interpreterFrom: theSetUpTest);
 				   bytecode: bytecode;
 				   yourself)

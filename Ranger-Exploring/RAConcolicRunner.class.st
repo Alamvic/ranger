@@ -290,7 +290,7 @@ RAConcolicRunner >> solutionsForBytecode: bytecode from: vmBuildingBlock [
 
 	^ RAPathExplorer new
 		  failOnError: false;
-		  exploreAndMutate: (RABytecodeConcolicCase new
+		  explore: (RABytecodeConcolicCase new
 				   vm: self interpreter;
 				   bytecode: bytecode;
 				   yourself)
@@ -301,7 +301,7 @@ RAConcolicRunner >> solutionsForBytecode: bytecode from: vmBuildingBlock [
 RAConcolicRunner >> solutionsForPrimitive: primitive from: vmBuildingBlock [
 
 	^ RAPathExplorer new failOnError: false;
-		exploreAndMutate: (RAPrimitiveConcolicCase new selector: primitive; yourself)
+		explore: (RAPrimitiveConcolicCase new selector: primitive; yourself)
 			vmBuildingBlock: vmBuildingBlock.
 ]
 
