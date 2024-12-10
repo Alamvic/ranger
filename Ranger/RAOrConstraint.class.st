@@ -15,16 +15,16 @@ RAOrConstraint >> distributeDisjunctions [
 	| _operands |
 	
 	_operands := operands collect: #distributeDisjunctions.
-	_operands first isAnd ifTrue: [ 1 halt. ^ RAAndConstraint new operands: { 
+	_operands first isAnd ifTrue: [ ^ RAAndConstraint new operands: { 
 			RAOrConstraint new operands: { _operands first operands first . _operands second } .
 			RAOrConstraint new operands: { _operands first operands second . _operands second } .
-		} distributeDisjunctions
+		}; distributeDisjunctions
 	].
 	
-	_operands second isAnd ifTrue: [ 1 halt. ^ RAAndConstraint new operands: { 
+	_operands second isAnd ifTrue: [ ^ RAAndConstraint new operands: { 
 			RAOrConstraint new operands: { _operands second operands first . _operands first } .
 			RAOrConstraint new operands: { _operands second operands second . _operands first } .
-		} distributeDisjunctions
+		}; distributeDisjunctions
 	].
 	
 	^ self
@@ -60,7 +60,7 @@ RAOrConstraint >> operator [
 RAOrConstraint >> removeRedundances [
 	
 	operands := operands collect: #removeRedundances.
-	operands first = operands second ifTrue: [ 1 halt. ^ operands first ].
+	operands first = operands second ifTrue: [ ^ operands first ].
 	
 	^ self
 ]

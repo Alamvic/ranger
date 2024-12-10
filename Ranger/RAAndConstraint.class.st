@@ -54,7 +54,7 @@ RAAndConstraint >> operator [
 RAAndConstraint >> removeRedundances [
 	
 	operands := operands collect: #removeRedundances.
-	operands first = operands second ifTrue: [ 1 halt. ^ operands first ].
+	operands first = operands second ifTrue: [ ^ operands first ].
 	
 	^ self
 ]

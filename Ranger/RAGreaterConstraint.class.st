@@ -50,7 +50,7 @@ RAGreaterConstraint >> operator [
 RAGreaterConstraint >> removeRedundances [
 	
 	operands := operands collect: #removeRedundances.
-	operands first = operands second ifTrue: [ 1 halt. ^ RAFalse new ].
+	operands first = operands second ifTrue: [ ^ RAFalse new ].
 	
 	^ self
 ]
