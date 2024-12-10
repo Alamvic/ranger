@@ -5,7 +5,8 @@ Class {
 		'interpreter',
 		'primitives',
 		'bytecodes',
-		'testCache'
+		'testCache',
+		'interpreterCache'
 	],
 	#category : 'Ranger-Exploring-Runner',
 	#package : 'Ranger-Exploring',
@@ -144,7 +145,8 @@ RAConcolicRunner >> initialize [
 	primitives := self class primitivesFrom: interpreter.
 	bytecodes := 1 to: 175.
 
-	testCache := Dictionary new
+	testCache := Dictionary new.
+	interpreterCache := Dictionary new.
 ]
 
 { #category : 'tests' }
@@ -172,21 +174,22 @@ RAConcolicRunner >> mutateCases: cases with: mutators [
 { #category : 'tests' }
 RAConcolicRunner >> newInterpreterForArchitecture: arch [
 
-	| theSetUpTest |
-	theSetUpTest := self suite detect: [ :e |
-		                e parametersToUse do: [ :aParameter |
-			                aParameter applyTo: e ].
-		                e wordSize = arch second value ].
-	^ theSetUpTest
-		  setUp;
-		  interpreter
+	| serializedByteArray |
+	serializedByteArray := interpreterCache at: arch first value ifAbsentPut: [
+		(self suite detect: [ :e |
+		                e parametersToUse do: [ :aParameter | aParameter applyTo: e ].
+		                e wordSize = arch second value
+						]) setUp interpreter serializeToByteArray
+	].
+
+	^ FLMaterializer new onStream: serializedByteArray readStream; materializeRoot
 ]
 
 { #category : 'tests' }
 RAConcolicRunner >> newTestForCase: aCase fromPrototype: aTestPrototype [
 
 	| serializedByteArray |
-	serializedByteArray := testCache at: aCase isa ifAbsentPut: [
+	serializedByteArray := testCache at: aCase isa value ifAbsentPut: [
 		                       aTestPrototype
 			                       parametersToUse: {
 					                       (#case -> 1) asTestParameter.

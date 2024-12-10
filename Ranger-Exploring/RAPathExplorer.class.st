@@ -137,7 +137,6 @@ RAPathExplorer >> initialize [
 	executionStack := OrderedCollection new.
 	solutions := OrderedCollection new.
 	constraintFactory := RAConstraintFactory new.
-	mutator := RAPathMutator lastestPathMutator.
 ]
 
 { #category : 'as yet unclassified' }
