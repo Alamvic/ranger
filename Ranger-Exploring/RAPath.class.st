@@ -80,7 +80,7 @@ RAPath >> isFailure [
 { #category : 'accessing' }
 RAPath >> minimize [
 	"First iteration of minimization"
-	| minimizedConstraints|
+	| minimizedConstraints |
 	minimizedConstraints := (pathConstraints inject: Set new into: [ :set :constraint |
 		constraint ifNotNil: [
 			constraint toCNF fndConjunctionOperands do: [ :operand |
@@ -89,10 +89,8 @@ RAPath >> minimize [
 		].
 		set
 	]) asArray.
-	
-	pathConstraints := minimizedConstraints.
 
-	^ self
+	^ self copy pathConstraints: minimizedConstraints
 ]
 
 { #category : 'negating' }

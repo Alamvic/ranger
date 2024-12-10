@@ -47,9 +47,7 @@ RAConcolicCase >> isa: anObject [
 { #category : 'window management' }
 RAConcolicCase >> minimize [
 
-	self solution: solution minimize.
-	
-	^ self
+	^ self copy solution: solution minimize.
 ]
 
 { #category : 'as yet unclassified' }
