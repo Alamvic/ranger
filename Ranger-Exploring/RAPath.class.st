@@ -84,7 +84,7 @@ RAPath >> minimize [
 	minimizedConstraints := (pathConstraints inject: Set new into: [ :set :constraint |
 		constraint ifNotNil: [
 			constraint toCNF fndConjunctionOperands do: [ :operand |
-				set add: operand; yourself
+				operand class = RATrue ifFalse: [ set add: operand ].
 			]
 		].
 		set

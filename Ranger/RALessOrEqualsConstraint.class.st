@@ -44,3 +44,12 @@ RALessOrEqualsConstraint >> operator [
 	
 	^ '<='
 ]
+
+{ #category : 'evaluating' }
+RALessOrEqualsConstraint >> removeRedundances [
+	
+	operands := operands collect: #removeRedundances.
+	operands first = operands second ifTrue: [ ^ RATrue new ].
+	
+	^ self
+]
