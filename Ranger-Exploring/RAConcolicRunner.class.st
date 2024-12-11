@@ -135,6 +135,16 @@ RAConcolicRunner >> compilerClass [
 	^ self interpreter cogit class
 ]
 
+{ #category : 'as yet unclassified' }
+RAConcolicRunner >> getReasonableCases: cases [ 
+
+	| filtered | 
+	filtered := cases select: [ :case | case solution solver isNotNil and: (case solution solver ~= #initial) ].
+	filtered := filtered select: [ :case | (case solution solver respondsTo: #result) and: case solution solver result isNotNil ].
+
+	^ filtered select: [ :case | case solution solver result beginsWith: '=====UNSATISFIABLE=====' ].
+]
+
 { #category : 'tests' }
 RAConcolicRunner >> initialize [
 
