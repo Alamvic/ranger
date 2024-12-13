@@ -16,6 +16,7 @@ BaselineOfRanger >> baseline: spec [
 		spec
 			baseline: 'Minizinc'
 			with: [ spec repository: 'github://tesonep/pharo-minizinc:main' ].
+		spec baseline: 'NeoJSON' with: [ spec repository: 'github://svenvc/NeoJSON/repository' ].
 		spec package: 'Ranger' with: [ spec requires: #( 'Minizinc' ) ].
 		spec package: 'Ranger-Exploring' with: [ spec requires: #( 'Ranger' ) ] ]
 ]
