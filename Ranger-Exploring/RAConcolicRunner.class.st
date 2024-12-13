@@ -138,11 +138,16 @@ RAConcolicRunner >> compilerClass [
 { #category : 'as yet unclassified' }
 RAConcolicRunner >> getReasonableCases: cases [ 
 
-	| filtered | 
-	filtered := cases select: [ :case | case solution solver isNotNil and: (case solution solver ~= #initial) ].
-	filtered := filtered select: [ :case | (case solution solver respondsTo: #result) and: case solution solver result isNotNil ].
+	| notNils initials withResults filtered |
+	notNils := cases select: [ :case | case solution solver isNotNil ].
+	
+	initials := notNils select: [ :case | case solution solver = #initial ].
+	
+	withResults := (notNils difference: initials) select: [ :case | (case solution solver respondsTo: #result) and: case solution solver result isNotNil ].
+	
+	filtered := withResults select: [ :case | (case solution solver result beginsWith: '=====UNSATISFIABLE=====') not ].
 
-	^ filtered select: [ :case | (case solution solver result beginsWith: '=====UNSATISFIABLE=====') not ].
+	^ filtered, initials.
 ]
 
 { #category : 'tests' }
