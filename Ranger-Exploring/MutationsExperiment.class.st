@@ -55,7 +55,7 @@ mutantDifferences := { 'bytecodes' -> Dictionary new . 'primitives' -> Dictionar
 		mutantClass := mutator class asString.
 		minimized_mutants := runner mutateCases: (cases at: 3) with: { mutator }.
 		original_mutants := runner mutateCases: (cases at: 4) with: { mutator }.
-		(mutantDifferences at: (cases at: 1)) at: mutantClass put: { 'original_mutants' -> original_mutants size . 'minimized_mutants' -> minimized_mutants size }.
+		(mutantDifferences at: (cases at: 1)) at: mutantClass put: { 'original_mutants' -> original_mutants size . 'minimized_mutants' -> minimized_mutants size } asDictionary.
 		RAConcolicRunner runAndMeasure: minimized_mutants with: (cases at: 2) at: (cases at: 1), '_', mutantClass, '.json'.
 	]	
 ].
