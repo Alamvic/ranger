@@ -106,6 +106,13 @@ RABytecodeAutoTest >> executeUntilReturn [
 		equals: (objectBuilder instantiate: solution result)
 ]
 
+{ #category : 'initialization' }
+RABytecodeAutoTest >> initialize [
+
+	super initialize.
+	jitCompilerClass := SimpleStackBasedCogit.
+]
+
 { #category : 'accessing' }
 RABytecodeAutoTest >> jitCompilerClass [
 
