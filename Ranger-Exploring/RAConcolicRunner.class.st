@@ -6,7 +6,8 @@ Class {
 		'primitives',
 		'bytecodes',
 		'testCache',
-		'interpreterCache'
+		'interpreterCache',
+		'shouldCache'
 	],
 	#category : 'Ranger-Exploring-Runner',
 	#package : 'Ranger-Exploring',
@@ -143,6 +144,24 @@ RAConcolicRunner >> compilerClass [
 	^ self interpreter cogit class
 ]
 
+{ #category : 'tests' }
+RAConcolicRunner >> doNotCache [
+
+	self shouldCache: false
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> forceNewTestForCase: aCase fromPrototype: aTestPrototype [
+
+	^ aTestPrototype
+		  parametersToUse: {
+				  (#case -> 1) asTestParameter.
+				  aCase isa asTestParameter.
+				  aCase wordsize asTestParameter };
+		  setUp;
+		  yourself
+]
+
 { #category : 'as yet unclassified' }
 RAConcolicRunner >> getReasonableCases: cases [ 
 
@@ -212,25 +231,19 @@ RAConcolicRunner >> newInterpreterForArchitecture: arch [
 RAConcolicRunner >> newTestForCase: aCase fromPrototype: aTestPrototype [
 
 	| serializedByteArray |
+
+	self shouldCache ifFalse: [
+		^ self forceNewTestForCase: aCase fromPrototype: aTestPrototype ].
+
 	serializedByteArray := testCache at: aCase isa value ifAbsentPut: [
-		                       aTestPrototype
-			                       parametersToUse: {
-					                       (#case -> 1) asTestParameter.
-					                       aCase isa asTestParameter.
-					                       aCase wordsize asTestParameter };
-			                       setUp;
+		                       (self
+			                        forceNewTestForCase: aCase
+			                        fromPrototype: aTestPrototype)
 			                       serializeToByteArray ].
 
 	^ FLMaterializer new
 		  onStream: serializedByteArray readStream;
 		  materializeRoot
-	"
-	^ aTestPrototype
-			                       parametersToUse: {
-					                       (#case -> 1) asTestParameter.
-					                       aCase isa asTestParameter.
-					                       aCase wordsize asTestParameter };
-			                       setUp"
 ]
 
 { #category : 'tests' }
@@ -316,6 +329,18 @@ RAConcolicRunner >> run: cases with: test [
 		case tearDown.
 		case solution ].
 	^ res
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> shouldCache [
+
+	^ shouldCache ifNil: [ true ]
+]
+
+{ #category : 'tests' }
+RAConcolicRunner >> shouldCache: aBoolean [
+
+	shouldCache := aBoolean
 ]
 
 { #category : 'as yet unclassified' }
