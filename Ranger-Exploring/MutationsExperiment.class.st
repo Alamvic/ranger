@@ -12,8 +12,8 @@ MutationsExperiment class >> main [
 "Basic cases"
 | runner bytecodeCases primitiveCases filteredBytecodeCases filteredPrimitiveCases minimizedBytecodeCases minimizedPrimitiveCases bytecodeTestCase primitiveTestCase mutators minimized_mutants original_mutants mutantDifferences |
 runner := RAConcolicRunner new.
-bytecodeCases := runner casesForAllBytecodes.
-primitiveCases := runner casesForAllPrimitives.
+bytecodeCases := {}."runner casesForAllBytecodes."
+primitiveCases := runner casesForPrimitives: { #primitiveAdd }. "runner casesForAllPrimitives."
 
 "Filtering"
 filteredBytecodeCases := runner getReasonableCases: bytecodeCases.
@@ -49,8 +49,8 @@ mutators := {
 }.
 
 mutantDifferences := { 'bytecodes' -> Dictionary new . 'primitives' -> Dictionary new } asDictionary.
-mutantDifferences at: 'bytecodes_path' put: ( bytecodeCases collect: [ :case | case solution path toString ] ).
-mutantDifferences at: 'primitives_path' put: ( primitiveCases collect: [ :case | case solution path toString ] ).
+mutantDifferences at: 'bytecodes_path' put: ( minimizedBytecodeCases collect: [ :case | case solution path toString ] ).
+mutantDifferences at: 'primitives_path' put: ( minimizedPrimitiveCases collect: [ :case | case solution path toString ] ).
 "Per each baseCases and per each mutator, we generate the report using only that mutator"
 { { 'bytecodes'. bytecodeTestCase . minimizedBytecodeCases . filteredBytecodeCases } . { 'primitives' . primitiveTestCase . minimizedPrimitiveCases . filteredPrimitiveCases } } do: [ :cases |
 	mutators do: [ :mutator | | mutantClass original_mutants_obj minimized_mutants_obj | 
@@ -58,10 +58,10 @@ mutantDifferences at: 'primitives_path' put: ( primitiveCases collect: [ :case |
 		minimized_mutants := runner mutateCases: (cases at: 3) with: { mutator }.
 		original_mutants := runner mutateCases: (cases at: 4) with: { mutator }.
 		
-		original_mutants_obj := { 'size' -> original_mutants size . 'path' -> original_mutants collect: [ :case | case solution path toString ] }.
-		minimized_mutants_obj := { 'size' -> minimized_mutants size . 'path' -> minimized_mutants collect: [ :case | case solution path toString ] }.
+		original_mutants_obj := { 'size' -> original_mutants size . 'path' -> (original_mutants collect: [ :case | case solution path toString ]) } .
+		minimized_mutants_obj := { 'size' -> minimized_mutants size . 'path' -> (minimized_mutants collect: [ :case | case solution path toString ]) }.
 		
-		(mutantDifferences at: (cases at: 1)) at: mutantClass put: { 'original_mutants' -> original_mutants_obj . 'minimized_mutants' -> minimized_mutants_obj } asDictionary.
+		(mutantDifferences at: (cases at: 1)) at: mutantClass put: { 'original_mutants' -> original_mutants_obj asDictionary . 'minimized_mutants' -> minimized_mutants_obj asDictionary } asDictionary.
 		RAConcolicRunner runAndMeasure: minimized_mutants with: (cases at: 2) at: (cases at: 1), '_', mutantClass, '.json'.
 	]
 ].
