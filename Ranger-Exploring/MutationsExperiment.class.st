@@ -12,8 +12,8 @@ MutationsExperiment class >> main [
 "Basic cases"
 | runner bytecodeCases primitiveCases filteredBytecodeCases filteredPrimitiveCases minimizedBytecodeCases minimizedPrimitiveCases bytecodeTestCase primitiveTestCase mutators minimized_mutants original_mutants mutantDifferences |
 runner := RAConcolicRunner new.
-bytecodeCases := {}."runner casesForAllBytecodes."
-primitiveCases := runner casesForPrimitives: { #primitiveAdd }. "runner casesForAllPrimitives."
+bytecodeCases := runner casesForAllBytecodes.
+primitiveCases := runner casesForAllPrimitives.
 
 "Filtering"
 filteredBytecodeCases := runner getReasonableCases: bytecodeCases.
