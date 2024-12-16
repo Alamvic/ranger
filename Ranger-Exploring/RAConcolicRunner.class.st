@@ -224,6 +224,13 @@ RAConcolicRunner >> newTestForCase: aCase fromPrototype: aTestPrototype [
 	^ FLMaterializer new
 		  onStream: serializedByteArray readStream;
 		  materializeRoot
+	"
+	^ aTestPrototype
+			                       parametersToUse: {
+					                       (#case -> 1) asTestParameter.
+					                       aCase isa asTestParameter.
+					                       aCase wordsize asTestParameter };
+			                       setUp"
 ]
 
 { #category : 'tests' }
