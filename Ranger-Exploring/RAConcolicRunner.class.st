@@ -29,6 +29,14 @@ RAConcolicRunner class >> primitivesFrom: interpreter [
 		  thenCollect: [ :elem | elem value ]
 ]
 
+{ #category : 'as yet unclassified' }
+RAConcolicRunner class >> runAndMeasure: cases with: testCase at: fileName [
+
+	| coverageResult |
+	coverageResult := CompilerCoverageCollector measure: [ RAConcolicRunner new run: cases with: testCase ].
+	CompilerCoverageCollector generateCompilerCoverage: coverageResult at: fileName
+]
+
 { #category : 'tests' }
 RAConcolicRunner >> bytecodeCaseBy: bytecode with: solution arch: arch [
 	
