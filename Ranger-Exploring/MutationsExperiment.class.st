@@ -49,8 +49,8 @@ mutators := {
 }.
 
 mutantDifferences := { 'bytecodes' -> Dictionary new . 'primitives' -> Dictionary new } asDictionary.
-(mutantDifferences at: 'bytecodes') at: 'Base' put: ( { 'cases' -> minimizedBytecodeCases collect: [ :case | case solution path toString ] . 'count' -> minimizedBytecodeCases size } asDictionary ).
-(mutantDifferences at: 'primitives') at: 'Base' put: ( {'cases' -> minimizedPrimitiveCases collect: [ :case | case solution path toString ] . 'count' -> minimizedPrimitiveCases size } asDictionary ).
+(mutantDifferences at: 'bytecodes') at: 'Base' put: ({ 'cases' -> (minimizedBytecodeCases collect: [ :case | case solution path toString ]). 'count' -> minimizedBytecodeCases size } asDictionary).
+(mutantDifferences at: 'primitives') at: 'Base' put: ({ 'cases' -> (minimizedPrimitiveCases collect: [ :case | case solution path toString ]) . 'count' -> minimizedPrimitiveCases size } asDictionary).
 
 "Per each baseCases and per each mutator, we generate the report using only that mutator"
 { { 'bytecodes'. bytecodeTestCase . minimizedBytecodeCases . filteredBytecodeCases } . { 'primitives' . primitiveTestCase . minimizedPrimitiveCases . filteredPrimitiveCases } } do: [ :cases |
