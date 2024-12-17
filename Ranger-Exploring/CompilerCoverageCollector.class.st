@@ -117,7 +117,7 @@ CompilerCoverageCollector class >> generateCompilerCoverage: result withFails: f
 
     tempDict := self compilerCoverage: result.
 
-	 tempDict at: 'Fails' put: (fails collect: #standardMessageText).
+	 tempDict at: 'Fails' put: (fails collect: [ :exception | exception signalerContext shortStack]).
 
     jsonString := NeoJSONWriter toStringPretty: tempDict.
 
