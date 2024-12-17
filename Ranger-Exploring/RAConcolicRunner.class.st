@@ -33,9 +33,12 @@ RAConcolicRunner class >> primitivesFrom: interpreter [
 { #category : 'as yet unclassified' }
 RAConcolicRunner class >> runAndMeasure: cases with: testCase at: fileName [
 
-	| coverageResult |
-	coverageResult := CompilerCoverageCollector measure: [ RAConcolicRunner new run: cases with: testCase ].
-	CompilerCoverageCollector generateCompilerCoverage: coverageResult at: fileName
+	| coverageResult fails |
+	coverageResult := CompilerCoverageCollector measure: [
+		fails := RAConcolicRunner new run: cases with: testCase
+	].
+	
+	CompilerCoverageCollector generateCompilerCoverage: coverageResult withFails: fails at: fileName
 ]
 
 { #category : 'tests' }
