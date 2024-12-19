@@ -1,6 +1,9 @@
 Class {
 	#name : 'MutationsExperiment',
 	#superclass : 'Object',
+	#instVars : [
+		'runner'
+	],
 	#category : 'Ranger-Exploring-Runner',
 	#package : 'Ranger-Exploring',
 	#tag : 'Runner'
@@ -28,13 +31,44 @@ MutationsExperiment class >> makeFileWith: tempDict at: fileName [
 ]
 
 { #category : 'accessing' }
+MutationsExperiment >> casesFor: aType [
+	"aType: { bytecodes, primitives }"
+
+	| cachedFile cases |
+	cachedFile := ('cases_', aType) asFileReference.
+	cachedFile exists ifTrue: [
+		('Found cached file: ', cachedFile fullName) traceCr.
+		^ STON fromStream: cachedFile readStream.
+	].
+
+	"If not found in the cache"	
+	('Not found cached file: ', cachedFile fullName) traceCr.
+	('Computing cases: ', aType) traceCr.
+
+	cases := runner perform: #casesForAll , aType capitalized.
+	
+	"Caching"
+	('Caching cases into: ', cachedFile fullName) traceCr.
+	cachedFile writeStreamDo: [ :stream |
+		STON put: cases onStreamPretty: stream
+	].
+	^ cases
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> initialize [
+
+	super initialize.
+	runner := RAConcolicRunner new
+]
+
+{ #category : 'accessing' }
 MutationsExperiment >> main [
 	"Basic cases"
 
-	| runner bytecodeCases primitiveCases filteredBytecodeCases filteredPrimitiveCases minimizedBytecodeCases minimizedPrimitiveCases bytecodeTestCase primitiveTestCase mutators minimized_mutants original_mutants mutantDifferences |
-	runner := RAConcolicRunner new.
+	| bytecodeCases primitiveCases filteredBytecodeCases filteredPrimitiveCases minimizedBytecodeCases minimizedPrimitiveCases bytecodeTestCase primitiveTestCase mutators minimized_mutants original_mutants mutantDifferences |
 
-	bytecodeCases := runner casesForAllBytecodes.
+	bytecodeCases := self casesFor: #bytecodes.
 	"Filtering"
 	filteredBytecodeCases := runner getReasonableCases: bytecodeCases.
 	"Minimizing"
@@ -48,7 +82,7 @@ MutationsExperiment >> main [
 		at: 'only_bytecodes.json'.
 
 
-	primitiveCases := runner casesForAllPrimitives.
+	primitiveCases := self casesFor: #primitives.
 	"Filtering"
 	filteredPrimitiveCases := runner getReasonableCases: primitiveCases.
 	"Minimizing"
