@@ -68,13 +68,13 @@ MutationsExperiment >> main [
 		                     ('bytecodes' -> Dictionary new).
 		                     ('primitives' -> Dictionary new) } asDictionary.
 	(mutantDifferences at: 'bytecodes') at: 'Base' put: {
-			('cases' -> (minimizedBytecodeCases collect: [ :case |
-				  case solution path toString ])).
-			('count' -> minimizedBytecodeCases size) } asDictionary.
+			('cases' -> (minimizedBytecodeCases collect: [  :case | case solution path ifNil: [''] ifNotNil: [ case solution path toString ] ])).
+			('count' -> minimizedBytecodeCases size)
+	} asDictionary.
 	(mutantDifferences at: 'primitives') at: 'Base' put: {
-			('cases' -> (minimizedPrimitiveCases collect: [ :case |
-				  case solution path toString ])).
-			('count' -> minimizedPrimitiveCases size) } asDictionary.
+			('cases' -> (minimizedPrimitiveCases collect: [  :case | case solution path ifNil: [''] ifNotNil: [ case solution path toString ] ])).
+			('count' -> minimizedPrimitiveCases size)
+	} asDictionary.
 
 	"Per each baseCases and per each mutator, we generate the report using only that mutator"
 	{
@@ -102,14 +102,12 @@ MutationsExperiment >> main [
 				                        ('size' -> original_mutants size).
 				                        ('path'
 				                         ->
-				                         (original_mutants collect: [ :case |
-					                          case solution path toString ])) }.
+				                         (original_mutants collect: [  :case | case solution path ifNil: [''] ifNotNil: [ case solution path toString ] ])) }.
 			minimized_mutants_obj := {
 				                         ('size' -> minimized_mutants size).
 				                         ('path'
 				                          ->
-				                          (minimized_mutants collect: [ :case |
-					                           case solution path toString ])) }.
+				                          (minimized_mutants collect: [  :case | case solution path ifNil: [''] ifNotNil: [ case solution path toString ] ])) }.
 
 			(mutantDifferences at: (cases at: 1)) at: mutantClass put: {
 					('original_mutants' -> original_mutants_obj asDictionary).
