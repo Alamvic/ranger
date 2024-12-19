@@ -215,5 +215,5 @@ MutationsExperiment >> run: aType cases: cases prefix: prefix [
 	RAConcolicRunner
 		runAndMeasure: cases
 		with: case
-		at: aType , '_' prefix , '_run' , '.json'
+		at: aType , '_', prefix , '_run' , '.json'
 ]
