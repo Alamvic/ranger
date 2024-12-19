@@ -329,7 +329,7 @@ RAConcolicRunner >> run: cases with: test [
 	cases do: [ :case |
 		| theTestToRun |
 		theTestToRun := self newTestForCase: case fromPrototype: test.
-		('Running ', theTestToRun asString) traceCr.
+		('Running ', case asString) traceCr.
 		[ case runOn: theTestToRun ]
 			on: Error, TestFailure
 			do: [ :e | res add: e signalerContext shortDebugStack "ignore the exception and continue" ].
