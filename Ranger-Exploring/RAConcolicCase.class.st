@@ -71,6 +71,8 @@ RAConcolicCase >> solution: anObject [
 { #category : 'running' }
 RAConcolicCase >> tearDown [
 
+	testToExecute tearDown.
+	testToExecute := nil.
 	endInstruction := nil
 ]
 
