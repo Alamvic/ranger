@@ -8,54 +8,61 @@ Class {
 
 { #category : 'accessing' }
 MutationsExperiment class >> main [
+
+	self new main
+]
+
+{ #category : 'accessing' }
+MutationsExperiment class >> makeFileWith: tempDict at: fileName [
+
+   | jsonString writeStream |
+	jsonString := NeoJSONWriter toStringPretty: tempDict.
+
+   writeStream := fileName asFileReference createFile writeStream.
+   writeStream nextPutAll: jsonString.
+   writeStream close
+
+
+
+
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> main [
 	"Basic cases"
 
 	| runner bytecodeCases primitiveCases filteredBytecodeCases filteredPrimitiveCases minimizedBytecodeCases minimizedPrimitiveCases bytecodeTestCase primitiveTestCase mutators minimized_mutants original_mutants mutantDifferences |
 	runner := RAConcolicRunner new.
-	bytecodeCases := runner casesForAllBytecodes.
-	primitiveCases := runner casesForAllPrimitives.
 
+	bytecodeCases := runner casesForAllBytecodes.
 	"Filtering"
 	filteredBytecodeCases := runner getReasonableCases: bytecodeCases.
-	filteredPrimitiveCases := runner getReasonableCases: primitiveCases.
-
 	"Minimizing"
 	minimizedBytecodeCases := filteredBytecodeCases collect: #minimize.
-	minimizedPrimitiveCases := filteredPrimitiveCases collect: #minimize.
-
 	"Test cases"
 	bytecodeTestCase := RABytecodeAutoTest new.
-	primitiveTestCase := RAPrimitiveAutoTest new.
-
 	"Baselines"
 	RAConcolicRunner
 		runAndMeasure: minimizedBytecodeCases
 		with: bytecodeTestCase
 		at: 'only_bytecodes.json'.
+
+
+	primitiveCases := runner casesForAllPrimitives.
+	"Filtering"
+	filteredPrimitiveCases := runner getReasonableCases: primitiveCases.
+	"Minimizing"
+	minimizedPrimitiveCases := filteredPrimitiveCases collect: #minimize.
+	"Test cases"
+	primitiveTestCase := RAPrimitiveAutoTest new.
+	"Baselines"
 	RAConcolicRunner
 		runAndMeasure: minimizedPrimitiveCases
 		with: primitiveTestCase
 		at: 'only_primitives.json'.
 
 	"Mutators"
-	mutators := {
-		            (RASyntacticIsIntMutator new bounds:
-			             (OrderedCollection new
-				              add: 0;
-				              add: SmallInteger maxVal;
-				              add: SmallInteger minVal;
-				              add: SmallInteger maxVal / 2;
-				              add: SmallInteger minVal / 2;
-				              yourself)).
-		            RASyntacticVarGreaterThanMutator new.
-		            RASyntacticCommutativeOperationMutator new.
-		            RASyntacticVarLessThanMutator new.
-		            RASyntacticNLessThanVarMutator new.
-		            RASyntacticVarGreaterOrEqualsThanVarMutator new.
-		            RASyntacticTypeObjectMutator new.
-		            RASyntacticVarGreaterThanIntroducingNewVarMutator new.
-		            RASyntacticIsNotIntNotEqualsRandomMutator new.
-		            RASyntacticBinaryArithOpWithRandomMutator new }.
+	mutators := self mutators.
 
 	mutantDifferences := {
 		                     ('bytecodes' -> Dictionary new).
@@ -114,20 +121,29 @@ MutationsExperiment class >> main [
 				at: (cases at: 1) , '_' , mutantClass , '.json' ] ].
 
 	"Make the file that shows the mutant differences between original and filtered cases sizes"
-	self makeFileWith: mutantDifferences at: 'mutantDifferences.json'
+	self class
+		makeFileWith: mutantDifferences
+		at: 'mutantDifferences.json'
 ]
 
 { #category : 'accessing' }
-MutationsExperiment class >> makeFileWith: tempDict at: fileName [
+MutationsExperiment >> mutators [
 
-   | jsonString writeStream |
-	jsonString := NeoJSONWriter toStringPretty: tempDict.
-
-   writeStream := fileName asFileReference createFile writeStream.
-   writeStream nextPutAll: jsonString.
-   writeStream close
-
-
-
-
+	^ {
+		  (RASyntacticIsIntMutator new bounds: (OrderedCollection new
+				    add: 0;
+				    add: SmallInteger maxVal;
+				    add: SmallInteger minVal;
+				    add: SmallInteger maxVal / 2;
+				    add: SmallInteger minVal / 2;
+				    yourself)).
+		  RASyntacticVarGreaterThanMutator new.
+		  RASyntacticCommutativeOperationMutator new.
+		  RASyntacticVarLessThanMutator new.
+		  RASyntacticNLessThanVarMutator new.
+		  RASyntacticVarGreaterOrEqualsThanVarMutator new.
+		  RASyntacticTypeObjectMutator new.
+		  RASyntacticVarGreaterThanIntroducingNewVarMutator new.
+		  RASyntacticIsNotIntNotEqualsRandomMutator new.
+		  RASyntacticBinaryArithOpWithRandomMutator new }
 ]
