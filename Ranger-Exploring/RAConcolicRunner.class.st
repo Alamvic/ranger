@@ -332,7 +332,7 @@ RAConcolicRunner >> run: cases with: test [
 		('Running ', theTestToRun asString) traceCr.
 		[ case runOn: theTestToRun ]
 			on: Error, TestFailure
-			do: [ :e | res add: e signalerContext shortStack "ignore the exception and continue" ].
+			do: [ :e | res add: e signalerContext shortDebugStack "ignore the exception and continue" ].
 		"Cleanup the test if required"
 		case tearDown.
 		case solution ].
