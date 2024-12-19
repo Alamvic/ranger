@@ -113,13 +113,13 @@ MutationsExperiment >> main: type [
 			mutator: mutator
 			prefix: type , '_base'.
 		self
-			mutatedCases: (self minimizedCasesForType: #type)
+			mutatedCases: (self minimizedCasesForType: type)
 			mutator: mutator
 			prefix: type , '_minimized'.
 		self
 			run: type
 			cases: (self
-					 mutatedCases: (self minimizedCasesForType: #type)
+					 mutatedCases: (self minimizedCasesForType: type)
 					 mutator: mutator
 					 prefix: type , '_minimized')
 			prefix: mutator class name ]
@@ -171,10 +171,8 @@ MutationsExperiment >> mutators [
 { #category : 'accessing' }
 MutationsExperiment >> onlyPrimitivesWithAllMutations [
 	
-	| runner primitiveCases filteredPrimitiveCases minimizedPrimitiveCases mutants |
-	runner := RAConcolicRunner new.
-	runner doNotCache. "delete me, please"
-
+	| primitiveCases filteredPrimitiveCases minimizedPrimitiveCases mutants |
+	
 	primitiveCases := runner casesForAllPrimitives.
 	"Filtering"
 	filteredPrimitiveCases := runner getReasonableCases: primitiveCases.
@@ -182,7 +180,7 @@ MutationsExperiment >> onlyPrimitivesWithAllMutations [
 	minimizedPrimitiveCases := filteredPrimitiveCases collect: #minimize.
 
 	"Mutate with all mutators"
-	mutants := runner mutateCases: minimizedPrimitiveCases with: { self mutators }.
+	mutants := runner mutateCases: minimizedPrimitiveCases with: self mutators.
 	RAConcolicRunner runAndMeasure: minimizedPrimitiveCases, mutants with: RAPrimitiveAutoTest new at: 'onlyPrimitivesWithAllMutations.json'.
 ]
 
