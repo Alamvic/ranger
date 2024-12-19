@@ -45,7 +45,7 @@ MutationsExperiment >> baseCasesForType: aType [
 			  ('Computing cases: ' , aType) traceCr.
 			  runner getReasonableCases:
 				  (runner perform: #casesForAll , aType capitalized) ]
-		  cached: aType, '_base'
+		  cached: aType, '_base_cases'
 ]
 
 { #category : 'accessing' }
@@ -132,7 +132,7 @@ MutationsExperiment >> minimizedCasesForType: aType [
 		  execute: [
 			  ('Minimizing cases: ' , aType) traceCr.
 			  (self baseCasesForType: aType) collect: #minimize ]
-		  cached: 'filtered_minimised_cases_' , aType
+		  cached: aType , '_filtered_minimised_cases'
 ]
 
 { #category : 'accessing' }
@@ -206,8 +206,8 @@ MutationsExperiment >> run: aType cases: cases prefix: prefix [
 	"Test cases"
 
 	| case |
-	('Running: ', prefix , ' ' , aType) traceCr.
-	
+	('Running: ' , prefix , ' ' , aType) traceCr.
+
 	case := aType = #bytecodes
 		        ifTrue: [ RABytecodeAutoTest new ]
 		        ifFalse: [ RAPrimitiveAutoTest new ].
@@ -215,5 +215,5 @@ MutationsExperiment >> run: aType cases: cases prefix: prefix [
 	RAConcolicRunner
 		runAndMeasure: cases
 		with: case
-		at: prefix , '_run_' , aType , '.json'
+		at: aType , '_' prefix , '_run' , '.json'
 ]
