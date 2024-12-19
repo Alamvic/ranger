@@ -182,5 +182,5 @@ RAPath >> toString [
 	| separator |
 	"To improve, this is the first iteration to see easily path patterns"
 	separator := ';', Character lf asString, Character tab asString.
-	^ (pathConstraints collect: [ :constraint | constraint toString ]) joinUsing: separator
+	^ ((pathConstraints select: #isNotNil) collect: [ :constraint | constraint toString ]) joinUsing: separator
 ]
