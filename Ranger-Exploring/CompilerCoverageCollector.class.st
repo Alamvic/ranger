@@ -113,17 +113,16 @@ CompilerCoverageCollector class >> generateCompilerCoverage: result at: fileName
 { #category : 'as yet unclassified' }
 CompilerCoverageCollector class >> generateCompilerCoverage: result withFails: fails at: fileName [
 
-    | tempDict jsonString  writeStream |
+	| tempDict jsonString writeStream |
+	tempDict := self compilerCoverage: result.
 
-    tempDict := self compilerCoverage: result.
+	tempDict at: 'Fails' put: fails.
 
-	 tempDict at: 'Fails' put: (fails collect: [ :exception | exception signalerContext shortStack]).
+	jsonString := NeoJSONWriter toStringPretty: tempDict.
 
-    jsonString := NeoJSONWriter toStringPretty: tempDict.
-
-    writeStream := fileName asFileReference createFile writeStream.
-    writeStream nextPutAll: jsonString.
-    writeStream close
+	writeStream := fileName asFileReference createFile writeStream.
+	writeStream nextPutAll: jsonString.
+	writeStream close
 ]
 
 { #category : 'as yet unclassified' }
