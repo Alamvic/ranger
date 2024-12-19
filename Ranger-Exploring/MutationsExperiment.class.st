@@ -139,7 +139,7 @@ MutationsExperiment >> minimizedCasesForType: aType [
 MutationsExperiment >> mutatedCases: cases mutator: mutator prefix: prefix [
 
 	
-	self
+	^ self
 		execute: [ 
 			('Mutating cases: ' , prefix , '-' , mutator class name) traceCr.
 			runner mutateCases: cases with: { mutator } ]
