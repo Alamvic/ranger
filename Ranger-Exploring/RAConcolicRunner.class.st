@@ -35,10 +35,14 @@ RAConcolicRunner class >> runAndMeasure: cases with: testCase at: fileName [
 
 	| coverageResult fails |
 	coverageResult := CompilerCoverageCollector measure: [
-		fails := RAConcolicRunner new run: cases with: testCase
-	].
-	
-	CompilerCoverageCollector generateCompilerCoverage: coverageResult withFails: fails at: fileName
+		                  fails := RAConcolicRunner new
+			                           run: cases
+			                           with: testCase ].
+
+	CompilerCoverageCollector
+		generateCompilerCoverage: coverageResult
+		withFails: fails
+		at: fileName
 ]
 
 { #category : 'tests' }
@@ -325,9 +329,10 @@ RAConcolicRunner >> run: cases with: test [
 	cases do: [ :case |
 		| theTestToRun |
 		theTestToRun := self newTestForCase: case fromPrototype: test.
+		('Running ', theTestToRun asString) traceCr.
 		[ case runOn: theTestToRun ]
 			on: Error, TestFailure
-			do: [ :e | res add: e freeze "ignore the exception and continue" ].
+			do: [ :e | res add: e signalerContext shortStack "ignore the exception and continue" ].
 		"Cleanup the test if required"
 		case tearDown.
 		case solution ].

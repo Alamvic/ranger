@@ -187,21 +187,6 @@ MutationsExperiment >> onlyPrimitivesWithAllMutations [
 ]
 
 { #category : 'accessing' }
-MutationsExperiment >> run: aType cases: cases [
-	"Test cases"
-
-	| case |
-	case := aType = #bytecodes
-		        ifTrue: [ RABytecodeAutoTest new ]
-		        ifFalse: [ RAPrimitiveAutoTest new ].
-	"Baselines"
-	RAConcolicRunner
-		runAndMeasure: cases
-		with: case
-		at: 'run_' , aType , '.json'
-]
-
-{ #category : 'accessing' }
 MutationsExperiment >> run: aType cases: cases prefix: prefix [
 	"Test cases"
 
