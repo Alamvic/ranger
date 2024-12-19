@@ -28,6 +28,12 @@ MutationsExperiment class >> makeFileWith: tempDict at: fileName [
 ]
 
 { #category : 'accessing' }
+MutationsExperiment class >> onlyPrimitivesWithAllMutations [
+
+	self new onlyPrimitivesWithAllMutations
+]
+
+{ #category : 'accessing' }
 MutationsExperiment >> main [
 	"Basic cases"
 
@@ -144,4 +150,22 @@ MutationsExperiment >> mutators [
 		  RASyntacticVarGreaterThanIntroducingNewVarMutator new.
 		  RASyntacticIsNotIntNotEqualsRandomMutator new.
 		  RASyntacticBinaryArithOpWithRandomMutator new }
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> onlyPrimitivesWithAllMutations [
+	
+	| runner primitiveCases filteredPrimitiveCases minimizedPrimitiveCases mutants |
+	runner := RAConcolicRunner new.
+	runner doNotCache. "delete me, please"
+
+	primitiveCases := runner casesForAllPrimitives.
+	"Filtering"
+	filteredPrimitiveCases := runner getReasonableCases: primitiveCases.
+	"Minimizing"
+	minimizedPrimitiveCases := filteredPrimitiveCases collect: #minimize.
+
+	"Mutate with all mutators"
+	mutants := runner mutateCases: minimizedPrimitiveCases with: { self mutators }.
+	RAConcolicRunner runAndMeasure: minimizedPrimitiveCases, mutants with: RAPrimitiveAutoTest new at: 'onlyPrimitivesWithAllMutations.json'.
 ]
