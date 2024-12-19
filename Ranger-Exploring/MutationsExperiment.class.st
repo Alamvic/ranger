@@ -1,6 +1,9 @@
 Class {
 	#name : 'MutationsExperiment',
 	#superclass : 'Object',
+	#instVars : [
+		'runner'
+	],
 	#category : 'Ranger-Exploring-Runner',
 	#package : 'Ranger-Exploring',
 	#tag : 'Runner'
@@ -34,11 +37,34 @@ MutationsExperiment class >> onlyPrimitivesWithAllMutations [
 ]
 
 { #category : 'accessing' }
+MutationsExperiment >> baseCasesForType: aType [
+	"Basic cases"
+
+	^ self
+		  execute: [
+			  ('Computing cases: ' , aType) traceCr.
+			  runner getReasonableCases:
+				  (runner perform: #casesForAll , aType capitalized) ]
+		  cached: aType, '_base'
+]
+
+{ #category : 'accessing' }
 MutationsExperiment >> casesFor: aType [
 	"aType: { bytecodes, primitives }"
 
-	| cachedFile cases |
-	cachedFile := ('cases_', aType) asFileReference.
+	^ self
+		  execute: [
+			  ('Computing cases: ' , aType) traceCr.
+			  runner perform: #casesForAll , aType capitalized ]
+		  cached: 'cases_' , aType
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> execute: aBlock cached: aCacheName [
+	"aType: { bytecodes, primitives }"
+
+	| cachedFile result |
+	cachedFile := aCacheName asFileReference, 'ston'.
 	cachedFile exists ifTrue: [
 		('Found cached file: ', cachedFile fullName) traceCr.
 		^ STON fromStream: cachedFile readStream.
@@ -46,16 +72,15 @@ MutationsExperiment >> casesFor: aType [
 
 	"If not found in the cache"	
 	('Not found cached file: ', cachedFile fullName) traceCr.
-	('Computing cases: ', aType) traceCr.
 
-	cases := runner perform: #casesForAll , aType capitalized.
+	result := aBlock value.
 	
 	"Caching"
-	('Caching cases into: ', cachedFile fullName) traceCr.
+	('Caching into: ', cachedFile fullName) traceCr.
 	cachedFile writeStreamDo: [ :stream |
-		STON put: cases onStreamPretty: stream
+		STON put: result onStreamPretty: stream
 	].
-	^ cases
+	^ result
 ]
 
 { #category : 'accessing' }
@@ -67,100 +92,58 @@ MutationsExperiment >> initialize [
 
 { #category : 'accessing' }
 MutationsExperiment >> main [
-	"Basic cases"
 
-	| bytecodeCases primitiveCases filteredBytecodeCases filteredPrimitiveCases minimizedBytecodeCases minimizedPrimitiveCases bytecodeTestCase primitiveTestCase mutators minimized_mutants original_mutants mutantDifferences |
+	#( bytecodes primitives ) do: [ :type |
+		self main: type ]
+]
 
-	bytecodeCases := self casesFor: #bytecodes.
-	"Filtering"
-	filteredBytecodeCases := runner getReasonableCases: bytecodeCases.
-	"Minimizing"
-	minimizedBytecodeCases := filteredBytecodeCases collect: #minimize.
-	"Test cases"
-	bytecodeTestCase := RABytecodeAutoTest new.
-	"Baselines"
-	RAConcolicRunner
-		runAndMeasure: minimizedBytecodeCases
-		with: bytecodeTestCase
-		at: 'only_bytecodes.json'.
+{ #category : 'accessing' }
+MutationsExperiment >> main: type [
 
+	('Processing: ', type) traceCr.
 
-	primitiveCases := self casesFor: #primitives.
-	"Filtering"
-	filteredPrimitiveCases := runner getReasonableCases: primitiveCases.
-	"Minimizing"
-	minimizedPrimitiveCases := filteredPrimitiveCases collect: #minimize.
-	"Test cases"
-	primitiveTestCase := RAPrimitiveAutoTest new.
-	"Baselines"
-	RAConcolicRunner
-		runAndMeasure: minimizedPrimitiveCases
-		with: primitiveTestCase
-		at: 'only_primitives.json'.
+	self
+		run: type
+		cases: (self minimizedCasesForType: type)
+		prefix: 'minimized'.
 
-	"Mutators"
-	mutators := self mutators.
+	self mutators do: [ :mutator |
+		self
+			mutatedCases: (self baseCasesForType: type)
+			mutator: mutator
+			prefix: type , '_base'.
+		self
+			mutatedCases: (self minimizedCasesForType: #type)
+			mutator: mutator
+			prefix: type , '_minimized'.
+		self
+			run: type
+			cases: (self
+					 mutatedCases: (self minimizedCasesForType: #type)
+					 mutator: mutator
+					 prefix: type , '_minimized')
+			prefix: mutator class name ]
+]
 
-	mutantDifferences := {
-		                     ('bytecodes' -> Dictionary new).
-		                     ('primitives' -> Dictionary new) } asDictionary.
-	(mutantDifferences at: 'bytecodes') at: 'Base' put: {
-			('cases' -> (minimizedBytecodeCases collect: [ :case |
-				  case solution path toString ])).
-			('count' -> minimizedBytecodeCases size) } asDictionary.
-	(mutantDifferences at: 'primitives') at: 'Base' put: {
-			('cases' -> (minimizedPrimitiveCases collect: [ :case |
-				  case solution path toString ])).
-			('count' -> minimizedPrimitiveCases size) } asDictionary.
+{ #category : 'accessing' }
+MutationsExperiment >> minimizedCasesForType: aType [
 
-	"Per each baseCases and per each mutator, we generate the report using only that mutator"
-	{
-		{
-			'bytecodes'.
-			bytecodeTestCase.
-			minimizedBytecodeCases.
-			filteredBytecodeCases }.
-		{
-			'primitives'.
-			primitiveTestCase.
-			minimizedPrimitiveCases.
-			filteredPrimitiveCases } } do: [ :cases |
-		mutators do: [ :mutator |
-			| mutantClass original_mutants_obj minimized_mutants_obj |
-			mutantClass := mutator class asString.
-			minimized_mutants := runner
-				                     mutateCases: (cases at: 3)
-				                     with: { mutator }.
-			original_mutants := runner
-				                    mutateCases: (cases at: 4)
-				                    with: { mutator }.
+	^ self
+		  execute: [
+			  ('Minimizing cases: ' , aType) traceCr.
+			  (self baseCasesForType: aType) collect: #minimize ]
+		  cached: 'filtered_minimised_cases_' , aType
+]
 
-			original_mutants_obj := {
-				                        ('size' -> original_mutants size).
-				                        ('path'
-				                         ->
-				                         (original_mutants collect: [ :case |
-					                          case solution path toString ])) }.
-			minimized_mutants_obj := {
-				                         ('size' -> minimized_mutants size).
-				                         ('path'
-				                          ->
-				                          (minimized_mutants collect: [ :case |
-					                           case solution path toString ])) }.
+{ #category : 'accessing' }
+MutationsExperiment >> mutatedCases: cases mutator: mutator prefix: prefix [
 
-			(mutantDifferences at: (cases at: 1)) at: mutantClass put: {
-					('original_mutants' -> original_mutants_obj asDictionary).
-					('minimized_mutants' -> minimized_mutants_obj asDictionary) }
-					asDictionary.
-			RAConcolicRunner
-				runAndMeasure: minimized_mutants
-				with: (cases at: 2)
-				at: (cases at: 1) , '_' , mutantClass , '.json' ] ].
-
-	"Make the file that shows the mutant differences between original and filtered cases sizes"
-	self class
-		makeFileWith: mutantDifferences
-		at: 'mutantDifferences.json'
+	
+	self
+		execute: [ 
+			('Mutating cases: ' , prefix , '-' , mutator class name) traceCr.
+			runner mutateCases: cases with: { mutator } ]
+		cached: prefix , '-' , mutator class name
 ]
 
 { #category : 'accessing' }
@@ -201,4 +184,36 @@ MutationsExperiment >> onlyPrimitivesWithAllMutations [
 	"Mutate with all mutators"
 	mutants := runner mutateCases: minimizedPrimitiveCases with: { self mutators }.
 	RAConcolicRunner runAndMeasure: minimizedPrimitiveCases, mutants with: RAPrimitiveAutoTest new at: 'onlyPrimitivesWithAllMutations.json'.
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> run: aType cases: cases [
+	"Test cases"
+
+	| case |
+	case := aType = #bytecodes
+		        ifTrue: [ RABytecodeAutoTest new ]
+		        ifFalse: [ RAPrimitiveAutoTest new ].
+	"Baselines"
+	RAConcolicRunner
+		runAndMeasure: cases
+		with: case
+		at: 'run_' , aType , '.json'
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> run: aType cases: cases prefix: prefix [
+	"Test cases"
+
+	| case |
+	('Running: ', prefix , ' ' , aType) traceCr.
+	
+	case := aType = #bytecodes
+		        ifTrue: [ RABytecodeAutoTest new ]
+		        ifFalse: [ RAPrimitiveAutoTest new ].
+	"Baselines"
+	RAConcolicRunner
+		runAndMeasure: cases
+		with: case
+		at: prefix , '_run_' , aType , '.json'
 ]
