@@ -10,6 +10,12 @@ Class {
 }
 
 { #category : 'accessing' }
+MutationsExperiment class >> bytecodesWithAllMutations [
+
+	self new bytecodesWithAllMutations
+]
+
+{ #category : 'accessing' }
 MutationsExperiment class >> main [
 
 	self new main
@@ -31,9 +37,24 @@ MutationsExperiment class >> makeFileWith: tempDict at: fileName [
 ]
 
 { #category : 'accessing' }
-MutationsExperiment class >> onlyPrimitivesWithAllMutations [
+MutationsExperiment class >> maximumReachableCoverage [
 
-	self new onlyPrimitivesWithAllMutations
+	self new maximumReachableCoverage
+]
+
+{ #category : 'accessing' }
+MutationsExperiment class >> primitivesWithAllMutations [
+
+	self new primitivesWithAllMutations
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> allPossibleCasesFor: type [
+	
+	| cases |
+	
+	cases := self minimizedCasesForType: type.
+	^ cases, (self mutators flatCollect: [ :mutator | self mutatedCases: cases mutator: mutator prefix: type , '_minimized' ]).
 ]
 
 { #category : 'accessing' }
@@ -46,6 +67,15 @@ MutationsExperiment >> baseCasesForType: aType [
 			  runner getReasonableCases:
 				  (runner perform: #casesForAll , aType capitalized) ]
 		  cached: aType, '_base_cases'
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> bytecodesWithAllMutations [
+	
+	| primitiveCases |
+	
+	primitiveCases := self allPossibleCasesFor: 'bytecodes'.
+	RAConcolicRunner runAndMeasure: primitiveCases with: RAPrimitiveAutoTest new at: 'bytecodesWithAllMutations.json'.
 ]
 
 { #category : 'accessing' }
@@ -126,6 +156,15 @@ MutationsExperiment >> main: type [
 ]
 
 { #category : 'accessing' }
+MutationsExperiment >> maximumReachableCoverage [
+	
+	| cases |
+	cases := #( bytecodes primitives ) flatCollect: [ :type | self allPossibleCasesFor: type ].	
+
+	RAConcolicRunner runAndMeasure: cases with: RAPrimitiveAutoTest new at: 'primitivesWithAllMutations.json'.
+]
+
+{ #category : 'accessing' }
 MutationsExperiment >> minimizedCasesForType: aType [
 
 	^ self
@@ -169,19 +208,13 @@ MutationsExperiment >> mutators [
 ]
 
 { #category : 'accessing' }
-MutationsExperiment >> onlyPrimitivesWithAllMutations [
+MutationsExperiment >> primitivesWithAllMutations [
 	
-	| primitiveCases filteredPrimitiveCases minimizedPrimitiveCases mutants |
+	| primitiveCases |
 	
-	primitiveCases := runner casesForAllPrimitives.
-	"Filtering"
-	filteredPrimitiveCases := runner getReasonableCases: primitiveCases.
-	"Minimizing"
-	minimizedPrimitiveCases := filteredPrimitiveCases collect: #minimize.
+	primitiveCases := self allPossibleCasesFor: 'primitives'.
 
-	"Mutate with all mutators"
-	mutants := runner mutateCases: minimizedPrimitiveCases with: self mutators.
-	RAConcolicRunner runAndMeasure: minimizedPrimitiveCases, mutants with: RAPrimitiveAutoTest new at: 'onlyPrimitivesWithAllMutations.json'.
+	RAConcolicRunner runAndMeasure: primitiveCases with: RAPrimitiveAutoTest new at: 'primitivesWithAllMutations.json'.
 ]
 
 { #category : 'accessing' }
