@@ -161,7 +161,7 @@ MutationsExperiment >> maximumReachableCoverage [
 	| cases |
 	cases := #( bytecodes primitives ) flatCollect: [ :type | self allPossibleCasesFor: type ].	
 
-	RAConcolicRunner runAndMeasure: cases with: RAPrimitiveAutoTest new at: 'primitivesWithAllMutations.json'.
+	RAConcolicRunner runAndMeasure: cases with: RAPrimitiveAutoTest new at: 'maximumReachableCoverage.json'.
 ]
 
 { #category : 'accessing' }
