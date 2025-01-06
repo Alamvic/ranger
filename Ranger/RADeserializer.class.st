@@ -9,7 +9,7 @@ Class {
 RADeserializer >> deserializeFile: aFileReference [
 
 	^ self deserializeJSONDictionary:
-		  (NeoJSONReader on: aFileReference readStream) next
+		  (NeoJSONReader on: aFileReference asFileReference readStream) next
 ]
 
 { #category : 'as yet unclassified' }
@@ -17,10 +17,10 @@ RADeserializer >> deserializeJSONDictionary: aDictionary [
 
 	| nodeDict result coveredNodes allMethods collector methodDict methodNames |
 	collector := CoverageCollector new.
-	methodDict := (aDictionary at: 'Backend') at: 'CogARMCompiler'.
+	methodDict := (aDictionary at: 'Backend') copyWithAll: (aDictionary at: 'Frontend').
+	methodNames := methodDict flatCollect: [ :m |
+		((m at: 'UncoveredMethods') copyWithAll: (m at: 'PartiallyCoveredMethods')) copyWithAll: (m at: 'TotalCoveredMethods')].
 
-	methodNames := (methodDict at: 'UncoveredMethods')
-	               , (methodDict at: 'PartiallyCoveredMethods').
 	allMethods := methodNames collect: [ :e |
 		              self methodForMethodName: e ].
 	collector methods: allMethods.
@@ -29,19 +29,19 @@ RADeserializer >> deserializeJSONDictionary: aDictionary [
 	result collector: collector.
 	nodeDict := aDictionary at: 'Node paths'.
 	result methods: (nodeDict keys
-			 collect: [ :e | self methodForMethodName: e ]
-			 thenSelect: [ :e | e methodClass = CogARMCompiler ]).
+			 collect: [ :e | self methodForMethodName: e ])
+			 "thenSelect: [ :e | e methodClass = CogARMCompiler ])".
 
 	coveredNodes := nodeDict keys flatCollect: [ :e |
 		                | method ast |
 		                method := self methodForMethodName: e.
 
-		                method methodClass = CogARMCompiler
+		                "method methodClass = CogARMCompiler
 			                ifTrue: [
-				                ast := method ast.
+				                "ast := method ast.
 				                (nodeDict at: e) collect: [ :coveredPath |
-					                ast childAtPath: coveredPath ] ]
-			                ifFalse: [ #(  ) ] ].
+					                ast childAtPath: coveredPath ] "]"
+			                "ifFalse: [ #(  ) ] "].
 	result nodes: coveredNodes.
 
 	^ result
@@ -65,10 +65,7 @@ RADeserializer >> diffNodesBetween: aFile and: anotherFile [
 { #category : 'as yet unclassified' }
 RADeserializer >> methodForMethodName: methodName [
 
-	| split |
-	split := methodName splitOn: '>>'.
-	^ (split first asClassInEnvironment: self class environment)
-	  >> split second allButFirst asSymbol
+	^ Object readFrom: methodName
 ]
 
 { #category : 'as yet unclassified' }
