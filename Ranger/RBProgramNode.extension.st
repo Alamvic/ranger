@@ -1,6 +1,14 @@
 Extension { #name : 'RBProgramNode' }
 
 { #category : '*Ranger' }
+RBProgramNode >> childAtPath: path [
+
+	path ifEmpty: [  ^ self ].
+	
+	^ (self children at: path first) childAtPath: path allButFirst
+]
+
+{ #category : '*Ranger' }
 RBProgramNode >> indexInParent [
 
 	^ self parent children indexOf: self
