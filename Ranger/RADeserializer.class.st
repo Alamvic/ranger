@@ -48,6 +48,21 @@ RADeserializer >> deserializeJSONDictionary: aDictionary [
 ]
 
 { #category : 'as yet unclassified' }
+RADeserializer >> diffNodesBetween: aFile and: anotherFile [
+
+	| file1 file2 additions deletions |
+	file1 := self deserializeFile: aFile.
+	file2 := self deserializeFile: anotherFile.
+
+	additions := file1 nodes difference: file2 nodes.
+	deletions := file2 nodes difference: file1 nodes.
+
+	^ {
+		  additions.
+		  deletions }
+]
+
+{ #category : 'as yet unclassified' }
 RADeserializer >> methodForMethodName: methodName [
 
 	| split |
