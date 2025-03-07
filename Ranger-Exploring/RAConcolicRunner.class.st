@@ -39,8 +39,7 @@ RAConcolicRunner class >> runAndMeasure: cases with: testCase at: fileName [
 		                  fails := RAConcolicRunner new
 			                           run: cases
 			                           with: testCase ].
-		
-	1 halt.
+
 	^ CompilerCoverageCollector
 		generateCompilerCoverage: coverageResult
 		withFails: fails
