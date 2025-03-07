@@ -31,6 +31,12 @@ RAObject class >> named: aName [
 ]
 
 { #category : 'testing' }
+RAObject >> * anOperand [
+
+	^ self integerValue * anOperand 
+]
+
+{ #category : 'testing' }
 RAObject >> = anotherVariable [
 
 	(anotherVariable isKindOf: self class)

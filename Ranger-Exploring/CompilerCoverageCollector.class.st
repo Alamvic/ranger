@@ -24,10 +24,11 @@ CompilerCoverageCollector class >> compilerBackendCoverage: result [
 { #category : 'as yet unclassified' }
 CompilerCoverageCollector class >> compilerCoverage: result [
 
-	| dict |
+	| dict coveredNodes |
+	coveredNodes := result nodes flatCollectAsSet: #allSequenceNodes.
 	dict := Dictionary new.
-	dict at: 'Covered nodes' put: (result nodes size).
-	dict at: 'Percentage of covered nodes' put: (result nodes size * 100) / result collector nodes size.
+	dict at: 'Covered nodes' put: coveredNodes size.
+	dict at: 'Percentage of covered nodes' put: (coveredNodes size * 100) / result collector nodes size.
 	dict at: 'Frontend' put: (self compilerFrontendCoverage: result).
 	dict at: 'Backend' put: (self compilerBackendCoverage: result).
 	dict at: 'Node paths' put: (self nodePathsFrom: result).
@@ -64,24 +65,34 @@ CompilerCoverageCollector class >> compilerMethods [
 { #category : 'as yet unclassified' }
 CompilerCoverageCollector class >> coveredMethod: result from: aClass [
 
-	| totalCoveredMethods unCoveredMethods partiallyCoveredMethods unCoveredPercentage partiallyPercentage |
+	| totalCoveredMethods unCoveredMethods partiallyCoveredMethods unCoveredPercentage partiallyPercentage classNodes coveredNodes |
+	unCoveredMethods := result uncoveredMethods select: [ :m |
+		                    m methodClass = aClass ].
+	partiallyCoveredMethods := result partiallyCoveredMethods select: [
+		                           :m | m methodClass = aClass ].
+
+	totalCoveredMethods := aClass methods difference:
+		                       unCoveredMethods , partiallyCoveredMethods asOrderedCollection .
+	unCoveredPercentage := (unCoveredMethods size / aClass methods size
+	                        * 100) asFloat.
+	partiallyPercentage := (partiallyCoveredMethods size
+	                        / aClass methods size * 100) asFloat.
 	
-	unCoveredMethods := result uncoveredMethods select: [ :m | m methodClass = aClass ].
-	partiallyCoveredMethods := result partiallyCoveredMethods select: [ :m | m methodClass = aClass ].
-
-	totalCoveredMethods := aClass methods difference: (unCoveredMethods , partiallyCoveredMethods).
-	unCoveredPercentage := ((unCoveredMethods size / aClass methods size) * 100) asFloat.
-	partiallyPercentage := ((partiallyCoveredMethods size / aClass methods size) * 100) asFloat.
-
+	classNodes := result nodes select: [ :node |
+				     node superParent compiledMethod methodClass == aClass ].
+	coveredNodes := classNodes flatCollectAsSet: #allSequenceNodes.
+	
 	^ (OrderedCollection newFromArray: {
-		'TotalCoveredPercentage' -> (100 - (unCoveredPercentage + partiallyPercentage)).
-		'UncoveredPercentage' -> unCoveredPercentage.
-		'PartiallyCoveredPercentage' -> partiallyPercentage.
-		
-		'TotalCoveredMethods' -> (totalCoveredMethods collect: #name).
-		'UncoveredMethods' -> (unCoveredMethods collect: #name).
-		'PartiallyCoveredMethods' -> (partiallyCoveredMethods collect: #name).
-	}) asDictionary.
+			   ('Covered nodes' -> coveredNodes size).
+			   ('TotalCoveredPercentage'
+			    -> (100 - (unCoveredPercentage + partiallyPercentage))).
+			   ('UncoveredPercentage' -> unCoveredPercentage).
+			   ('PartiallyCoveredPercentage' -> partiallyPercentage).
+
+			   ('TotalCoveredMethods' -> (totalCoveredMethods collect: #name)).
+			   ('UncoveredMethods' -> (unCoveredMethods collect: #name)).
+			   ('PartiallyCoveredMethods'
+			    -> (partiallyCoveredMethods collect: #name)) }) asDictionary
 ]
 
 { #category : 'as yet unclassified' }

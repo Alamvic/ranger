@@ -176,7 +176,7 @@ MutationsExperiment >> maximumReachableCoverageWithoutMutations [
 	| cases |
 	cases := #( bytecodes primitives ) flatCollect: [ :type | self minimizedCasesForType: type ].	
 
-	RAConcolicRunner runAndMeasure: cases with: RAPrimitiveAutoTest new at: 'maximumReachableCoverageWithoutMutations.json'.
+	^ RAConcolicRunner runAndMeasure: cases with: RAPrimitiveAutoTest new at: 'maximumReachableCoverageWithoutMutations.json'.
 ]
 
 { #category : 'accessing' }
@@ -204,6 +204,7 @@ MutationsExperiment >> mutatedCases: cases mutator: mutator prefix: prefix [
 MutationsExperiment >> mutators [
 
 	^ {
+			RAShiftableIntMutator new.
 		  (RASyntacticIsIntMutator new bounds: (OrderedCollection new
 				    add: 0;
 				    add: SmallInteger maxVal;
@@ -219,7 +220,8 @@ MutationsExperiment >> mutators [
 		  RASyntacticTypeObjectMutator new.
 		  RASyntacticVarGreaterThanIntroducingNewVarMutator new.
 		  RASyntacticIsNotIntNotEqualsRandomMutator new.
-		  RASyntacticBinaryArithOpWithRandomMutator new }
+		  RASyntacticBinaryArithOpWithRandomMutator new
+		}
 ]
 
 { #category : 'accessing' }
