@@ -56,12 +56,27 @@ MutationsExperiment class >> primitivesWithAllMutations [
 ]
 
 { #category : 'accessing' }
+MutationsExperiment class >> runBytecode: bytecode [
+
+	self new runBytecode: bytecode
+]
+
+{ #category : 'accessing' }
 MutationsExperiment >> allPossibleCasesFor: type [
 	
 	| cases |
 	
 	cases := self minimizedCasesForType: type.
 	^ cases, (self mutators flatCollect: [ :mutator | self mutatedCases: cases mutator: mutator prefix: type , '_minimized' ]).
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> allPossibleCasesFor: type number: num [
+	
+	| cases |
+	
+	cases := self minimizedCasesForType: type number: num.
+	^ cases, (self mutators flatCollect: [ :mutator | self mutatedCases: cases mutator: mutator prefix: type , num asString, '_minimized' ]).
 ]
 
 { #category : 'accessing' }
@@ -74,6 +89,18 @@ MutationsExperiment >> baseCasesForType: aType [
 			  runner getReasonableCases:
 				  (runner perform: #casesForAll , aType capitalized) ]
 		  cached: aType, '_base_cases'
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> baseCasesForType: aType number: num [
+	"Basic cases"
+
+	^ self
+		  execute: [
+			  ('Computing cases: ' , aType) traceCr.
+			  runner getReasonableCases:
+				  (runner perform: #casesFor, aType capitalized allButLast, ':' with: num) ]
+		  cached: aType, num asString, '_base_cases'
 ]
 
 { #category : 'accessing' }
@@ -207,6 +234,16 @@ MutationsExperiment >> minimizedCasesForType: aType [
 ]
 
 { #category : 'accessing' }
+MutationsExperiment >> minimizedCasesForType: aType number: num [
+
+	^ self
+		  execute: [
+			  ('Minimizing cases: ' , aType) traceCr.
+			  (self baseCasesForType: aType number: num) collect: #minimize ]
+		  cached: aType , num asString, '_filtered_minimised_cases'
+]
+
+{ #category : 'accessing' }
 MutationsExperiment >> mutatedCases: cases mutator: mutator prefix: prefix [
 
 	
@@ -266,4 +303,10 @@ MutationsExperiment >> run: aType cases: cases prefix: prefix [
 		runAndMeasure: cases
 		with: case
 		at: aType , '_', prefix , '_run' , '.json'
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> runBytecode: bytecode [
+	
+	^ RAConcolicRunner runAndMeasure: (self allPossibleCasesFor: #bytecodes number: bytecode) with: RAPrimitiveAutoTest new at: 'runBytecode', bytecode asString, '.json'.
 ]

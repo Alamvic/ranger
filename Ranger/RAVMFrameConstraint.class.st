@@ -138,48 +138,56 @@ RAVMFrameConstraint >> method: anObject [
 ]
 
 { #category : 'building' }
-RAVMFrameConstraint >> newFrameConstraintForSolution: aMzSolver constraintFactory: constraintFactory [ 
+RAVMFrameConstraint >> newFrameConstraintForSolution: aMzSolver constraintFactory: constraintFactory [
 
 	| newConstraints theOperandStackSize newMethod |
-
 	newConstraints := RAVMFrameConstraint new.
 	newConstraints receiver: constraintFactory newAbstractSmallInteger.
 
 	newMethod := constraintFactory newAbstractMethod.
 	newConstraints method: newMethod.
-	newMethod numSlots value: (aMzSolver at: method numSlots name ifAbsent: [ 0 ]).
-	
+	method ifNotNil: [
+		newMethod numSlots value:
+			(aMzSolver at: method numSlots name ifAbsent: [ 0 ]) ].
+
 	theOperandStackSize := aMzSolver
-		at: 'frame_operand_stack_size'
-		ifAbsent: [ 0 ].
+		                       at: 'frame_operand_stack_size'
+		                       ifAbsent: [ 0 ].
 	newConstraints operandStackSize value: theOperandStackSize.
 
-	theOperandStackSize to: 1 by: -1 "iterate the stack backwarsd"
-		do: [ :index | | constrainedObject oldConstrainedObject |
-			constrainedObject := constraintFactory newAbstractObject.
-			oldConstrainedObject := operandStack at: index ifAbsent: [ nil ].
-			oldConstrainedObject ifNotNil: [ | typeTag integerValue numSlots oldClassObject classObject format definedFixedFields |
-				"If there is an object in the previous frame at that position"
-				typeTag := aMzSolver at: oldConstrainedObject typeTag name ifAbsent: [ 0 ].
-				constrainedObject typeTag value: typeTag.
-				
-				integerValue := aMzSolver at: oldConstrainedObject integerValue name ifAbsent: [ 0 ].
-				constrainedObject integerValue value: integerValue.
-				
-				numSlots := aMzSolver at: oldConstrainedObject numSlots name ifAbsent: [ 0 ].
-				constrainedObject numSlots value: numSlots.
-				
-				oldClassObject := oldConstrainedObject classObject.
-				classObject := constrainedObject classObject.
-				
-				format := aMzSolver at: oldClassObject format name ifAbsent: [ 0 ].
-				classObject format value: format.
-				
-				definedFixedFields := aMzSolver at: oldClassObject definedFixedFields name ifAbsent: [ 0 ].
-				classObject definedFixedFields value: definedFixedFields.
-			].
-			newConstraints basicPush: constrainedObject
-	].
+	theOperandStackSize to: 1 by: -1 do: [ :index |
+		| constrainedObject oldConstrainedObject |
+		constrainedObject := constraintFactory newAbstractObject.
+		oldConstrainedObject := operandStack at: index ifAbsent: [ nil ].
+		oldConstrainedObject ifNotNil: [
+			| typeTag integerValue numSlots oldClassObject classObject format definedFixedFields |
+			"If there is an object in the previous frame at that position"
+			typeTag := aMzSolver
+				           at: oldConstrainedObject typeTag name
+				           ifAbsent: [ 0 ].
+			constrainedObject typeTag value: typeTag.
+
+			integerValue := aMzSolver
+				                at: oldConstrainedObject integerValue name
+				                ifAbsent: [ 0 ].
+			constrainedObject integerValue value: integerValue.
+
+			numSlots := aMzSolver
+				            at: oldConstrainedObject numSlots name
+				            ifAbsent: [ 0 ].
+			constrainedObject numSlots value: numSlots.
+
+			oldClassObject := oldConstrainedObject classObject.
+			classObject := constrainedObject classObject.
+
+			format := aMzSolver at: oldClassObject format name ifAbsent: [ 0 ].
+			classObject format value: format.
+
+			definedFixedFields := aMzSolver
+				                      at: oldClassObject definedFixedFields name
+				                      ifAbsent: [ 0 ].
+			classObject definedFixedFields value: definedFixedFields ].
+		newConstraints basicPush: constrainedObject ]. "iterate the stack backwarsd"
 	^ newConstraints
 ]
 
