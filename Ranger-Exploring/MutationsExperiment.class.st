@@ -2,7 +2,8 @@ Class {
 	#name : 'MutationsExperiment',
 	#superclass : 'Object',
 	#instVars : [
-		'runner'
+		'runner',
+		'cached'
 	],
 	#category : 'Ranger-Exploring-Runner',
 	#package : 'Ranger-Exploring',
@@ -85,6 +86,18 @@ MutationsExperiment >> bytecodesWithAllMutations [
 ]
 
 { #category : 'accessing' }
+MutationsExperiment >> cached [
+
+	^ cached 
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> cached: boolean [
+
+	cached := boolean 
+]
+
+{ #category : 'accessing' }
 MutationsExperiment >> casesFor: aType [
 	"aType: { bytecodes, primitives }"
 
@@ -100,6 +113,9 @@ MutationsExperiment >> execute: aBlock cached: aCacheName [
 	"aType: { bytecodes, primitives }"
 
 	| cachedFile result |
+	
+	cached ifFalse: [ ^ aBlock value ].
+	
 	cachedFile := aCacheName asFileReference, 'ston'.
 	cachedFile exists ifTrue: [
 		('Found cached file: ', cachedFile fullName) traceCr.
@@ -123,7 +139,8 @@ MutationsExperiment >> execute: aBlock cached: aCacheName [
 MutationsExperiment >> initialize [
 
 	super initialize.
-	runner := RAConcolicRunner new
+	runner := RAConcolicRunner new.
+	cached := true.
 ]
 
 { #category : 'accessing' }
