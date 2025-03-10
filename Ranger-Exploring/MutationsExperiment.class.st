@@ -81,7 +81,7 @@ MutationsExperiment >> bytecodesWithAllMutations [
 	| primitiveCases |
 	
 	primitiveCases := self allPossibleCasesFor: 'bytecodes'.
-	RAConcolicRunner runAndMeasure: primitiveCases with: RAPrimitiveAutoTest new at: 'bytecodesWithAllMutations.json'.
+	RAConcolicRunner runAndMeasure: primitiveCases with: RABytecodeAutoTest new at: 'bytecodesWithAllMutations.json'.
 ]
 
 { #category : 'accessing' }
