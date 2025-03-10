@@ -140,11 +140,14 @@ RAVMFrameConstraint >> method: anObject [
 { #category : 'building' }
 RAVMFrameConstraint >> newFrameConstraintForSolution: aMzSolver constraintFactory: constraintFactory [ 
 
-	| newConstraints theOperandStackSize |
+	| newConstraints theOperandStackSize newMethod |
 
 	newConstraints := RAVMFrameConstraint new.
 	newConstraints receiver: constraintFactory newAbstractSmallInteger.
-	newConstraints method: constraintFactory newAbstractMethod.
+
+	newMethod := constraintFactory newAbstractMethod.
+	newConstraints method: newMethod.
+	newMethod numSlots value: (aMzSolver at: method numSlots name ifAbsent: [ 0 ]).
 	
 	theOperandStackSize := aMzSolver
 		at: 'frame_operand_stack_size'
