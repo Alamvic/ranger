@@ -15,8 +15,14 @@ CompilerCoverageCollector class >> backendClasses [
 { #category : 'as yet unclassified' }
 CompilerCoverageCollector class >> compilerBackendCoverage: result [
 
+	^ self compilerBackendCoverage: result withSequence: true
+]
+
+{ #category : 'as yet unclassified' }
+CompilerCoverageCollector class >> compilerBackendCoverage: result withSequence: boolean [
+
 	^ self backendClasses inject: Dictionary new into: [ :dict :class |
-		dict at: (class name) put: (self coveredMethod: result from: class).
+		dict at: (class name) put: (self coveredMethod: result from: class withSequence: boolean).
 		dict
 	]
 ]
@@ -28,10 +34,33 @@ CompilerCoverageCollector class >> compilerCoverage: result [
 	coveredNodes := result nodes flatCollectAsSet: #allSequenceNodes.
 	dict := Dictionary new.
 	dict at: 'Covered nodes' put: coveredNodes size.
-	dict at: 'Percentage of covered nodes' put: (coveredNodes size * 100) / result collector nodes size.
+	result collector nodes ifNotNil: [
+		dict at: 'Percentage of covered nodes' put: (coveredNodes size * 100) / result collector nodes size
+	].
 	dict at: 'Frontend' put: (self compilerFrontendCoverage: result).
 	dict at: 'Backend' put: (self compilerBackendCoverage: result).
 	dict at: 'Node paths' put: (self nodePathsFrom: coveredNodes).
+	
+	^ dict
+]
+
+{ #category : 'as yet unclassified' }
+CompilerCoverageCollector class >> compilerCoverageDifference: result at: fileName [
+
+	 self writeDict: (self compilerFlatCoverage: result) at: fileName
+]
+
+{ #category : 'as yet unclassified' }
+CompilerCoverageCollector class >> compilerFlatCoverage: result [
+
+	| dict |
+	
+	dict := Dictionary new.
+	dict at: 'Difference covered nodes' put: result nodes size.
+	dict at: 'Node paths' put: (self nodePathsFrom: result nodes).
+	
+	dict at: 'Frontend' put: (self compilerFrontendCoverage: result withSequence: false).
+	dict at: 'Backend' put: (self compilerBackendCoverage: result withSequence: false).
 	
 	^ dict
 ]
@@ -41,6 +70,15 @@ CompilerCoverageCollector class >> compilerFrontendCoverage: result [
 
 	^ self frontendClasses inject: Dictionary new into: [ :dict :class |
 		dict at: (class name) put: (self coveredMethod: result from: class).
+		dict
+	]
+]
+
+{ #category : 'as yet unclassified' }
+CompilerCoverageCollector class >> compilerFrontendCoverage: result withSequence: boolean [
+
+	^ self frontendClasses inject: Dictionary new into: [ :dict :class |
+		dict at: (class name) put: (self coveredMethod: result from: class withSequence: boolean).
 		dict
 	]
 ]
@@ -65,6 +103,12 @@ CompilerCoverageCollector class >> compilerMethods [
 { #category : 'as yet unclassified' }
 CompilerCoverageCollector class >> coveredMethod: result from: aClass [
 
+	^ self coveredMethod: result from: aClass withSequence: true 
+]
+
+{ #category : 'as yet unclassified' }
+CompilerCoverageCollector class >> coveredMethod: result from: aClass withSequence: boolean [
+
 	| totalCoveredMethods unCoveredMethods partiallyCoveredMethods unCoveredPercentage partiallyPercentage classNodes coveredNodes |
 	unCoveredMethods := result uncoveredMethods select: [ :m |
 		                    m methodClass = aClass ].
@@ -81,7 +125,7 @@ CompilerCoverageCollector class >> coveredMethod: result from: aClass [
 
 	classNodes := result nodes select: [ :node |
 		              node superParent compiledMethod methodClass == aClass ].
-	coveredNodes := classNodes flatCollectAsSet: #allSequenceNodes.
+	coveredNodes := boolean ifTrue: [ classNodes flatCollectAsSet: #allSequenceNodes ] ifFalse: [ classNodes ].
 
 	^ (OrderedCollection newFromArray: {
 			   ('Covered nodes' -> coveredNodes size).
@@ -113,15 +157,7 @@ CompilerCoverageCollector class >> generateCompilerCoverage: result [
 { #category : 'as yet unclassified' }
 CompilerCoverageCollector class >> generateCompilerCoverage: result at: fileName [ 
 
-    | tempDict jsonString  writeStream |
-
-    tempDict := self compilerCoverage: result.
-
-    jsonString := NeoJSONWriter toStringPretty: tempDict.
-
-    writeStream := fileName asFileReference createFile writeStream.
-    writeStream nextPutAll: jsonString.
-    writeStream close
+	self writeDict: (self compilerCoverage: result) at: fileName
 ]
 
 { #category : 'as yet unclassified' }
@@ -158,6 +194,18 @@ CompilerCoverageCollector class >> nodePathsFrom: nodes [
 			  ifPresent: [ (dict at: methodName) add: path ]
 			  ifAbsentPut: [ OrderedCollection new add: path; yourself ].
 		  dict ]
+]
+
+{ #category : 'as yet unclassified' }
+CompilerCoverageCollector class >> writeDict: tempDict at: fileName [
+	
+	| jsonString writeStream |
+
+    jsonString := NeoJSONWriter toStringPretty: tempDict.
+
+    writeStream := fileName asFileReference createFile writeStream.
+    writeStream nextPutAll: jsonString.
+    writeStream close
 ]
 
 { #category : 'initialization' }

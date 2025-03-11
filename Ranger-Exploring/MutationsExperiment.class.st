@@ -145,13 +145,14 @@ MutationsExperiment >> casesFor: aType [
 MutationsExperiment >> difference: dict1 with: dict2 andSaveIn: fileName [
 
 	| differenceResult collectorResult collector |
-	differenceResult := dict2 associations inject: dict1 into: [ :dict :assc |
+	differenceResult := dict2 associations inject: dict1 deepCopy into: [ :dict :assc |
 		dict at: assc key ifPresent: [ | difference |
 			difference := ((dict at: assc key) difference: assc value).
 			difference ifEmpty: [ dict removeKey: assc key ] ifNotEmpty: [ dict at: assc key put: difference ]
 		].
 		dict.
 	].
+
 	collector := C2CoverageCollector new methods: CompilerCoverageCollector compilerMethods.
 	differenceResult associations do: [ :assc | | method |
 		method := Object readFrom: assc key.
@@ -160,8 +161,7 @@ MutationsExperiment >> difference: dict1 with: dict2 andSaveIn: fileName [
 	collectorResult := collector result collectResult: collector.
 	
 	^ CompilerCoverageCollector
-		generateCompilerCoverage: collectorResult
-		withFails: {}
+		compilerCoverageDifference: collectorResult
 		at: fileName
 	
 ]
@@ -295,15 +295,15 @@ MutationsExperiment >> mutatedCases: cases mutator: mutator prefix: prefix [
 MutationsExperiment >> mutators [
 
 	^ {
-"		  (RASyntacticIsIntMutator new bounds: (OrderedCollection new
+		  (RASyntacticIsIntMutator new bounds: (OrderedCollection new
 				    add: 0;
 				    add: SmallInteger maxVal;
 				    add: SmallInteger minVal;
 				    add: SmallInteger maxVal / 2;
 				    add: SmallInteger minVal / 2;
-				    yourself))."
+				    yourself)).
 		  RAShiftableIntMutator new.
-"		  RASyntacticCommutativeOperationMutator new.
+		  RASyntacticCommutativeOperationMutator new.
 		  RASyntacticIsNotIntNotEqualsRandomMutator new.
 		  RASyntacticBinaryArithOpWithRandomMutator new.
 		  RASyntacticVarGreaterThanMutator new.
@@ -311,7 +311,7 @@ MutationsExperiment >> mutators [
 		  RASyntacticNLessThanVarMutator new.
 		  RASyntacticVarGreaterOrEqualsThanVarMutator new.
 		  RASyntacticTypeObjectMutator new.
-		  RASyntacticVarGreaterThanIntroducingNewVarMutator new"
+		  RASyntacticVarGreaterThanIntroducingNewVarMutator new
 		}
 ]
 
@@ -360,7 +360,21 @@ MutationsExperiment >> segmentedMutationExperiment [
 " Base report is given from
   primitives.json, bytecodes.json and primitivesAndBytecodes.json
 "
-	| primitiveCases bytecodeCases basePrimitivesNodePaths baseBytecodesNodePaths primitivesAndBytecodesNodePaths |
+	| primitiveCases bytecodeCases basePrimitivesNodePaths baseBytecodesNodePaths primitivesAndBytecodesNodePaths mutators |
+	
+	mutators := {
+		  (RASyntacticIsIntMutator new bounds: (OrderedCollection new
+				    add: 0;
+				    add: SmallInteger maxVal;
+				    add: SmallInteger minVal;
+				    add: SmallInteger maxVal / 2;
+				    add: SmallInteger minVal / 2;
+				    yourself)).
+		  RAShiftableIntMutator new.
+		  RASyntacticCommutativeOperationMutator new.
+		  RASyntacticIsNotIntNotEqualsRandomMutator new.
+		  RASyntacticVarGreaterThanMutator new.
+		}.
 	
 	basePrimitivesNodePaths := self nodePathsOf: (self jsonFrom: 'primitives.json').
 	baseBytecodesNodePaths :=  self nodePathsOf: (self jsonFrom: 'bytecodes.json').
@@ -369,21 +383,21 @@ MutationsExperiment >> segmentedMutationExperiment [
 	primitiveCases := self minimizedCasesForType: #primitives.
 	bytecodeCases := self minimizedCasesForType: #bytecodes.
 	
-	self mutators do: [ :mutator | | mutatedPrimitives primitivesResult mutatedBytecodes bytecodesResult unionNodePaths primitivesNodePaths bytecodesNodePaths |
+	mutators do: [ :mutator | | mutatedPrimitives primitivesResult mutatedBytecodes bytecodesResult unionNodePaths primitivesNodePaths bytecodesNodePaths |
 		mutatedPrimitives := self mutatedCases: primitiveCases mutator: mutator prefix: 'primitives_minimized'.
 		mutatedBytecodes := self mutatedCases: bytecodeCases mutator: mutator prefix: 'bytecodes_minimized'.
+		
 		primitivesResult := RAConcolicRunner runAndMeasure: mutatedPrimitives with: RAPrimitiveAutoTest new at: mutator className, '_primitives.json'.
 		bytecodesResult := RAConcolicRunner runAndMeasure: mutatedBytecodes with: RABytecodeAutoTest new at: mutator className, '_bytecodes.json'.
 		
 		primitivesNodePaths := self nodePathsOf: primitivesResult.
 		bytecodesNodePaths := self nodePathsOf: bytecodesResult.
-		
 		unionNodePaths := self unionOfNodePaths: primitivesNodePaths with: bytecodesNodePaths.
 		
 		"Calculate the difference and save it in a file"
-		self difference: primitivesNodePaths with: basePrimitivesNodePaths andSaveIn: mutator className, '_difference_primitives_mutated'.
-		self difference: bytecodesNodePaths with: baseBytecodesNodePaths andSaveIn: mutator className, '_difference_bytecodes_mutated'.
-		self difference: unionNodePaths with: primitivesAndBytecodesNodePaths andSaveIn: mutator className, '_difference_union_mutated'.
+		self difference: primitivesNodePaths with: basePrimitivesNodePaths andSaveIn: mutator className, '_difference_primitives_mutated.json'.
+		self difference: bytecodesNodePaths with: baseBytecodesNodePaths andSaveIn: mutator className, '_difference_bytecodes_mutated.json'.
+		self difference: unionNodePaths with: primitivesAndBytecodesNodePaths andSaveIn: mutator className, '_difference_union_mutated.json'.
 	]
 
 ]
@@ -391,7 +405,7 @@ MutationsExperiment >> segmentedMutationExperiment [
 { #category : 'accessing' }
 MutationsExperiment >> unionOfNodePaths: dict1 with: dict2 [
 	
-	^ dict2 associations inject: dict1 into: [ :dict :assc |
+	^ dict2 associations inject: dict1 deepCopy into: [ :dict :assc |
 		dict
 			  at: assc key
 			  ifPresent: [
