@@ -144,7 +144,7 @@ MutationsExperiment >> casesFor: aType [
 { #category : 'accessing' }
 MutationsExperiment >> difference: dict1 with: dict2 andSaveIn: fileName [
 
-	| differenceResult collectorResult nodes collector |
+	| differenceResult collectorResult collector |
 	differenceResult := dict2 associations inject: dict1 into: [ :dict :assc |
 		dict at: assc key ifPresent: [ | difference |
 			difference := ((dict at: assc key) difference: assc value).
@@ -152,14 +152,15 @@ MutationsExperiment >> difference: dict1 with: dict2 andSaveIn: fileName [
 		].
 		dict.
 	].
-	collector := C2CoverageCollector new methods: CompilerCoverageCollector.
+	collector := C2CoverageCollector new methods: CompilerCoverageCollector compilerMethods.
 	differenceResult associations do: [ :assc | | method |
 		method := Object readFrom: assc key.
 		assc value do: [ :path | collector coverNode: path inMethod: method name ]
 	].
 	collectorResult := collector result collectResult: collector.
+	
 	^ CompilerCoverageCollector
-		generateCompilerCoverage: differenceResult
+		generateCompilerCoverage: collectorResult
 		withFails: {}
 		at: fileName
 	
