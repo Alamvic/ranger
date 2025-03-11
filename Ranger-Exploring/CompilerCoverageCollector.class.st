@@ -31,7 +31,7 @@ CompilerCoverageCollector class >> compilerCoverage: result [
 	dict at: 'Percentage of covered nodes' put: (coveredNodes size * 100) / result collector nodes size.
 	dict at: 'Frontend' put: (self compilerFrontendCoverage: result).
 	dict at: 'Backend' put: (self compilerBackendCoverage: result).
-	dict at: 'Node paths' put: (self nodePathsFrom: result).
+	dict at: 'Node paths' put: (self nodePathsFrom: coveredNodes).
 	
 	^ dict
 ]
@@ -136,7 +136,8 @@ CompilerCoverageCollector class >> generateCompilerCoverage: result withFails: f
 
 	writeStream := fileName asFileReference createFile writeStream.
 	writeStream nextPutAll: jsonString.
-	writeStream close
+	writeStream close.
+	^ tempDict
 ]
 
 { #category : 'as yet unclassified' }
@@ -146,9 +147,9 @@ CompilerCoverageCollector class >> measure: block [
 ]
 
 { #category : 'as yet unclassified' }
-CompilerCoverageCollector class >> nodePathsFrom: result [
+CompilerCoverageCollector class >> nodePathsFrom: nodes [
 
-	^ result nodes inject: Dictionary new into: [ :dict :node |
+	^ nodes inject: Dictionary new into: [ :dict :node |
 		  | methodName path |
 		  methodName := node methodNode compiledMethod name.
 		  path := node path.

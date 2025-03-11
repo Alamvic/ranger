@@ -85,6 +85,12 @@ C2CoverageCollector >> collectResult [
 ]
 
 { #category : 'basic' }
+C2CoverageCollector >> coverNode: aNodePath inMethod: aMethodName [
+
+	result coverNode: aNodePath inMethod: aMethodName
+]
+
+{ #category : 'basic' }
 C2CoverageCollector >> edges [
 	^ edges
 ]
@@ -248,6 +254,11 @@ C2CoverageCollector >> remapMethods [
 C2CoverageCollector >> resetResult [
 
 	result := C2IncrementalResult new
+]
+
+{ #category : 'basic' }
+C2CoverageCollector >> result [
+	^ result
 ]
 
 { #category : 'basic' }

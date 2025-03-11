@@ -13,7 +13,6 @@ C2IncrementalResult >> collectResult: collector [
 
 	| nodes |
 	nodes := (coveredNodes collect: [ :tuple | self resolveNode: tuple ]).
-
 	^ C2CoverageResult new
 		  collector: collector;
 		  nodes: nodes;
