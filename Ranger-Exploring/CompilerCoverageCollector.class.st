@@ -15,7 +15,7 @@ CompilerCoverageCollector class >> backendClasses [
 { #category : 'as yet unclassified' }
 CompilerCoverageCollector class >> compilerBackendCoverage: result [
 
-	^ self compilerBackendCoverage: result withSequence: true
+	^ self compilerBackendCoverage: result withSequence: false
 ]
 
 { #category : 'as yet unclassified' }
@@ -31,7 +31,7 @@ CompilerCoverageCollector class >> compilerBackendCoverage: result withSequence:
 CompilerCoverageCollector class >> compilerCoverage: result [
 
 	| dict coveredNodes |
-	coveredNodes := result nodes flatCollectAsSet: #allSequenceNodes.
+	coveredNodes := result nodes "flatCollectAsSet: #allSequenceNodes". "<- Tenemos un bug acá? "
 	dict := Dictionary new.
 	dict at: 'Covered nodes' put: coveredNodes size.
 	result collector nodes ifNotNil: [
@@ -68,10 +68,7 @@ CompilerCoverageCollector class >> compilerFlatCoverage: result [
 { #category : 'as yet unclassified' }
 CompilerCoverageCollector class >> compilerFrontendCoverage: result [
 
-	^ self frontendClasses inject: Dictionary new into: [ :dict :class |
-		dict at: (class name) put: (self coveredMethod: result from: class).
-		dict
-	]
+	^ self compilerFrontendCoverage: result withSequence: false
 ]
 
 { #category : 'as yet unclassified' }

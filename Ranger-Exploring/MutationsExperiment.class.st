@@ -110,6 +110,12 @@ MutationsExperiment >> baseCasesForType: aType number: num [
 ]
 
 { #category : 'accessing' }
+MutationsExperiment >> bytecodes [
+
+	^ RAConcolicRunner runAndMeasure: (self minimizedCasesForType: #bytecodes) with: RAPrimitiveAutoTest new at: 'bytecodes.json'.
+]
+
+{ #category : 'accessing' }
 MutationsExperiment >> bytecodesWithAllMutations [
 	
 	| primitiveCases |
@@ -257,7 +263,7 @@ MutationsExperiment >> maximumReachableCoverageWithoutMutations [
 	| cases |
 	cases := #( bytecodes primitives ) flatCollect: [ :type | self minimizedCasesForType: type ].	
 
-	^ RAConcolicRunner runAndMeasure: cases with: RAPrimitiveAutoTest new at: 'maximumReachableCoverageWithoutMutations.json'.
+	^ RAConcolicRunner runAndMeasure: cases with: RAPrimitiveAutoTest new at: 'primitivesAndBytecodes.json'.
 ]
 
 { #category : 'accessing' }
@@ -322,6 +328,21 @@ MutationsExperiment >> nodePathsOf: result [
 ]
 
 { #category : 'accessing' }
+MutationsExperiment >> primitives [
+
+	^ RAConcolicRunner runAndMeasure: (self minimizedCasesForType: #primitives) with: RAPrimitiveAutoTest new at: 'primitives.json'.
+]
+
+{ #category : 'accessing' }
+MutationsExperiment >> primitivesAndBytecodes [
+	
+	| cases |
+	cases := #( bytecodes primitives ) flatCollect: [ :type | self minimizedCasesForType: type ].	
+
+	^ RAConcolicRunner runAndMeasure: cases with: RAPrimitiveAutoTest new at: 'primitivesAndBytecodes.json'.
+]
+
+{ #category : 'accessing' }
 MutationsExperiment >> primitivesWithAllMutations [
 	
 	| primitiveCases |
@@ -357,9 +378,6 @@ MutationsExperiment >> runBytecode: bytecode [
 { #category : 'accessing' }
 MutationsExperiment >> segmentedMutationExperiment [
 
-" Base report is given from
-  primitives.json, bytecodes.json and primitivesAndBytecodes.json
-"
 	| primitiveCases bytecodeCases basePrimitivesNodePaths baseBytecodesNodePaths primitivesAndBytecodesNodePaths mutators |
 	
 	mutators := {
@@ -372,9 +390,19 @@ MutationsExperiment >> segmentedMutationExperiment [
 				    yourself)).
 		  RAShiftableIntMutator new.
 		  RASyntacticCommutativeOperationMutator new.
+		  RASyntacticBinaryArithOpWithRandomMutator new.
 		  RASyntacticIsNotIntNotEqualsRandomMutator new.
 		  RASyntacticVarGreaterThanMutator new.
+		  RASyntacticVarLessThanMutator new.
+		  RASyntacticNLessThanVarMutator new.
+		  RASyntacticVarGreaterOrEqualsThanVarMutator new.
+		  RASyntacticTypeObjectMutator new.
+		  RASyntacticVarGreaterThanIntroducingNewVarMutator new
 		}.
+	"Generate the primitives, bytecodes and the union"
+	self primitives.
+	self bytecodes.
+	self primitivesAndBytecodes.
 	
 	basePrimitivesNodePaths := self nodePathsOf: (self jsonFrom: 'primitives.json').
 	baseBytecodesNodePaths :=  self nodePathsOf: (self jsonFrom: 'bytecodes.json').
@@ -383,12 +411,12 @@ MutationsExperiment >> segmentedMutationExperiment [
 	primitiveCases := self minimizedCasesForType: #primitives.
 	bytecodeCases := self minimizedCasesForType: #bytecodes.
 	
-	mutators do: [ :mutator | | mutatedPrimitives primitivesResult mutatedBytecodes bytecodesResult unionNodePaths primitivesNodePaths bytecodesNodePaths |
-		mutatedPrimitives := self mutatedCases: primitiveCases mutator: mutator prefix: 'primitives_minimized'.
-		mutatedBytecodes := self mutatedCases: bytecodeCases mutator: mutator prefix: 'bytecodes_minimized'.
+	mutators do: [ :mutator | | mutatedPrimitivesCases primitivesResult mutatedBytecodesCases bytecodesResult unionNodePaths primitivesNodePaths bytecodesNodePaths |
+		mutatedPrimitivesCases := self mutatedCases: primitiveCases mutator: mutator prefix: 'primitives_minimized'.
+		mutatedBytecodesCases := self mutatedCases: bytecodeCases mutator: mutator prefix: 'bytecodes_minimized'.
 		
-		primitivesResult := RAConcolicRunner runAndMeasure: mutatedPrimitives with: RAPrimitiveAutoTest new at: mutator className, '_primitives.json'.
-		bytecodesResult := RAConcolicRunner runAndMeasure: mutatedBytecodes with: RABytecodeAutoTest new at: mutator className, '_bytecodes.json'.
+		primitivesResult := RAConcolicRunner runAndMeasure: mutatedPrimitivesCases with: RAPrimitiveAutoTest new at: mutator className, '_primitives.json'.
+		bytecodesResult := RAConcolicRunner runAndMeasure: mutatedBytecodesCases with: RABytecodeAutoTest new at: mutator className, '_bytecodes.json'.
 		
 		primitivesNodePaths := self nodePathsOf: primitivesResult.
 		bytecodesNodePaths := self nodePathsOf: bytecodesResult.
