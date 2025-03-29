@@ -39,3 +39,18 @@ RANotEqualsConstraint >> negated [
 
 	^ RAEqualsConstraint operands: self operands
 ]
+
+{ #category : 'accessing' }
+RANotEqualsConstraint >> operator [
+	
+	^ '≠'
+]
+
+{ #category : 'accessing' }
+RANotEqualsConstraint >> removeRedundances [
+	
+	operands := operands collect: #removeRedundances.
+	operands first = operands second ifTrue: [ 1 halt. ^ RAFalse new ].
+	
+	^ self
+]

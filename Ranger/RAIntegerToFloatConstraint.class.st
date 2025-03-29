@@ -1,6 +1,6 @@
 Class {
 	#name : 'RAIntegerToFloatConstraint',
-	#superclass : 'RAValueConstraint',
+	#superclass : 'VMConstraint',
 	#category : 'Ranger-VMSpecificConstraints',
 	#package : 'Ranger',
 	#tag : 'VMSpecificConstraints'
@@ -34,4 +34,10 @@ RAIntegerToFloatConstraint >> mutate: mutator [
 RAIntegerToFloatConstraint >> mzConstraintOnInterpreter: aCogVMSimulatorLSB [ 
 	
 	^ self
+]
+
+{ #category : 'printing' }
+RAIntegerToFloatConstraint >> operator [ 
+
+	^ 'IntToFloat'
 ]

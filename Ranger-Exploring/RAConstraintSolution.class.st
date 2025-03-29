@@ -8,8 +8,9 @@ Class {
 		'outputConstraints',
 		'timeToExplore'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Exploring',
+	#package : 'Ranger-Exploring',
+	#tag : 'Exploring'
 }
 
 { #category : 'validating' }
@@ -74,6 +75,16 @@ RAConstraintSolution >> isInvalidIn: aTest [
 ]
 
 { #category : 'accessing' }
+RAConstraintSolution >> minimize [
+	
+	path ifNotNil: [ ^ self copy path: path minimize ].
+	
+	^ self copy
+	
+	
+]
+
+{ #category : 'accessing' }
 RAConstraintSolution >> outputConstraints [
 
 	^ outputConstraints
@@ -119,6 +130,12 @@ RAConstraintSolution >> result [
 	^ self exitCondition result
 ]
 
+{ #category : 'as yet unclassified' }
+RAConstraintSolution >> solutionLabel [
+
+	^ 'Solution'
+]
+
 { #category : 'accessing' }
 RAConstraintSolution >> solver [
 
@@ -141,4 +158,12 @@ RAConstraintSolution >> timeToExplore [
 RAConstraintSolution >> timeToExplore: anObject [
 
 	timeToExplore := anObject
+]
+
+{ #category : 'printing' }
+RAConstraintSolution >> toString [
+	
+	^ self solutionLabel, ': ',
+		Character lf asString, Character tab asString ,
+		path toString
 ]

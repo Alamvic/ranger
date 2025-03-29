@@ -59,6 +59,35 @@ RAConstraint >> = anotherConstraint [
 	^ self operands = anotherConstraint operands
 ]
 
+{ #category : 'accessing' }
+RAConstraint >> deMorgan [
+	"Negations are not supported for the moment"
+	"De Morgan's laws:
+		- ~(A & B) is (~A v ~B)
+		- ~(A v B) is (~A & ~B)
+	"
+	^ self
+]
+
+{ #category : 'accessing' }
+RAConstraint >> distributeDisjunctions [
+	"Distribute disjunction (v) over conjunction (^):
+        - A v (B ^ C) is (A v B) ^ (A v C)
+	"
+	^ self
+]
+
+{ #category : 'printing' }
+RAConstraint >> fndConjunctionOperands [
+	^ { self }
+]
+
+{ #category : 'testing' }
+RAConstraint >> isAnd [
+
+	^ false
+]
+
 { #category : 'testing' }
 RAConstraint >> isConstant [
 	
@@ -102,6 +131,12 @@ RAConstraint >> operands: anObject [
 ]
 
 { #category : 'accessing' }
+RAConstraint >> operator [
+	
+	self subclassResponsibility 
+]
+
+{ #category : 'accessing' }
 RAConstraint >> origin: aStackTrace [
 
 ]
@@ -137,10 +172,74 @@ RAConstraint >> printOn: aStream [
 	
 ]
 
+{ #category : 'accessing' }
+RAConstraint >> removeDoubleNegation [
+	"Negations are not supported for the moment"
+	"Replace double negations:
+		- ~~A is A
+	"
+	^ self
+]
+
+{ #category : 'accessing' }
+RAConstraint >> removeImplications [
+	"Implications and equivalences are not supported for the moment"
+	"Replace implications: 
+		- (A -> B) is (~A v B)
+	"
+	^ self
+]
+
+{ #category : 'accessing' }
+RAConstraint >> removeRedundances [
+	"We manage redundances of the form:
+		- A v A is A
+		- A ^ A is A
+		- ...
+	"
+	^ self
+]
+
+{ #category : 'printing' }
+RAConstraint >> sanitize [
+
+	operands := operands collect: [ :operand |
+		operand class = SmallInteger
+			ifTrue: [ RAConstant new value: operand ]
+			ifFalse: [ operand sanitize  ]
+	].
+
+	^  self
+]
+
+{ #category : 'testing' }
+RAConstraint >> sanitizeOperands [
+	
+	operands withIndexDo: [ :element :index |
+		element class = SmallInteger ifTrue: [ operands at: index put: (RAConstant new value: element) ].
+	]
+]
+
 { #category : 'as yet unclassified' }
 RAConstraint >> simplify [
 
 	^ self
+]
+
+{ #category : 'accessing' }
+RAConstraint >> toCNF [
+	"Step 1 - Remove implications and equivalences"
+	"Step 2 - Apply De Morgan to push negations to literals" 
+	"Step 3 - Remove double negations"
+	"Step 4 - Distribute disjunctions"
+	"Step 5 - Remove redundances"
+	^ self removeImplications deMorgan removeDoubleNegation distributeDisjunctions sanitize removeRedundances
+]
+
+{ #category : 'printing' }
+RAConstraint >> toString [
+
+	^ '(' , operands first toString , ' ' , self operator , ' ' , operands second toString , ')' 
 ]
 
 { #category : 'testing' }

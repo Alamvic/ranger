@@ -7,8 +7,9 @@ Class {
 		'inputs',
 		'exitCondition'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Exploring',
+	#package : 'Ranger-Exploring',
+	#tag : 'Exploring'
 }
 
 { #category : 'copying' }
@@ -76,6 +77,22 @@ RAPath >> isFailure [
 	^ exitCondition isFailure
 ]
 
+{ #category : 'accessing' }
+RAPath >> minimize [
+	"First iteration of minimization"
+	| minimizedConstraints |
+	minimizedConstraints := (pathConstraints inject: Set new into: [ :set :constraint |
+		constraint ifNotNil: [
+			constraint toCNF fndConjunctionOperands do: [ :operand |
+				operand class = RATrue ifFalse: [ set add: operand ].
+			]
+		].
+		set
+	]) asArray.
+
+	^ self copy pathConstraints: minimizedConstraints
+]
+
 { #category : 'negating' }
 RAPath >> negateLastSegmentInCommonWith: aParent [ 
 	
@@ -139,15 +156,31 @@ RAPath >> solveWithInterpreter: interpreter [
 
 	| solver |
 	solver := MzSolver new.
-	pathConstraints do: [ :constraint | 
-		solver addConstraint: (constraint mzConstraintOnInterpreter: interpreter).
-	].
 
+	[
+	pathConstraints do: [ :constraint |
+		solver addConstraint:
+			(constraint mzConstraintOnInterpreter: interpreter) ].
 	solver timeout: 2 seconds.
-	solver satisfy.
+	solver satisfy ]
+		on: Error , Exception
+		do: [ :e |
+			RAErrorSolution new
+				path: self;
+				error: e;
+				yourself ].
 
 	^ RAConstraintSolution new
 		  path: self;
 		  solver: solver;
 		  yourself
+]
+
+{ #category : 'printing' }
+RAPath >> toString [
+	
+	| separator |
+	"To improve, this is the first iteration to see easily path patterns"
+	separator := ';', Character lf asString, Character tab asString.
+	^ ((pathConstraints select: #isNotNil) collect: [ :constraint | constraint toString ]) joinUsing: separator
 ]

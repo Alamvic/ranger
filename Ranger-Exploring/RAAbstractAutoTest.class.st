@@ -6,8 +6,9 @@ Class {
 		'objectBuilder',
 		'sendTrampolineStop'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Tests',
+	#package : 'Ranger-Exploring',
+	#tag : 'Tests'
 }
 
 { #category : 'building' }
@@ -38,6 +39,7 @@ RAAbstractAutoTest >> createSpecialSelectorArray [
 
 { #category : 'testing' }
 RAAbstractAutoTest >> instanceVariablesToKeep [
+
 	^ super instanceVariablesToKeep, #( solution )
 ]
 
@@ -53,6 +55,12 @@ RAAbstractAutoTest >> isInvalidMemoryAccessInvalid [
 	^ self subclassResponsibility
 ]
 
+{ #category : 'accessing' }
+RAAbstractAutoTest >> objectBuilder [
+
+	^ objectBuilder
+]
+
 { #category : 'running' }
 RAAbstractAutoTest >> receiverTags [
 
@@ -66,12 +74,20 @@ RAAbstractAutoTest >> runCaseManaged [
 ]
 
 { #category : 'running' }
-RAAbstractAutoTest >> setUp [
+RAAbstractAutoTest >> sendTrampolineStop [
 
-	super setUp.
+	^ sendTrampolineStop
+]
+
+{ #category : 'running' }
+RAAbstractAutoTest >> setUp: aCase [
+
+	environmentBuilder doBuildSimulator.
+	self jitCompilerClass initializeWithOptions: (Cogit asOptionsDictionary: self jitOptions).
+	self setUpMachineCodeSimulator.
 	
-	solution checkSupported.
-	(solution isInvalidIn: self) ifTrue: [ ^ self ].
+	aCase solution checkSupported.
+	(aCase solution isInvalidIn: aCase ) ifTrue: [ ^ self ].
 	
 	cogit maybeGenerateCheckFeatures.
 	self installFloatClass.
@@ -82,13 +98,13 @@ RAAbstractAutoTest >> setUp [
 			 instSpec: (memory byteFormatForNumBytes: 0)).
 
 
-	cogit receiverTags: self receiverTags.
-	cogit methodOrBlockNumArgs: solution inputConstraints arguments size.
+	cogit receiverTags: aCase receiverTags.
+	cogit methodOrBlockNumArgs: aCase solution inputConstraints arguments size.
 	
 	self jitCompilerClass = SimpleStackBasedCogit ifFalse:[
 		"Assume single bytecode set for the tests"
 		cogit bytecodeSetOffset: 0. 
-		cogit methodOrBlockNumTemps: solution inputConstraints locals size + solution inputConstraints arguments size.
+		cogit methodOrBlockNumTemps: aCase solution inputConstraints locals size + aCase solution inputConstraints arguments size.
 		cogit initSimStackForFramefulMethod: 0.
 		cogit regArgsHaveBeenPushed: false ].
 	

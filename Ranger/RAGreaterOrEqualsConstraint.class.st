@@ -39,3 +39,18 @@ RAGreaterOrEqualsConstraint >> negated [
 
 	^ RALessConstraint operands: self operands
 ]
+
+{ #category : 'accessing' }
+RAGreaterOrEqualsConstraint >> operator [
+	
+	^ '>='
+]
+
+{ #category : 'evaluating' }
+RAGreaterOrEqualsConstraint >> removeRedundances [
+	
+	operands := operands collect: #removeRedundances.
+	operands first = operands second ifTrue: [ ^ RATrue new ].
+	
+	^ self
+]

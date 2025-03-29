@@ -14,8 +14,9 @@ Class {
 		'constraintFactory',
 		'mutator'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Exploring',
+	#package : 'Ranger-Exploring',
+	#tag : 'Exploring'
 }
 
 { #category : 'accessing' }
@@ -26,31 +27,30 @@ RAPathExplorer >> constraintFactory [
 
 { #category : 'api' }
 RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
-
+	
 	| currentPath solution previousInputFrameConstraints exploredPath inputFrame |
+	
 	selector := aConcolicCase selector.
-
+	
 	currentPath := RAPath new.
 	solution := RAConstraintSolution new solver: #initial.
-
+	
 	previousInputFrameConstraints := RAVMFrameConstraint new
 		newFrameConstraintForSolution: MzSolver new
 		constraintFactory: constraintFactory.
 
 	[ | timeToExplore |
-	timeToExplore := [| objectBuilder |
+	timeToExplore := [ | objectBuilder |
 	vm := aBuildingBlock value.
-	objectBuilder := RAObjectBuilder new
-		                 interpreter: vm;
-		                 nextIndex: 100;
-		                 yourself.
+
+	objectBuilder := RAObjectBuilder new interpreter: vm; nextIndex: 100; yourself.
+
 	aConcolicCase initializeVM: vm.
 
 	inputFrame := previousInputFrameConstraints
 		              instantiateWith: objectBuilder
 		              constraintBuilder: constraintFactory.
-		
-	exploredPath := self
+	exploredPath := self "This generate the solution too, not only get the explored Path"
 		                explorePathWithFrame: inputFrame
 		                solver: solution solver.
 
@@ -59,9 +59,6 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	Continue by negating the going to the next path.
 	Can this loop?"
 	currentPath := (exploredPath ifNil: [ currentPath nextPath ]) veryDeepCopy.
-	
-	"We mutate the current path to avoid deterministic exploration"
-	currentPath := self mutate: currentPath.
 
 	"Negate and solve constraints!"
 	solution := self solve: currentPath.
@@ -72,6 +69,22 @@ RAPathExplorer >> explore: aConcolicCase vmBuildingBlock: aBuildingBlock [
 	solutions last timeToExplore: timeToExplore.
 	solution isEmpty ] whileFalse.
 	^ solutions
+]
+
+{ #category : 'api' }
+RAPathExplorer >> exploreAndMutate: aConcolicCase vmBuildingBlock: aBuildingBlock [
+	
+	| interpreter |
+	
+	interpreter := aBuildingBlock value.
+
+	^((self explore: aConcolicCase vmBuildingBlock: aBuildingBlock) inject: OrderedCollection new writeStream into: [
+		:stream :solution |
+			stream nextPutAll: { solution };
+			nextPutAll: (self solutionMutations: solution);
+			yourself
+	]) contents
+
 ]
 
 { #category : 'api' }
@@ -98,9 +111,8 @@ RAPathExplorer >> explorePathWithFrame: inputFrame solver: solver [
 			self recordSolution: (RAErrorSolution new
 					 inputConstraints: inputFrame frameConstraints;
 					 outputConstraints: outputFrame frameConstraints;
-					 vm: vm;
 					 selector: selector;
-					 error: e freeze;
+					 error: e signalerContext shortDebugStack;
 					 yourself) ].
 	^ explorer path
 ]
@@ -125,25 +137,31 @@ RAPathExplorer >> initialize [
 	executionStack := OrderedCollection new.
 	solutions := OrderedCollection new.
 	constraintFactory := RAConstraintFactory new.
-	mutator := IdleMutator new
 ]
 
 { #category : 'as yet unclassified' }
-RAPathExplorer >> mutate: aPath [
+RAPathExplorer >> mutator [
 
-	^ mutator mutate: aPath 
+	^ mutator 
 ]
 
-{ #category : 'accessing' }
+{ #category : 'as yet unclassified' }
 RAPathExplorer >> mutator: aMutator [
 
-	mutator := aMutator
+	mutator := aMutator 
 ]
 
 { #category : 'solving' }
 RAPathExplorer >> recordSolution: aSolution [
 
 	solutions add: aSolution
+]
+
+{ #category : 'as yet unclassified' }
+RAPathExplorer >> solutionMutations: solution [
+
+	^ mutator mutateSolution: solution from: vm
+
 ]
 
 { #category : 'solving' }
@@ -167,9 +185,8 @@ RAPathExplorer >> solve: aRAPath [
 			Then retry with the next one"
 			self recordSolution: (RAErrorSolution new
 					 path: nextPath;
-					 vm: vm;
 					 selector: selector;
-					 error: e freeze;
+					 error: e signalerContext shortDebugStack;
 					 yourself).
 
 			^ self solve: (aRAPath copyWithNumberOfSegments: ktry - 1) ].

@@ -1,6 +1,6 @@
 Class {
 	#name : 'RAFloatObjectOf',
-	#superclass : 'RAValueConstraint',
+	#superclass : 'VMConstraint',
 	#category : 'Ranger-VMSpecificConstraints',
 	#package : 'Ranger',
 	#tag : 'VMSpecificConstraints'
@@ -10,4 +10,10 @@ Class {
 RAFloatObjectOf >> mutate: mutator [
 
 	^ mutator mutateIsFloatObjectOfConstraint: self
+]
+
+{ #category : 'printing' }
+RAFloatObjectOf >> operator [ 
+
+	^ 'FloatObjOf'
 ]

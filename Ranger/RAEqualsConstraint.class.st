@@ -28,6 +28,9 @@ RAEqualsConstraint >> mutate: mutator [
 RAEqualsConstraint >> mzConstraintOnInterpreter: interpreter [ 
 
 	| leftOperand rightOperand |
+	
+	self sanitizeOperands. "TODO: REVIEW THIS"
+
 	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
 	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
 
@@ -38,4 +41,19 @@ RAEqualsConstraint >> mzConstraintOnInterpreter: interpreter [
 RAEqualsConstraint >> negated [
 
 	^ RANotEqualsConstraint operands: self operands
+]
+
+{ #category : 'accessing' }
+RAEqualsConstraint >> operator [
+
+	^ '='
+]
+
+{ #category : 'accessing' }
+RAEqualsConstraint >> removeRedundances [
+	
+	operands := operands collect: #removeRedundances.
+	operands first = operands second ifTrue: [ ^ RATrue new ].
+	
+	^ self
 ]

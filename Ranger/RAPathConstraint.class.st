@@ -11,3 +11,11 @@ RAPathConstraint >> evaluateWith: anObjectBuilder [
 	
 	self subclassResponsibility
 ]
+
+{ #category : 'evaluating' }
+RAPathConstraint >> removeRedundances [
+	
+	operands := operands collect: #removeRedundances.
+	
+	^ self
+]

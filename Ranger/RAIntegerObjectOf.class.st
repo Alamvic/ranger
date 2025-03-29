@@ -1,6 +1,6 @@
 Class {
 	#name : 'RAIntegerObjectOf',
-	#superclass : 'RAValueConstraint',
+	#superclass : 'VMConstraint',
 	#category : 'Ranger-VMSpecificConstraints',
 	#package : 'Ranger',
 	#tag : 'VMSpecificConstraints'
@@ -28,4 +28,10 @@ RAIntegerObjectOf >> isIntegerObjectOf [
 RAIntegerObjectOf >> mutate: mutator [
 
 	^ mutator mutateIsIntegerObjectOfConstraint: self
+]
+
+{ #category : 'printing' }
+RAIntegerObjectOf >> operator [ 
+
+	^ 'IntObjOf'
 ]

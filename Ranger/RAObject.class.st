@@ -38,6 +38,16 @@ RAObject >> = anotherVariable [
 	^ variableName = anotherVariable variableName
 ]
 
+{ #category : 'testing' }
+RAObject >> asVariable [
+
+	^ MzVariable new
+		name: variableName;
+		value: typeTag;
+		type: '-100000..100000';
+		value: integerValue
+]
+
 { #category : 'accessing' }
 RAObject >> classIndex [
 
@@ -108,6 +118,13 @@ RAObject >> floatValue: aValue [
 RAObject >> format [
 
 	^ classObject format
+]
+
+{ #category : 'testing' }
+RAObject >> greaterThan: anotherVariable [
+
+	^ self asVariable greaterThan: anotherVariable
+	
 ]
 
 { #category : 'accessing' }
@@ -273,6 +290,13 @@ RAObject >> isVariable [
 	^ true
 ]
 
+{ #category : 'testing' }
+RAObject >> lessOrEquals: anOperand [
+
+	"TODO: I have no idea why I am doing this here, It never shouldn't be entering here"
+	^ self asVariable lessOrEquals: anOperand  
+]
+
 { #category : 'accessing' }
 RAObject >> long32Slots [
 
@@ -295,6 +319,13 @@ RAObject >> mzConstraintOnInterpreter: interpreter [
 RAObject >> name [
 	
 	^ variableName
+]
+
+{ #category : 'testing' }
+RAObject >> notEquals: anOperand [
+
+	"TODO: I have no idea why I am doing this here, It never shouldn't be entering here"
+	^ anOperand notEquals: self asVariable
 ]
 
 { #category : 'accessing' }
@@ -322,6 +353,18 @@ RAObject >> printOn: aStream [
 	aStream nextPut: $(.
 	aStream print: variableName.
 	aStream nextPut: $).
+]
+
+{ #category : 'accessing' }
+RAObject >> removeRedundances [
+
+	^ self
+]
+
+{ #category : 'accessing' }
+RAObject >> sanitize [
+
+	^ self
 ]
 
 { #category : 'accessing' }
@@ -364,6 +407,12 @@ RAObject >> specialSelectorIndex [
 RAObject >> specialSelectorIndex: anIndex [
 
 	specialSelectorIndex := anIndex
+]
+
+{ #category : 'printing' }
+RAObject >> toString [
+
+	^ 'Object(' , variableName , ')'
 ]
 
 { #category : 'accessing' }

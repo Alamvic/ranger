@@ -20,7 +20,6 @@ RATest >> explorePrimitive: aPrimitiveName [
 	| explorer |
 	explorer := RAPathExplorer new.
 	explorer failOnError: true.
-	explorer mutator: LessIntConstraintMutator new.
 
 	^ explorer
 		  explore: (RAPrimitiveConcolicCase new

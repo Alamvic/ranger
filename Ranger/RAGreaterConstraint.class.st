@@ -39,3 +39,18 @@ RAGreaterConstraint >> negated [
 	
 	^ RALessOrEqualsConstraint operands: self operands
 ]
+
+{ #category : 'accessing' }
+RAGreaterConstraint >> operator [
+	
+	^ '>'
+]
+
+{ #category : 'microzinc' }
+RAGreaterConstraint >> removeRedundances [
+	
+	operands := operands collect: #removeRedundances.
+	operands first = operands second ifTrue: [ ^ RAFalse new ].
+	
+	^ self
+]

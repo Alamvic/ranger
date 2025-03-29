@@ -30,7 +30,6 @@ RALessOrEqualsConstraint >> mzConstraintOnInterpreter: interpreter [
 	| leftOperand rightOperand |
 	leftOperand := operands first mzConstraintOnInterpreter: interpreter.
 	rightOperand := operands second mzConstraintOnInterpreter: interpreter.
-
 	^ leftOperand lessOrEquals: rightOperand
 ]
 
@@ -38,4 +37,19 @@ RALessOrEqualsConstraint >> mzConstraintOnInterpreter: interpreter [
 RALessOrEqualsConstraint >> negated [
 	
 	^ RAGreaterConstraint operands: self operands
+]
+
+{ #category : 'accessing' }
+RALessOrEqualsConstraint >> operator [
+	
+	^ '<='
+]
+
+{ #category : 'evaluating' }
+RALessOrEqualsConstraint >> removeRedundances [
+	
+	operands := operands collect: #removeRedundances.
+	operands first = operands second ifTrue: [ ^ RATrue new ].
+	
+	^ self
 ]

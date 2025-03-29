@@ -18,3 +18,9 @@ RAValueConstraint >> isIntegerObjectOf [
 	
 	^ false
 ]
+
+{ #category : 'printing' }
+RAValueConstraint >> operator [
+
+	self subclassResponsibility 
+]

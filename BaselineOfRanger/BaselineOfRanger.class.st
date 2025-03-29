@@ -1,16 +1,22 @@
 Class {
-	#name : #BaselineOfRanger,
-	#superclass : #BaselineOf,
-	#category : #BaselineOfRanger
+	#name : 'BaselineOfRanger',
+	#superclass : 'BaselineOf',
+	#category : 'BaselineOfRanger',
+	#package : 'BaselineOfRanger'
 }
 
-{ #category : #baselines }
+{ #category : 'baselines' }
 BaselineOfRanger >> baseline: spec [
 
 	<baseline>
 	spec for: #common do: [
 		spec
+			baseline: 'VMMaker'
+			with: [ spec repository: 'github://evref-inria/pharo-vm:ranger2' ].
+		spec
 			baseline: 'Minizinc'
 			with: [ spec repository: 'github://tesonep/pharo-minizinc:main' ].
-		spec package: 'Ranger' with: [ spec requires: #( 'Minizinc' ) ] ]
+		spec baseline: 'NeoJSON' with: [ spec repository: 'github://svenvc/NeoJSON/repository' ].
+		spec package: 'Ranger' with: [ spec requires: #( 'Minizinc' ) ].
+		spec package: 'Ranger-Exploring' with: [ spec requires: #( 'Ranger' ) ] ]
 ]

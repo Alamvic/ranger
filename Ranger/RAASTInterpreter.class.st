@@ -234,20 +234,32 @@ RAASTInterpreter >> visitLiteralValueNode: aRBLiteralValueNode [
 { #category : 'visiting' }
 RAASTInterpreter >> visitMessageNode: aRBMessageNode [
 
-	(#(flag: assert:) includes: aRBMessageNode selector) ifTrue: [ 
-		"If this is an assert or flag, ignore it.
+	aRBMessageNode selector = #halt ifTrue: [
+		self halt.
+		self pushOperand: nil.
+		^ self
+		].
+
+	(#( flag: assert: ) includes: aRBMessageNode selector) ifTrue: [ "If this is an assert or flag, ignore it.
 		Make sure it is a stament, otherwise its value is used???"
 		self assert: aRBMessageNode parent isSequence.
 		self pushOperand: nil.
-		^ self ].
+		^ self
+		].
 
 	"Resolve it as a normal send"
-	specialCases at: aRBMessageNode selector ifPresent: [ :mapping | 
+	specialCases at: aRBMessageNode selector ifPresent: [ :mapping |
 		^ self perform: mapping withArguments: { aRBMessageNode } ].
-	
+
 	"Stop here if we are going far too low level..."
-	(#(storePointer:ofObject:withValue: rawNumSlotsOf: byteAt: byteAt:put: shortAt: shortAt:put: longAt: longAt:put: long32At: long32At:put: long64At: long64At:put: unsignedLongAt: unsignedLongAt:put:) includes: aRBMessageNode selector)
-		ifTrue: [ self halt. ^ self pushOperand: { 0 . nil } ].
+	(#( storePointer:ofObject:withValue: rawNumSlotsOf: byteAt: byteAt:put:
+	    shortAt: shortAt:put: longAt: longAt:put: long32At: long32At:put:
+	    long64At: long64At:put: unsignedLongAt: unsignedLongAt:put: )
+		 includes: aRBMessageNode selector) ifTrue: [
+		self halt.
+		^ self pushOperand: { 0. nil }
+		].
+	self haltIf: [ aRBMessageNode selector = #/ ].
 	^ self doBasicMessageSend: aRBMessageNode
 ]
 

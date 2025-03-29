@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'value'
 	],
-	#category : 'Ranger-Exploring',
-	#package : 'Ranger-Exploring'
+	#category : 'Ranger-Exploring-Exploring',
+	#package : 'Ranger-Exploring',
+	#tag : 'Exploring'
 }
 
 { #category : 'instance creation' }
@@ -25,6 +26,12 @@ RAConstant >> = anotherConstant [
 	^ value = anotherConstant value
 ]
 
+{ #category : 'accessing' }
+RAConstant >> distributeDisjunctions [
+
+	^ self
+]
+
 { #category : 'evaluating' }
 RAConstant >> evaluate [
 	
@@ -35,6 +42,12 @@ RAConstant >> evaluate [
 RAConstant >> evaluateWith: anObjectBuilder [
 	
 	^ self value
+]
+
+{ #category : 'accessing' }
+RAConstant >> isAnd [
+	
+	^ false
 ]
 
 { #category : 'testing' }
@@ -81,6 +94,24 @@ RAConstant >> printOn: aStream [
 	aStream nextPut: $(.
 	aStream print: value.
 	aStream nextPut: $).
+]
+
+{ #category : 'removing' }
+RAConstant >> removeRedundances [
+
+	^ self
+]
+
+{ #category : 'accessing' }
+RAConstant >> sanitize [
+
+	^ self 
+]
+
+{ #category : 'accessing' }
+RAConstant >> toString [
+	
+	^ value asString 
 ]
 
 { #category : 'accessing' }
